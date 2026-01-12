@@ -32,9 +32,12 @@
   <header id="header" class="fixed-top">
     <div class="container d-flex align-items-center">
       
-      <h1 class="logo mr-auto"><a href="{{ url_for('home') }}">PhishDetector</a></h1>
-      <!-- Uncomment below if you prefer to use an image logo -->
-      <a href="{{ url_for('home') }}" class="logo mr-auto"><img src="static/assets/img/newlogo.jpg" alt="" class="img-fluid"></a>
+      <div class="logo mr-auto d-flex align-items-center">
+        <a href="{{ url_for('home') }}" class="d-flex align-items-center">
+          <img src="static/assets/img/newlogo.jpg" alt="PhishDetector Logo" class="img-fluid mr-2" style="max-height: 40px; border-radius: 8px;">
+          <span class="logo-text">PhishDetector</span>
+        </a>
+      </div>
 
       <nav class="nav-menu d-none d-lg-block">
         <ul>
@@ -69,50 +72,46 @@
 
   <!-- ======= Hero Section ======= -->
   <section id="hero" class="d-flex align-items-center">
+    <div class="container" data-aos="fade-up">
+      <div class="row gy-4">
+        <div class="col-lg-6 d-flex flex-column justify-content-center order-2 order-lg-1">
+          <h1 class="main-heading">PhishDetector: AI-Powered Protection</h1>
+          <p class="sub-heading">Safeguard your digital presence with real-time website scanning. Our advanced algorithms detect phishing threats before they strike.</p>
+          
+          <div class="hero-actions mt-4">
+            <form action="/result" method="POST" class="scan-form">
+              <div class="input-group">
+                <input type="url" name="name" class="form-control" placeholder="Paste URL here (https://...)" required>
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-primary">Scan Website</button>
+                </div>
+              </div>
+            </form>
 
-    <div class="container d-flex flex-column align-items-center justify-content-center" data-aos="fade-up">
-      <h1>FAKE WEBSITE DETECTION</h1>
-            <form action="/result" method="POST" role="form" class="form">
-        <div class="row no-gutters">
-          <div class="col-md-6 form-group pr-md-1">
-              <input type="url" name="name" class="form-control" id="name" placeholder="Enter a URL link in format http or https" required>
+            <div class="scan-result mt-4">
+              {% if name %}
+              <div class="result-card p-4 rounded shadow-lg">
+                <p class="url-text mb-2 text-muted">Scanning: <span>{{name[0]}}</span></p>
+                <h3 class="{% if name[3] %}text-success{% else %}text-danger{% endif %} fw-bold mb-3">
+                  This website is {{name[1]}}
+                </h3>
+                <div class="d-flex gap-3">
+                  {% if name[3] %}
+                  <button class="btn btn-success px-4 py-2" onclick="window.open('{{name[0]}}')" target="_blank">Proceed Safely</button>
+                  {% else %}
+                  <button class="btn btn-danger px-4 py-2" onclick="window.open('{{name[0]}}')" target="_blank">View Anyway (Risk)</button>
+                  {% endif %}
+                </div>
+              </div>
+              {% endif %}
+            </div>
           </div>
         </div>
-        <div class="text-center"><button type="submit">Scan URL</button></div>
-        <p>
-          {% if name %}
-          <b><p>{{name[0]}}</p></b>
-          <h2 style="color:blue;">Website is {{name[1]}} to use</h2><br>
-            {% if name[3] %}
-            <button class="button1" onclick="window.open('{{name[0]}}')" target="_blank" >{{name[2]}}</button><br>
-            {% else %}
-            <button class="button2" onclick="window.open('{{name[0]}}')" target="_blank" >{{name[2]}}</button><br>
-            {% endif %}
-          {% endif %}
-      </p>
-      </form> 
-      <img src="static\assets\img\Phishing.gif" class="img-fluid hero-img" alt="" data-aos="zoom-in" data-aos-delay="150"><br><br><br>
+        <div class="col-lg-6 order-1 order-lg-2 hero-img-container" data-aos="zoom-in" data-aos-delay="200">
+          <img src="static/assets/img/Phishing.gif" class="img-fluid animated" alt="Cyber Security Protection">
+        </div>
+      </div>
     </div>
-    <script>
-        
-            /*let x = '{{xx}}';
-            let num = x*100;
-            if (0<=x && x<0.50){
-                num = 100-num;
-            }
-            let txtx = num.toString();
-            if(x<=1 && x>=0.50){
-                var label = "Website is "+txtx +"% safe to use...";
-                document.getElementById("prediction").innerHTML = label;
-                document.getElementById("button1").style.display="block";
-            }
-            else if (0<=x && x<0.50){
-                var label = "Website is "+txtx +"% unsafe to use..."
-                document.getElementById("prediction").innerHTML = label ;
-                document.getElementById("button2").style.display="block";
-            }*/
-        
-    </script>
   </section><!-- End Hero -->
 
      <!-- ======= Frequently Asked Questions Section ======= -->
