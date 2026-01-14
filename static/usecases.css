@@ -1,0 +1,119 @@
+/*--------------------------------------------------------------
+# Usecases Section
+--------------------------------------------------------------*/
+.usecases {
+  padding: 80px 0;
+  background-color: #f9f9ff;
+}
+
+.usecases .section-title h2 {
+  color: #2d405f;
+}
+
+.usecases .section-title p {
+  color: #5a7194;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+}
+
+.usecase-card {
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+  padding: 30px;
+  margin-bottom: 30px;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border: 1px solid #eef0f2;
+  height: 100%;
+}
+
+.usecase-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.usecase-card .usecase-icon {
+  font-size: 48px;
+  color: #3b4ef8;
+  margin-bottom: 20px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.usecase-card:hover .usecase-icon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.usecase-card h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2d405f;
+  margin-bottom: 15px;
+}
+
+.usecase-card p {
+  font-size: 16px;
+  color: #5a7194;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.usecase-card .read-more {
+  color: #3b4ef8;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.usecase-card .read-more i {
+  margin-left: 5px;
+  font-size: 16px;
+  transition: margin-left 0.3s ease;
+}
+
+.usecase-card .read-more:hover {
+  color: #2539f7;
+}
+
+.usecase-card .read-more:hover i {
+  margin-left: 10px;
+}
+
+.usecase-card .tags {
+  margin-top: 20px;
+}
+
+.usecase-card .tags .badge {
+  background-color: #e2e5fe;
+  color: #3b4ef8;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  display: inline-block;
+  font-size: 12px;
+}
+
+/* Responsive Styles */
+@media (max-width: 991px) {
+  .usecases {
+    padding: 60px 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .usecases .section-title h2 {
+    font-size: 28px;
+  }
+  
+  .usecase-card {
+    padding: 20px;
+  }
+
+  .usecase-card h3 {
+    font-size: 20px;
+  }
+}
