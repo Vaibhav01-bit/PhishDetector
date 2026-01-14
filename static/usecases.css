@@ -1,119 +1,230 @@
 /*--------------------------------------------------------------
-# Usecases Section
+# Usecases Section (Premium Static)
 --------------------------------------------------------------*/
-.usecases {
-  padding: 80px 0;
-  background-color: #f9f9ff;
-}
-
-.usecases .section-title h2 {
-  color: #2d405f;
-}
-
-.usecases .section-title p {
-  color: #5a7194;
-  max-width: 800px;
-  margin: 0 auto 30px auto;
-}
-
-.usecase-card {
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
-  padding: 30px;
-  margin-bottom: 30px;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  border: 1px solid #eef0f2;
+html,
+body {
   height: 100%;
 }
 
-.usecase-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+body {
+  /* Subtle premium gradient background since animation is removed */
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background-attachment: fixed;
+  font-family: var(--font-body);
+  color: var(--color-text-dark);
 }
 
-.usecase-card .usecase-icon {
-  font-size: 48px;
-  color: #3b4ef8;
-  margin-bottom: 20px;
-  display: inline-block;
-  transition: transform 0.3s ease;
+.usecases {
+  padding: 80px 0;
 }
 
-.usecase-card:hover .usecase-icon {
-  transform: scale(1.1) rotate(-5deg);
+/* Headings */
+h2 {
+  color: var(--color-text-dark) !important;
+  font-family: var(--font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em;
 }
 
-.usecase-card h3 {
-  font-size: 22px;
-  font-weight: 700;
-  color: #2d405f;
-  margin-bottom: 15px;
-}
-
-.usecase-card p {
-  font-size: 16px;
-  color: #5a7194;
-  line-height: 1.7;
-  margin-bottom: 20px;
-}
-
-.usecase-card .read-more {
-  color: #3b4ef8;
-  font-weight: 600;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  transition: all 0.3s ease;
-}
-
-.usecase-card .read-more i {
-  margin-left: 5px;
-  font-size: 16px;
-  transition: margin-left 0.3s ease;
-}
-
-.usecase-card .read-more:hover {
-  color: #2539f7;
-}
-
-.usecase-card .read-more:hover i {
-  margin-left: 10px;
-}
-
-.usecase-card .tags {
-  margin-top: 20px;
-}
-
-.usecase-card .tags .badge {
-  background-color: #e2e5fe;
-  color: #3b4ef8;
-  font-weight: 500;
-  padding: 5px 12px;
+/* Glass Effect Mixin */
+.premium-glass {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
   border-radius: 20px;
-  margin-right: 5px;
-  margin-bottom: 5px;
-  display: inline-block;
-  font-size: 12px;
 }
 
-/* Responsive Styles */
-@media (max-width: 991px) {
-  .usecases {
-    padding: 60px 0;
-  }
+/* FAQ / Scenarios Styles */
+.faq .faq-list ul {
+  padding: 0;
+  list-style: none;
 }
 
-@media (max-width: 767px) {
-  .usecases .section-title h2 {
-    font-size: 28px;
+.faq .faq-list li {
+  padding: 30px;
+  /* More breathing room */
+  margin-bottom: 24px;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Apply premium glass to list items */
+.faq .faq-list li {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+}
+
+.faq .faq-list li:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.85);
+  /* Slightly lighter on hover */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border-color: #fff;
+}
+
+.faq .faq-list a {
+  display: block;
+  position: relative;
+  font-family: var(--font-heading);
+  font-size: 19px;
+  /* Slightly larger */
+  line-height: 28px;
+  font-weight: 600;
+  padding: 0 30px;
+  outline: none;
+  cursor: pointer;
+  color: var(--color-text-dark);
+  text-decoration: none;
+}
+
+.faq .faq-list .icon-help {
+  font-size: 24px;
+  position: absolute;
+  right: 0;
+  left: 20px;
+  color: var(--color-primary);
+  top: 2px;
+}
+
+.faq .faq-list .icon-show,
+.faq .faq-list .icon-close {
+  font-size: 24px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.faq .faq-list p {
+  padding-top: 15px;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  /* Better readability */
+  font-size: 16px;
+}
+
+/* Testimonials / Visual Examples */
+.testimonial-item {
+  margin: 10px 15px;
+  padding: 25px;
+
+  /* Glass Style */
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: all 0.4s ease;
+}
+
+.testimonial-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Iframe / Image wrapper styling */
+.testimonial-item iframe {
+  width: 100%;
+  border-radius: 12px;
+  border: none;
+  /* Cleaner look */
+  background: #fff;
+  height: 320px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  /* Inner shadow for depth */
+}
+
+/* Description Text */
+.testimonial-item p {
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.testimonial-item b {
+  color: var(--color-text-dark);
+  font-weight: 600;
+}
+
+/* Fix for specific Description sizing inline override */
+/* Fix for specific Description sizing inline override */
+.testimonial-item p[style*="font-size: 12px"] {
+  font-size: 14px !important;
+  /* Override inline style for readability */
+}
+
+/* --------------------------------------------------------------
+# Mobile Optimization
+-------------------------------------------------------------- */
+@media (max-width: 768px) {
+
+  /* FAQ List */
+  .faq .faq-list a {
+    font-size: 17px;
+    padding-right: 20px;
+    /* Decrease side padding */
+    padding-left: 10px;
+    line-height: 1.4;
   }
-  
-  .usecase-card {
+
+  .faq .faq-list .icon-help {
+    font-size: 20px;
+    left: 10px;
+    top: 4px;
+    display: none;
+    /* Hide icon on small screens to save space if needed, or adjust */
+  }
+
+  .faq .faq-list a {
+    padding-left: 0;
+    /* Remove padding reserved for icon if icon is hidden/moved */
+  }
+
+  .faq .faq-list li {
     padding: 20px;
   }
 
-  .usecase-card h3 {
-    font-size: 20px;
+  .faq .faq-list p {
+    font-size: 15px;
+  }
+
+  /* Testimonials / Cards */
+  .testimonial-item {
+    margin: 15px 0;
+    /* Full width spacing */
+    padding: 24px 20px;
+  }
+
+  .testimonial-item iframe,
+  .testimonial-item img {
+    height: 220px;
+    /* Reduce image height on mobile */
+  }
+
+  /* Disable complicated hover 3D effects on touch to prevent getting stuck */
+  .testimonial-item:hover {
+    transform: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    /* keep simple shadow */
+  }
+
+  .testimonial-item:hover img,
+  .testimonial-item:hover iframe {
+    transform: none;
+  }
+
+  .testimonials .container {
+    perspective: none;
+    /* Flatten 3D space for performance/usability */
   }
 }
