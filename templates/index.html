@@ -116,6 +116,60 @@
                     Anyway (Risk)</button>
                   {% endif %}
                 </div>
+
+                {% if details %}
+                <div class="layer-breakdown mt-4 text-left">
+                  <h5 class="border-bottom pb-2">5-Layer Security Analysis</h5>
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <div>
+                        <strong>Layer 1: Blacklist Check</strong><br>
+                        <small class="text-muted">{{ details.layers.layer1.message }}</small>
+                      </div>
+                      <span
+                        class="badge badge-{% if details.layers.layer1.status == 'Safe' %}success{% elif details.layers.layer1.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
+                        details.layers.layer1.status }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <div>
+                        <strong>Layer 2: Domain Analysis</strong><br>
+                        <small class="text-muted">{{ details.layers.layer2.message }}</small>
+                      </div>
+                      <span
+                        class="badge badge-{% if details.layers.layer2.status == 'Safe' %}success{% elif details.layers.layer2.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
+                        details.layers.layer2.status }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <div>
+                        <strong>Layer 3: SSL Certificate</strong><br>
+                        <small class="text-muted">{{ details.layers.layer3.message }}</small>
+                      </div>
+                      <span
+                        class="badge badge-{% if details.layers.layer3.status == 'Safe' %}success{% elif details.layers.layer3.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
+                        details.layers.layer3.status }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <div>
+                        <strong>Layer 4: AI/ML Model</strong><br>
+                        <small class="text-muted">{{ details.layers.layer4.message }}</small>
+                      </div>
+                      <span
+                        class="badge badge-{% if details.layers.layer4.status == 'Safe' %}success{% elif details.layers.layer4.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
+                        details.layers.layer4.status }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <div>
+                        <strong>Layer 5: Behavioral Analysis</strong><br>
+                        <small class="text-muted">{{ details.layers.layer5.message }}</small>
+                      </div>
+                      <span
+                        class="badge badge-{% if details.layers.layer5.status == 'Safe' %}success{% elif details.layers.layer5.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
+                        details.layers.layer5.status }}</span>
+                    </li>
+                  </ul>
+                </div>
+                {% endif %}
+
               </div>
               {% endif %}
             </div>

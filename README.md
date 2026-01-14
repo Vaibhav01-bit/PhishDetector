@@ -4,8 +4,42 @@
 
 ![image1](https://github.com/asrith-reddy/Phishing-detector/assets/76733972/fe706a06-84fe-493f-abb8-34d3fbc594b5)
 
-## Objective
+## System Architecture: 5-Layer Phishing Detection
+The project has been upgraded to a robust, real-world security pipeline consisting of 5 sequential layers:
 
+```mermaid
+graph TD
+    Input[User Enters URL] --> L1{Layer 1: Blacklist Check}
+    L1 -- Match Found --> Phishing[Classified as PHISHING]
+    L1 -- No Match --> L2{Layer 2: Domain Analysis}
+    L2 -- Suspicious Features --> Warning[Add Warning Score]
+    L2 -- Clean --> L3{Layer 3: SSL Validation}
+    
+    L3 -- Invalid Cert --> Phishing
+    L3 -- No HTTPS --> Warning
+    L3 -- Valid --> L4
+    
+    L4{Layer 4: ML Model}
+    L4 -- Predicts Phishing --> Phishing
+    L4 -- Predicts Safe --> L5{Layer 5: Behavioral}
+    
+    L5 -- Suspicious patterns --> Warning
+    L5 -- Clean --> FinalEvaluator
+    
+    Warning --> FinalEvaluator{Final Risk Evaluation}
+    FinalEvaluator -- High Risk --> Phishing
+    FinalEvaluator -- Medium Risk --> Suspicious[Classified as SUSPICIOUS]
+    FinalEvaluator -- Low Risk --> Safe[Classified as SAFE]
+```
+
+### Detection Layers
+1. **Layer 1 - Blacklist Check**: Instantly blocks known malicious domains from a local or remote blacklist.
+2. **Layer 2 - Domain Analysis**: Heuristic analysis of domain length, subdomain count, and TLD reputation.
+3. **Layer 3 - SSL/TLS Verification**: Checks for valid HTTPS certificates and secure connections.
+4. **Layer 4 - AI/ML Model**: Uses the trained gradient boosting classifier to analyze deep content features.
+5. **Layer 5 - Behavioral Analysis**: Checks for obfuscation techniques (e.g., using IP instead of domain, multiple redirects).
+
+## Objective
 A phishing website is a common social engineering method that mimics trustful uniform resource locators (URLs) and webpages. The objective of this project is to train machine learning models and deep neural nets on the dataset created to predict phishing websites. Both phishing and benign URLs of websites are gathered to form a dataset and from them required URL and website content-based features are extracted. The performance level of each model is measures and compared.
 
 ## Installation
