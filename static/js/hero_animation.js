@@ -17,8 +17,13 @@ const config = {
     perspective: 800,
     connectionDistance: 60,
     colors: {
-        dot: 'rgba(59, 130, 246, 0.8)',   // Bright Blue (visible on light bg)
-        line: 'rgba(148, 163, 184, 0.8)',  // Silver/Light Gray
+        palette: [
+            'rgba(6, 182, 212, 1)',   // Cyan
+            'rgba(139, 92, 246, 1)',  // Purple
+            'rgba(59, 130, 246, 1)',  // Blue
+            'rgba(20, 184, 166, 1)',  // Teal
+            'rgba(236, 72, 153, 1)'   // Pink/Rose (for soft accent)
+        ],
         bg: 'transparent'
     }
 };
@@ -57,6 +62,9 @@ class Dot {
         this.xProjected = 0;
         this.yProjected = 0;
         this.scaleProjected = 0;
+
+        // Random Color from Palette
+        this.colorString = config.colors.palette[Math.floor(Math.random() * config.colors.palette.length)];
     }
 
     rotate(angleY) {
@@ -100,24 +108,133 @@ class Dot {
     draw() {
         // Alpha based on depth (fade back side)
         // z3d goes from -radius to +radius. Front is -radius (closest)? No, we projected standard.
-        // Let's assume standard right-hand: +Z is towards viewer? 
-        // Based on rotation math above: z = r * ... sin(theta). 
+        // Let's assume standard right-hand: +Z is towards viewer?
+        // Based on rotation math above: z = r * ... sin(theta).
         // Let's just use the scaleProjected. Larger scale = closer.
 
         const alpha = Math.max(0.1, (this.scaleProjected - 0.5) * 1.5);
 
         ctx.beginPath();
         ctx.arc(this.xProjected, this.yProjected, 2 * this.scaleProjected, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(6, 182, 212, ${alpha})`;
+        // Use instance color with calculated opacity
+        // Hack: replace '1)' with alpha
+        ctx.fillStyle = this.colorString.replace('1)', `${alpha})`);
         ctx.fill();
     }
 }
+
+
+/**
+ * Security Icon Class (Shields, Locks, Keys)
+ */
+class SecurityIcon {
+    constructor() {
+        this.reset();
+        this.y = Math.random() * height; // Start anywhere
+        this.iconType = Math.random() > 0.6 ? 'shield' : (Math.random() > 0.5 ? 'lock' : 'check'); // Random type
+        // Random color
+        this.baseColor = config.colors.palette[Math.floor(Math.random() * config.colors.palette.length)];
+    }
+
+    reset() {
+        this.x = Math.random() * width;
+        this.y = height + 50; // Start below screen
+        this.speed = Math.random() * 0.4 + 0.2; // Slow gentle drift
+        this.size = Math.random() * 25 + 20;
+        this.opacity = 0;
+        this.fadeIn = true;
+        this.maxOpacity = Math.random() * 0.4 + 0.2; // 0.2 to 0.6 (Much more visible)
+        this.wobble = Math.random() * Math.PI * 2;
+        this.baseColor = config.colors.palette[Math.floor(Math.random() * config.colors.palette.length)];
+    }
+
+    update() {
+        this.y -= this.speed;
+        this.wobble += 0.02;
+        this.x += Math.sin(this.wobble) * 0.5;
+
+        // Fade in/out logic
+        if (this.fadeIn) {
+            this.opacity += 0.005;
+            if (this.opacity >= this.maxOpacity) this.fadeIn = false;
+        } else {
+            // Start fading out when near top
+            if (this.y < height * 0.2) {
+                this.opacity -= 0.005;
+            }
+        }
+
+        if (this.y < -50 || this.opacity < 0) {
+            this.reset();
+        }
+    }
+
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        // Apply opacity to base color
+        const color = this.baseColor.replace('1)', `${Math.max(0, this.opacity)})`);
+        const fill = this.baseColor.replace('1)', `${Math.max(0, this.opacity * 0.1)})`);
+
+        ctx.strokeStyle = color;
+        ctx.fillStyle = fill;
+        ctx.lineWidth = 2; // Thicker line
+
+        // Removed heavy shadowBlur which was washing it out. kept minimal or none.
+        ctx.shadowBlur = 0;
+
+        const s = this.size;
+
+        if (this.iconType === 'shield') {
+            // Draw Shield
+            ctx.beginPath();
+            ctx.moveTo(0, s / 2);
+            ctx.quadraticCurveTo(0, -s / 2, s / 2, -s / 2);
+            ctx.quadraticCurveTo(s / 2, s / 4, 0, s);
+            ctx.moveTo(0, s / 2);
+            ctx.quadraticCurveTo(0, -s / 2, -s / 2, -s / 2);
+            ctx.quadraticCurveTo(-s / 2, s / 4, 0, s);
+            ctx.stroke();
+        } else if (this.iconType === 'lock') {
+            // Draw Lock
+            const w = s * 0.7;
+            const h = s * 0.6;
+            ctx.strokeRect(-w / 2, 0, w, h);
+            ctx.beginPath();
+            ctx.arc(0, 0, w / 2 * 0.7, Math.PI, 0);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, h / 2, 2, 0, Math.PI * 2);
+            ctx.moveTo(0, h / 2 + 2);
+            ctx.lineTo(0, h / 2 + 6);
+            ctx.stroke();
+        } else {
+            // Computed / Check icon
+            ctx.beginPath();
+            ctx.moveTo(-s / 2, 0);
+            ctx.lineTo(-s / 6, s / 3);
+            ctx.lineTo(s / 2, -s / 3);
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+}
+
+let securityIcons = [];
 
 // Initialize
 function init() {
     dots = [];
     for (let i = 0; i < config.dotCount; i++) {
         dots.push(new Dot());
+    }
+
+    // Init Icons
+    securityIcons = [];
+    for (let i = 0; i < 25; i++) { // Increase density
+        securityIcons.push(new SecurityIcon());
     }
 }
 
@@ -128,6 +245,12 @@ function animate() {
     // Smooth interaction
     config.rotationSpeed += (targetRotationY - config.rotationSpeed) * 0.05;
     const currentSpeed = 0.003 + config.rotationSpeed; // Base speed + mouse influence
+
+    // 1. Draw Background Icons (Floaters)
+    securityIcons.forEach(icon => {
+        icon.update();
+        icon.draw();
+    });
 
     // Update & Project
     dots.forEach(dot => {
@@ -153,7 +276,7 @@ function animate() {
 
             if (dist2d < config.connectionDistance * d1.scaleProjected) {
                 // Opacity based on Z (hide back of sphere lines mostly)
-                if (d1.z < 0 && d2.z < 0) continue; // Skip lines entirely on the back hemisphere?
+                // if (d1.z < 0 && d2.z < 0) continue; // Skip lines entirely on the back hemisphere?
 
                 // Better: Average z scale
                 const scale = (d1.scaleProjected + d2.scaleProjected) / 2;
@@ -161,11 +284,22 @@ function animate() {
 
                 // If both are on back side (scale < 1 roughly), reduce alpha heavily
                 const isBack = scale < 0.9;
+                if (isBack && alpha < 0.2) continue; // Optimization
+
+                // Create Gradient for line
+                const grad = ctx.createLinearGradient(d1.xProjected, d1.yProjected, d2.xProjected, d2.yProjected);
+
+                // Apply alpha to the colors
+                const c1 = d1.colorString.replace('1)', `${isBack ? alpha * 0.2 : alpha})`);
+                const c2 = d2.colorString.replace('1)', `${isBack ? alpha * 0.2 : alpha})`);
+
+                grad.addColorStop(0, c1);
+                grad.addColorStop(1, c2);
 
                 ctx.beginPath();
                 ctx.moveTo(d1.xProjected, d1.yProjected);
                 ctx.lineTo(d2.xProjected, d2.yProjected);
-                ctx.strokeStyle = `rgba(37, 99, 235, ${isBack ? alpha * 0.2 : alpha})`;
+                ctx.strokeStyle = grad;
                 ctx.lineWidth = 0.5 * scale;
                 ctx.stroke();
             }

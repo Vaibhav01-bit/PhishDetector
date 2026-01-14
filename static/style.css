@@ -1276,57 +1276,82 @@ section {
 }
 
 .faq .faq-list li+li {
-  margin-top: 15px;
+  margin-top: 24px;
+  /* Increased spacing between items */
 }
 
 .faq .faq-list li {
-  padding: 30px;
-  background: #F6F7FF;
-  box-shadow: 20px 20px 60px #e4e2db, -20px -20px 60px #f6f4ed;
-  border-radius: 5px;
+  padding: 32px 40px;
+  /* More breathing room */
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  /* Cleaner, modern shadow */
+  border-radius: 8px;
   position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.faq .faq-list li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(59, 78, 248, 0.1);
+  /* Subtle lift on hover */
 }
 
 .faq .faq-list a {
   display: block;
   position: relative;
-  font-family: "Roboto", sans-serif;
-  font-size: 16px;
-  line-height: 24px;
+  font-family: "Outfit", sans-serif;
+  /* Updated font */
+  font-size: 18px;
+  /* Larger text */
+  line-height: 28px;
   font-weight: 600;
   padding: 0 30px;
   outline: none;
+  color: #2c4964;
+  transition: color 0.3s;
 }
 
 .faq .faq-list .icon-help {
-  font-size: 24px;
+  font-size: 28px;
   position: absolute;
   right: 0;
   left: 20px;
-  color: #3B4EF8;
+  color: #8b5cf6;
+  /* Updated to Purple to match new theme */
+  top: 30%;
+  /* Center vertically relative to title */
 }
 
 .faq .faq-list .icon-circle {
-  font-size: 17px;
+  font-size: 18px;
   color: #3B4EF8;
+  margin-right: 8px;
 }
 
 .faq .faq-list .icon-arrrow {
   font-size: 20px;
   color: #3B4EF8;
+  margin-right: 5px;
 }
 
 .faq .faq-list .icon-show,
 .faq .faq-list .icon-close {
-  font-size: 24px;
+  font-size: 28px;
   position: absolute;
   right: 0;
   top: 0;
+  color: #94a3b8;
 }
 
 .faq .faq-list p {
   margin-bottom: 0;
-  padding: 10px 0 0 0;
+  padding: 20px 0 0 0;
+  font-size: 16px;
+  line-height: 1.8;
+  /* Better readability */
+  color: #475569;
 }
 
 .faq .faq-list .icon-show {
@@ -1334,7 +1359,7 @@ section {
 }
 
 .faq .faq-list a.collapsed {
-  color: #2c4964;
+  color: #1e293b;
 }
 
 .faq .faq-list a.collapsed:hover {
