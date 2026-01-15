@@ -28,17 +28,65 @@ class Layer1_Blacklist:
             return set()
 
     def check(self, url):
-        parsed = urlparse(url)
-        domain = parsed.netloc or url # Handle cases without scheme
-        if domain in self.blacklist:
-            return PHISHING, "Domain found in blacklist."
-        return SAFE, "Domain not in blacklist."
+        # Normalize the input URL to match the blacklist format
+        # 1. Parse URL
+        try:
+             # Ensure scheme exists for urlparse
+            if not url.startswith(('http://', 'https://')):
+                temp_url = 'http://' + url
+            else:
+                temp_url = url
+            
+            parsed = urlparse(temp_url)
+            domain = parsed.netloc or temp_url
+            
+            # 2. Normalize
+            domain = domain.lower()
+            if domain.startswith("www."):
+                domain = domain[4:]
+            
+            domain = domain.strip()
+            
+            if domain in self.blacklist:
+                return PHISHING, "Domain found in blacklist."
+            return SAFE, "Domain not in blacklist."
+        except Exception:
+             # If parsing fails, fall back to simple check or safe
+             return SAFE, "Domain analysis skipped (invalid format)."
 
 class Layer2_Domain:
+    # Static whitelist for brand impersonation checks
+    BRAND_DOMAINS = {
+        'paypal': ['paypal.com', 'paypal-objects.com'],
+        'google': ['google.com', 'gmail.com', 'accounts.google.com'],
+        'apple': ['apple.com', 'icloud.com'],
+        'microsoft': ['microsoft.com', 'live.com', 'office.com'],
+        'amazon': ['amazon.com', 'ssl-images-amazon.com'],
+        'facebook': ['facebook.com', 'fb.com'],
+        'instagram': ['instagram.com'],
+        'netflix': ['netflix.com'],
+        'chase': ['chase.com'],
+        'wellsfargo': ['wellsfargo.com']
+    }
+
+    # Static list of known decentralized content gateways
+    DECENTRALIZED_GATEWAYS = [
+        'ipfs.io',
+        'cloudflare-ipfs.com',
+        'gateway.pinata.cloud',
+        'dweb.link'
+    ]
+
     def check(self, url):
         parsed = urlparse(url)
         domain = parsed.netloc or url
+        domain = domain.lower() # Normalize for analysis
         
+        # 0. Check for Decentralized Gateway
+        # If matched, treat as neutral infrastructure (WARNING/Suspicious mainly for opacity)
+        if any(domain == gateway or domain.endswith('.' + gateway) for gateway in self.DECENTRALIZED_GATEWAYS):
+            return WARNING, "Hosted on a Decentralized Platform – Proceed with Caution"
+            
         score = 0
         reasons = []
 
@@ -49,15 +97,39 @@ class Layer2_Domain:
 
         # Feature 2: High Subdomain Count
         subdomains = domain.split('.')
+        # Filter out empty strings from split (e.g., trailing dot)
+        subdomains = [s for s in subdomains if s]
         if len(subdomains) > 4:
             score += 1
             reasons.append("High number of subdomains.")
             
-        # Feature 3: Suspicious TLD
-        suspicious_tlds = ['.xyz', '.top', '.club', '.info', '.cn']
-        if any(domain.endswith(tld) for tld in suspicious_tlds):
+        # Feature 3: Suspicious TLD Weighting
+        high_risk_tlds = ['.xyz', '.top', '.club', '.info', '.cn', '.help', '.work', '.gq']
+        low_risk_tlds = ['.gov', '.edu', '.mil']
+        
+        if any(domain.endswith(tld) for tld in high_risk_tlds):
             score += 1
-            reasons.append("Suspicious Top Level Domain (TLD).")
+            reasons.append("Suspicious or high-risk Top Level Domain (TLD).")
+            
+        elif any(domain.endswith(tld) for tld in low_risk_tlds):
+            score -= 1 # Reduce risk for trusted TLDs
+            
+        # Feature 4: Brand Impersonation Detection
+        # Check if a brand keyword is present in the domain
+        for brand, valid_domains in self.BRAND_DOMAINS.items():
+            if brand in domain:
+                # If the brand is present, check if it matches a valid domain
+                # We need to check if the domain ENDS WITH any of the valid domains
+                # This accounts for subdomains (e.g., auth.paypal.com is valid)
+                is_valid = any(domain == valid or domain.endswith('.' + valid) for valid in valid_domains)
+                
+                if not is_valid:
+                    score += 2 # Strong indicator if brand is used but not authorized
+                    reasons.append(f"Potential impersonation of brand '{brand}'.")
+                break # Stop checking after first match to avoid double counting
+
+        # Ensure score floor is 0
+        score = max(0, score)
             
         if score >= 2:
              return WARNING, f"Suspicious domain features: {', '.join(reasons)}"
@@ -65,25 +137,12 @@ class Layer2_Domain:
 
 class Layer3_SSL:
     def check(self, url):
-        if not url.startswith("https://"):
-             return WARNING, "URL does not use HTTPS."
+        # Simplified check: Rely on scheme.
+        # This avoids SSRF risks and performance overhead of connection checks.
+        if url.startswith("https://"):
+             return SAFE, "Valid HTTPS Scheme."
         
-        # Simple certificate validation (timeout to prevent hanging)
-        try:
-            parsed = urlparse(url)
-            domain = parsed.netloc
-            # If no domain (e.g. just a path), skip
-            if not domain:
-                 return WARNING, "Invalid URL format for SSL check."
-                 
-            # Attempt a quick valid connection
-            requests.get(url, timeout=3, verify=True)
-            return SAFE, "Valid HTTPS certificate."
-        except requests.exceptions.SSLError:
-            return PHISHING, "Invalid or Untrusted SSL Certificate."
-        except Exception:
-            # Other connection errors (timeout, DNS) - treat as warning for availability but not necessarily phishing
-            return WARNING, "Could not verify SSL certificate (Connection failed)."
+        return WARNING, "Insecure (HTTP) or Unknown Scheme."
 
 class Layer4_ML_Model:
     def __init__(self, model_path="newmodel.pkl"):
