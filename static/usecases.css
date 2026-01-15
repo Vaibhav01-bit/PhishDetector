@@ -3,92 +3,135 @@
 --------------------------------------------------------------*/
 html,
 body {
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
-  /* Subtle premium gradient background since animation is removed */
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  /* Premium Mesh Gradient Background */
+  background: 
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
+    #F8FAFC;
   background-attachment: fixed;
   font-family: var(--font-body);
   color: var(--color-text-dark);
 }
 
 .usecases {
-  padding: 80px 0;
+  padding: 100px 0;
 }
 
 /* Headings */
 h2 {
   color: var(--color-text-dark) !important;
   font-family: var(--font-heading) !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.02em;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  position: relative;
+  display: inline-block;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: 2px;
 }
 
 /* Glass Effect Mixin */
 .premium-glass {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
-  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  border-radius: 24px;
 }
 
 /* FAQ / Scenarios Styles */
+.faq {
+  padding-top: 120px !important;
+}
+
 .faq .faq-list ul {
   padding: 0;
   list-style: none;
 }
 
 .faq .faq-list li {
-  padding: 30px;
-  /* More breathing room */
-  margin-bottom: 24px;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  padding: 35px;
+  margin-bottom: 30px;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  border-radius: 24px;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Apply premium glass to list items */
-.faq .faq-list li {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 1px 3px rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
+.faq .faq-list li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--color-primary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .faq .faq-list li:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.85);
-  /* Slightly lighter on hover */
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-  border-color: #fff;
+  transform: translateY(-8px) scale(1.01);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 25px 50px rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+.faq .faq-list li:hover::before {
+  opacity: 1;
 }
 
 .faq .faq-list a {
   display: block;
   position: relative;
   font-family: var(--font-heading);
-  font-size: 19px;
-  /* Slightly larger */
-  line-height: 28px;
-  font-weight: 600;
-  padding: 0 30px;
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: 700;
+  padding: 0 45px 0 35px;
   outline: none;
   cursor: pointer;
   color: var(--color-text-dark);
   text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.faq .faq-list li:hover a {
+  color: var(--color-primary);
 }
 
 .faq .faq-list .icon-help {
-  font-size: 24px;
+  font-size: 26px;
   position: absolute;
-  right: 0;
   left: 20px;
+  top: 32px;
   color: var(--color-primary);
-  top: 2px;
+  transition: transform 0.3s ease;
+}
+
+.faq .faq-list li:hover .icon-help {
+  transform: rotate(15deg);
 }
 
 .faq .faq-list .icon-show,
@@ -96,135 +139,157 @@ h2 {
   font-size: 24px;
   position: absolute;
   right: 0;
-  top: 0;
+  top: 2px;
+  color: var(--color-text-muted);
+  transition: all 0.3s ease;
+}
+
+.faq .faq-list a.collapse .icon-show {
+  display: none;
+}
+
+.faq .faq-list a.collapse .icon-close {
+  display: inline-block;
+}
+
+.faq .faq-list a.collapsed .icon-show {
+  display: inline-block;
+}
+
+.faq .faq-list a.collapsed .icon-close {
+  display: none;
 }
 
 .faq .faq-list p {
-  padding-top: 15px;
+  padding: 25px 35px 0 35px;
   color: var(--color-text-muted);
   font-family: var(--font-body);
-  line-height: 1.7;
-  /* Better readability */
+  line-height: 1.8;
   font-size: 16px;
+  margin-bottom: 0;
+}
+
+.faq .faq-list .icon-circle {
+  color: var(--color-primary);
+  margin-right: 8px;
+  font-size: 14px;
+  vertical-align: middle;
 }
 
 /* Testimonials / Visual Examples */
 .testimonial-item {
-  margin: 10px 15px;
-  padding: 25px;
-
-  /* Glass Style */
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
-
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  transition: all 0.4s ease;
+  margin: 20px 15px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .testimonial-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  transform: translateY(-10px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 0.9);
 }
 
-/* Iframe / Image wrapper styling */
 .testimonial-item iframe {
   width: 100%;
-  border-radius: 12px;
+  border-radius: 16px;
   border: none;
-  /* Cleaner look */
   background: #fff;
-  height: 320px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  /* Inner shadow for depth */
+  height: 380px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.5s ease;
 }
 
-/* Description Text */
+.testimonial-item:hover iframe {
+  transform: scale(1.02);
+}
+
 .testimonial-item p {
   font-family: var(--font-body);
   color: var(--color-text-muted);
   font-size: 15px;
   line-height: 1.6;
+  margin-bottom: 0;
 }
 
 .testimonial-item b {
   color: var(--color-text-dark);
-  font-weight: 600;
+  font-weight: 700;
 }
 
-/* Fix for specific Description sizing inline override */
-/* Fix for specific Description sizing inline override */
-.testimonial-item p[style*="font-size: 12px"] {
-  font-size: 14px !important;
-  /* Override inline style for readability */
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
 }
 
 /* --------------------------------------------------------------
 # Mobile Optimization
 -------------------------------------------------------------- */
 @media (max-width: 768px) {
+  .faq {
+    padding-top: 80px !important;
+  }
 
-  /* FAQ List */
+  .usecases {
+    padding: 60px 0;
+  }
+
+  h2 {
+    font-size: 26px !important;
+  }
+
   .faq .faq-list a {
-    font-size: 17px;
-    padding-right: 20px;
-    /* Decrease side padding */
-    padding-left: 10px;
-    line-height: 1.4;
+    font-size: 18px;
+    padding: 0 35px 0 0;
   }
 
   .faq .faq-list .icon-help {
-    font-size: 20px;
-    left: 10px;
-    top: 4px;
     display: none;
-    /* Hide icon on small screens to save space if needed, or adjust */
-  }
-
-  .faq .faq-list a {
-    padding-left: 0;
-    /* Remove padding reserved for icon if icon is hidden/moved */
   }
 
   .faq .faq-list li {
-    padding: 20px;
+    padding: 25px 20px;
   }
 
   .faq .faq-list p {
+    padding: 20px 0 0 0;
     font-size: 15px;
   }
 
-  /* Testimonials / Cards */
   .testimonial-item {
     margin: 15px 0;
-    /* Full width spacing */
-    padding: 24px 20px;
+    padding: 20px;
   }
 
-  .testimonial-item iframe,
-  .testimonial-item img {
-    height: 220px;
-    /* Reduce image height on mobile */
+  .testimonial-item iframe {
+    height: 250px;
   }
+}
 
-  /* Disable complicated hover 3D effects on touch to prevent getting stuck */
-  .testimonial-item:hover {
-    transform: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    /* keep simple shadow */
-  }
+/* Owl Carousel Pagination Refinement */
+.owl-theme .owl-dots .owl-dot span {
+  width: 10px;
+  height: 10px;
+  background: rgba(37, 99, 235, 0.2);
+  transition: all 0.3s ease;
+  border-radius: 50%;
+}
 
-  .testimonial-item:hover img,
-  .testimonial-item:hover iframe {
-    transform: none;
-  }
-
-  .testimonials .container {
-    perspective: none;
-    /* Flatten 3D space for performance/usability */
-  }
+.owl-theme .owl-dots .owl-dot.active span,
+.owl-theme .owl-dots .owl-dot:hover span {
+  background: var(--color-primary);
+  width: 24px;
+  border-radius: 5px;
 }
