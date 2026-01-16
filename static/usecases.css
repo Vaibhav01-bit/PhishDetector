@@ -188,6 +188,13 @@ h2::after {
   perspective: 1200px;
   /* Ensure it doesn't overflow horizontally on smaller screens */
   max-width: 100%;
+  cursor: grab;
+  /* New drag cursor */
+}
+
+/* Grabbing state applied by JS */
+.carousel-container:active {
+  cursor: grabbing;
 }
 
 .carousel-stage {
@@ -247,39 +254,24 @@ h2::after {
   /* Ensure content fits */
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  /* Allow scrolling if content exceeds height */
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  /* Firefox */
   backface-visibility: hidden;
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   cursor: pointer;
   /* Indicate interactive */
+
+  /* Responsive Constraints */
+  max-width: 90vw;
+  max-height: 80vh;
+  box-sizing: border-box;
 }
 
 /* Active State for "Come Out" effect */
-.testimonial-item.active {
-  background: rgba(255, 255, 255, 1);
-  box-shadow:
-    0 50px 100px rgba(37, 99, 235, 0.2),
-    0 0 0 1px rgba(37, 99, 235, 0.4);
-  z-index: 100 !important;
-  /* Ensure it's on top */
-}
-
-/* Dimmed State for non-selected items during focus */
-.testimonial-item.dimmed {
-  opacity: 0.5;
-  filter: grayscale(80%) blur(2px);
-  pointer-events: auto;
-  cursor: pointer;
-  /* Allow switching focus directly */
-}
-
-.testimonial-item.dimmed:hover {
-  opacity: 0.8;
-  filter: grayscale(0%);
-  transform: scale(0.98);
-  /* Slight lift on hover even if dimmed - transform handled by JS? No, JS sets transform inline. So hover transform might conflict. Let's avoid transform here or use !important if needed, but safer to just change opacity/filter */
-  transition: all 0.3s ease;
-}
+/* Active and Dimmed states removed for fluid drag interaction */
 
 /* Hover effects for the item itself */
 .testimonial-item:hover {
@@ -293,6 +285,10 @@ h2::after {
 .testimonial-item iframe {
   width: 100%;
   flex-grow: 1;
+  min-height: 150px;
+  /* Ensure visibility */
+  flex-shrink: 0;
+  /* Don't collapse to 0 */
   /* Take available space */
   border-radius: 16px;
   border: none;
@@ -302,6 +298,8 @@ h2::after {
   pointer-events: none;
   /* Pass clicks to parent so card is clickable */
 }
+
+
 
 .testimonial-item p {
   font-family: var(--font-body);
