@@ -22,6 +22,12 @@
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: 1px solid rgba(255, 255, 255, 0.5);
   --glass-blur: blur(12px);
+
+  /* Footer Particles */
+  --particle-color-primary: rgba(0, 0, 0, 0.7);
+  /* High Contrast Black for Day Mode */
+  --particle-color-secondary: rgba(249, 115, 22, 0.8);
+  /* High Contrast Orange for Day Mode */
 }
 
 /*--------------------------------------------------------------
@@ -1657,10 +1663,27 @@ section {
 # Footer
 --------------------------------------------------------------*/
 #footer {
+  position: relative;
+  min-height: 120px;
+  overflow: hidden;
   color: #444444;
   font-size: 14px;
   background: #f1f3ff;
   box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes footerGradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 #footer .container {

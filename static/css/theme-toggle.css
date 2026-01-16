@@ -189,6 +189,12 @@ body.dark-mode {
     /* Redefine variables for components using them */
     --color-text-dark: #E2E8F0;
     --color-text-muted: #94A3B8;
+
+    /* Footer Particle Overrides */
+    --particle-color-primary: rgba(255, 255, 255, 0.9);
+    /* White for Dark Mode */
+    --particle-color-secondary: rgba(249, 115, 22, 0.9);
+    /* Orange for Dark Mode */
 }
 
 body.dark-mode .testimonial-item {
@@ -343,4 +349,32 @@ body.dark-mode .team-info .badge-item {
 body.dark-mode .guide-title,
 body.dark-mode .guide-names {
     color: #94A3B8;
+}
+
+/* Footer Dark Mode */
+body.dark-mode #footer {
+    background: linear-gradient(270deg, #0F172A, #1E293B, #0F172A, #1E293B);
+    background-size: 400% 400%;
+    animation: footerGradientAnimation 8s ease infinite;
+    color: #E2E8F0;
+    box-shadow: 0px -2px 15px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode #footer .copyright {
+    color: #E2E8F0;
+}
+
+body.dark-mode #footer .copyright a {
+    color: #60A5FA !important;
+}
+
+body.dark-mode #footer .button3 {
+    background: #334155;
+    color: #E2E8F0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #footer .button3:hover {
+    background: #60A5FA;
+    color: #fff;
 }
