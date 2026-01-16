@@ -31,6 +31,8 @@
 
   <!-- Template Main CSS File -->
   <link href="static/style.css" rel="stylesheet">
+  <link href="static/css/theme-toggle.css" rel="stylesheet">
+  <link href="static/css/neon-glow.css" rel="stylesheet">
 </head>
 
 <body>
@@ -70,6 +72,26 @@
               </li>
             </ul>
           </li>
+          <li class="d-none d-lg-block">
+            <div class="theme-switch-wrapper">
+              <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" aria-label="Toggle Dark Theme" />
+                <div class="slider round">
+                  <div class="clouds">
+                    <div class="cloud cloud-1"></div>
+                    <div class="cloud cloud-2"></div>
+                    <div class="cloud cloud-3"></div>
+                  </div>
+                  <div class="stars">
+                    <div class="star star-1"></div>
+                    <div class="star star-2"></div>
+                    <div class="star star-3"></div>
+                    <div class="star star-4"></div>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </li>
           <!-- Mobile Only: Download Guide -->
           <li class="d-lg-none"><a href="static/assets/Phishing Website Identification.pdf"
               download="nofallmagaguide">Download Guide <i class='bx bxs-download'></i></a></li>
@@ -92,10 +114,13 @@
 
           <div class="hero-actions mt-4">
             <form action="/result" method="POST" class="scan-form">
-              <div class="input-group">
-                <input type="url" name="name" class="form-control" placeholder="Paste URL here (https://...)" required>
-                <div class="input-group-append">
-                  <button type="submit" class="btn btn-primary">Scan Website</button>
+              <div class="input-group neon-box">
+                <div class="input-content-mask">
+                  <input type="url" name="name" class="form-control" placeholder="Paste URL here (https://...)"
+                    required>
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Scan Website</button>
+                  </div>
                 </div>
               </div>
             </form>
@@ -439,6 +464,7 @@
   <!-- Template Main JS File -->
   <script src="static/assets/js/main.js"></script>
   <script src="static/js/hero_animation.js"></script>
+  <script src="static/js/theme-toggle.js"></script>
 </body>
 
 </html>
