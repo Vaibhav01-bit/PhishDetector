@@ -1,0 +1,130 @@
+/* Soft Starfield Particle Background for FAQ Section */
+
+/* Ensure the section has relative positioning to contain absolute children */
+#faq {
+    position: relative;
+    overflow: hidden;
+    /* Prevent particles from spilling out */
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+    /* Force dark background */
+}
+
+/* Container for the particles */
+.faq-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    /* Behind content */
+    pointer-events: none;
+    /* Allow clicks to pass through */
+}
+
+/* Particle Layers using Box Shadow */
+.faq-particle-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
+
+/* Layer 1: Smallest, slowest, most numerous (White) */
+.layer-1 {
+    width: 2px;
+    height: 2px;
+    background: transparent;
+    animation: floating-1 60s linear infinite;
+    opacity: 0.4;
+    box-shadow:
+        10vw 10vh #fff, 20vw 80vh #fff, 30vw 20vh #fff,
+        40vw 50vh #fff, 50vw 90vh #fff, 60vw 10vh #fff,
+        70vw 60vh #fff, 80vw 30vh #fff, 90vw 80vh #fff,
+        15vw 40vh #fff, 25vw 10vh #fff, 35vw 70vh #fff,
+        45vw 20vh #fff, 55vw 50vh #fff, 65vw 90vh #fff,
+        75vw 10vh #fff, 85vw 40vh #fff, 95vw 70vh #fff,
+        5vw 95vh #fff, 95vw 5vh #fff;
+}
+
+/* Layer 2: Medium, slightly faster (White + Subtle Orange) */
+.layer-2 {
+    width: 3px;
+    height: 3px;
+    background: transparent;
+    animation: floating-2 80s linear infinite;
+    opacity: 0.3;
+    border-radius: 50%;
+    box-shadow:
+        15vw 15vh #fff, 35vw 85vh #fff, 55vw 25vh #fff,
+        75vw 55vh #fed7aa,
+        /* Orange highlight */
+        95vw 85vh #fff, 25vw 65vh #fff,
+        45vw 35vh #fff, 65vw 75vh #fff, 85vw 15vh #fff,
+        5vw 55vh #fed7aa;
+    /* Orange highlight */
+}
+
+/* Layer 3: Larger, blurred, very slow (Atmosphere) */
+.layer-3 {
+    width: 4px;
+    height: 4px;
+    background: transparent;
+    animation: floating-3 100s linear infinite;
+    opacity: 0.2;
+    filter: blur(1px);
+    border-radius: 50%;
+    box-shadow:
+        20vw 20vh #fff, 40vw 90vh #fff, 60vw 30vh #fff,
+        80vw 70vh #fed7aa,
+        /* Orange highlight */
+        10vw 70vh #fff, 30vw 30vh #fff,
+        50vw 80vh #fff, 70vw 20vh #fff, 90vw 60vh #fff;
+}
+
+/* Animations */
+@keyframes floating-1 {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-100vh);
+    }
+}
+
+@keyframes floating-2 {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-120vh);
+    }
+}
+
+@keyframes floating-3 {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-150vh);
+    }
+}
+
+/* Content z-index fix */
+#faq .container {
+    position: relative;
+    z-index: 1;
+    /* Ensure content sits above particles */
+}
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .faq-particle-layer {
+        animation: none;
+    }
+}

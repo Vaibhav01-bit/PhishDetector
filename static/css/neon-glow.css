@@ -1,57 +1,116 @@
-/* Premium Slim Glow Input (Redesigned) */
+/* Premium Integrated Slim Input & Button */
 .neon-box {
     position: relative;
-    border-radius: 12px;
-    /* Clean, modern rounded corners */
-    background-color: rgba(15, 23, 42, 0.8);
-    /* Dark Slate with slight transparency */
-    backdrop-filter: blur(10px);
-    /* Glassmorphism feel */
+    border-radius: 50px;
+    /* Full pill shape for modern slim look */
+    background-color: rgba(15, 23, 42, 0.6);
+    /* Dark Slate, lower opacity */
+    backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    /* Very subtle default border */
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    /* Shadow SM */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
-    padding: 4px;
-    /* Minimal padding for the container */
+    padding: 3px;
+    /* Very tight padding for integrated feel */
     overflow: hidden;
-    /* Contain inner elements */
+    max-width: 600px;
+    /* Constrain width for slim appearance */
+    margin: 0 auto;
+    /* Center it */
 }
 
-/* Hover State - Gentle Lift and Border Light-up */
+/* Hover State - Scale & Glow */
 .neon-box:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-    /* Shadow MD */
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.2),
+        0 0 15px rgba(37, 99, 235, 0.1);
+    /* Subtle blue outer warmth */
     transform: translateY(-1px);
 }
 
-/* Focus State - The "Subtle Glow" */
+/* Focus State - Active Glow */
 .neon-box:focus-within {
-    border-color: rgba(59, 130, 246, 0.5);
-    /* Blue-500 soft border */
-    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.1),
-        /* Ring */
-        0 0 20px rgba(59, 130, 246, 0.15),
-        /* Soft outer glow */
-        inset 0 0 20px rgba(59, 130, 246, 0.05);
-    /* Inner depth */
-    background-color: rgba(15, 23, 42, 0.95);
+    background-color: rgba(15, 23, 42, 0.9);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1),
+        0 0 25px rgba(59, 130, 246, 0.2);
 }
 
-/* Animated Spotlight/Sheen Effect on Border (Subtle) */
+/* Input Styling - Clean & Slim */
+.neon-box input.form-control {
+    background: transparent !important;
+    border: none !important;
+    color: #F1F5F9 !important;
+    /* Slate-100 */
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    padding: 10px 20px;
+    height: 48px;
+    /* Fixed slim height */
+    box-shadow: none !important;
+    width: 100%;
+}
+
+.neon-box input.form-control::placeholder {
+    color: #94A3B8;
+    transition: opacity 0.3s ease;
+}
+
+.neon-box:focus-within input.form-control::placeholder {
+    opacity: 0.7;
+}
+
+/* Button Styling - Pill shape, Integrated */
+.neon-box .input-group-append {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.neon-box .btn-primary {
+    border-radius: 40px !important;
+    /* Nested pill */
+    padding: 0 24px !important;
+    height: 42px !important;
+    /* Slightly smaller than container to float inside */
+    font-size: 0.9rem !important;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+    transition: all 0.3s ease;
+    margin-right: 3px;
+    /* Right spacing */
+    white-space: nowrap;
+}
+
+.neon-box .btn-primary:hover {
+    background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+    box-shadow: 0 6px 15px rgba(37, 99, 235, 0.4);
+    transform: translateY(-1px);
+}
+
+.neon-box .btn-primary:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+/* Sheen Animation */
 .neon-box::before {
     content: "";
     position: absolute;
     top: 0;
     left: -100%;
-    width: 50%;
+    width: 100%;
     height: 100%;
     background: linear-gradient(90deg,
             transparent,
-            rgba(255, 255, 255, 0.05),
+            rgba(255, 255, 255, 0.03),
             transparent);
     transform: skewX(-20deg);
     transition: 0.5s;
@@ -59,69 +118,11 @@
 }
 
 .neon-box:hover::before {
-    left: 150%;
-    transition: 1s ease-in-out;
+    left: 200%;
+    transition: 1.5s ease-in-out;
 }
 
-/* Typography & Input Styling */
-.neon-box input.form-control {
-    background: transparent !important;
-    border: none !important;
-    color: #F8FAFC !important;
-    /* Slate-50 */
-    font-family: 'Inter', sans-serif;
-    font-weight: 500;
-    font-size: 0.95rem;
-    /* Slightly closer to 16px but refined */
-    letter-spacing: 0.01em;
-    padding: 10px 16px;
-    height: auto;
-    /* Let padding define height */
-    box-shadow: none !important;
-}
-
-.neon-box input.form-control::placeholder {
-    color: #64748B;
-    /* Slate-500 */
-    font-weight: 400;
-    transition: color 0.3s ease;
-}
-
-.neon-box:focus-within input.form-control::placeholder {
-    color: #94A3B8;
-    /* Slate-400 */
-}
-
-/* Button Styling - Slim & Integrated */
-.neon-box .input-group-append {
-    margin-right: 2px;
-}
-
-.neon-box .btn-primary {
-    border-radius: 8px !important;
-    padding: 8px 20px !important;
-    font-size: 0.9rem !important;
-    font-weight: 600;
-    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-    border: none;
-    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
-    transition: all 0.3s ease;
-    height: auto;
-}
-
-.neon-box .btn-primary:hover {
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-    transform: translateY(-1px);
-    background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
-}
-
-.neon-box .btn-primary:active {
-    transform: translateY(0);
-}
-
-/* Remove old mask constraints if present in HTML logic, 
-   CSS here handles layout directly via flexbox on .neon-box */
+/* Fix wrapper display from previous interactions */
 .neon-box .input-content-mask {
     display: contents;
-    /* Strip the wrapper's layout influence, let flex work */
 }
