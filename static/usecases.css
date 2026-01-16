@@ -8,7 +8,7 @@ body {
 
 body {
   /* Premium Mesh Gradient Background */
-  background: 
+  background:
     radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
     radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
     radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
@@ -177,37 +177,130 @@ h2::after {
 }
 
 /* Testimonials / Visual Examples */
-.testimonial-item {
-  margin: 20px 15px;
-  padding: 30px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+/* 3D Carousel Container */
+.carousel-container {
+  margin: 100px auto;
+  width: 380px;
+  /* Reduced from 420px */
+  height: 560px;
+  /* Reduced from 600px */
+  position: relative;
+  perspective: 1200px;
+  /* Ensure it doesn't overflow horizontally on smaller screens */
+  max-width: 100%;
 }
 
+.carousel-stage {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transform-style: preserve-3d;
+  /* animation: spin 20s infinite linear; REMOVED for JS control */
+  transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Animations */
+/* Spin keyframes removed as we use JS now */
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Testimonial Item Updates for 3D */
+.testimonial-item {
+  position: absolute;
+  width: 340px;
+  /* Reduced from 380px */
+  height: 500px;
+  /* Reduced from 520px */
+  left: 20px;
+  /* Centered in 380px container */
+  top: 30px;
+  padding: 30px;
+  border-radius: 24px;
+
+  /* Glassmorphism */
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  /* Premium Shadows */
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.1),
+    inset 0 0 20px rgba(255, 255, 255, 0.5);
+
+  /* Ensure content fits */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backface-visibility: hidden;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  cursor: pointer;
+  /* Indicate interactive */
+}
+
+/* Active State for "Come Out" effect */
+.testimonial-item.active {
+  background: rgba(255, 255, 255, 1);
+  box-shadow:
+    0 50px 100px rgba(37, 99, 235, 0.2),
+    0 0 0 1px rgba(37, 99, 235, 0.4);
+  z-index: 100 !important;
+  /* Ensure it's on top */
+}
+
+/* Dimmed State for non-selected items during focus */
+.testimonial-item.dimmed {
+  opacity: 0.5;
+  filter: grayscale(80%) blur(2px);
+  pointer-events: auto;
+  cursor: pointer;
+  /* Allow switching focus directly */
+}
+
+.testimonial-item.dimmed:hover {
+  opacity: 0.8;
+  filter: grayscale(0%);
+  transform: scale(0.98);
+  /* Slight lift on hover even if dimmed - transform handled by JS? No, JS sets transform inline. So hover transform might conflict. Let's avoid transform here or use !important if needed, but safer to just change opacity/filter */
+  transition: all 0.3s ease;
+}
+
+/* Hover effects for the item itself */
 .testimonial-item:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--color-primary);
+  box-shadow:
+    0 25px 50px rgba(37, 99, 235, 0.15),
+    inset 0 0 0 1px rgba(37, 99, 235, 0.1);
 }
 
 .testimonial-item iframe {
   width: 100%;
+  flex-grow: 1;
+  /* Take available space */
   border-radius: 16px;
   border: none;
   background: #fff;
-  height: 380px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  transition: transform 0.5s ease;
-}
-
-.testimonial-item:hover iframe {
-  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+  pointer-events: none;
+  /* Pass clicks to parent so card is clickable */
 }
 
 .testimonial-item p {
@@ -216,28 +309,34 @@ h2::after {
   font-size: 15px;
   line-height: 1.6;
   margin-bottom: 0;
-}
-
-.testimonial-item b {
-  color: var(--color-text-dark);
-  font-weight: 700;
-}
-
-/* Animations */
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-}
-
-.floating {
-  animation: float 6s ease-in-out infinite;
+  max-height: 120px;
+  overflow-y: auto;
+  /* Scroll text if too long */
 }
 
 /* --------------------------------------------------------------
 # Mobile Optimization
 -------------------------------------------------------------- */
 @media (max-width: 768px) {
+  .carousel-container {
+    width: 300px;
+    height: 500px;
+    perspective: 800px;
+    margin: 60px auto;
+  }
+
+  .testimonial-item {
+    width: 280px;
+    height: 460px;
+    left: 10px;
+    top: 10px;
+    padding: 20px;
+  }
+
+  /* Disable 3D spin on very small screens if needed, 
+     or just adjust radius via JS. 
+     JS handles radius, CSS handles container size. */
+
   .faq {
     padding-top: 80px !important;
   }
@@ -267,29 +366,4 @@ h2::after {
     padding: 20px 0 0 0;
     font-size: 15px;
   }
-
-  .testimonial-item {
-    margin: 15px 0;
-    padding: 20px;
-  }
-
-  .testimonial-item iframe {
-    height: 250px;
-  }
-}
-
-/* Owl Carousel Pagination Refinement */
-.owl-theme .owl-dots .owl-dot span {
-  width: 10px;
-  height: 10px;
-  background: rgba(37, 99, 235, 0.2);
-  transition: all 0.3s ease;
-  border-radius: 50%;
-}
-
-.owl-theme .owl-dots .owl-dot.active span,
-.owl-theme .owl-dots .owl-dot:hover span {
-  background: var(--color-primary);
-  width: 24px;
-  border-radius: 5px;
 }
