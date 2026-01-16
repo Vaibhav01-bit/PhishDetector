@@ -1,12 +1,42 @@
 /* Premium Ambient Glow Background for FAQ Section */
 
-/* Ensure the section has relative positioning and a clean white background */
+/* Theme Variables */
+:root {
+    --faq-bg: #ffffff;
+    --faq-card-bg: rgba(255, 255, 255, 0.8);
+    --faq-card-border: rgba(0, 0, 0, 0.04);
+    --faq-orb-1: radial-gradient(circle, rgba(255, 237, 213, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+    /* Warm Orange */
+    --faq-orb-2: radial-gradient(circle, rgba(241, 245, 249, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+    /* Slate Gray */
+    --faq-orb-3: radial-gradient(circle, rgba(255, 247, 237, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+    /* Light Warm */
+    --faq-shadow-hover: rgba(251, 146, 60, 0.15);
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    --faq-bg: #0F172A;
+    /* Dark Slate */
+    --faq-card-bg: rgba(30, 41, 59, 0.7);
+    /* Darker Glass */
+    --faq-card-border: rgba(255, 255, 255, 0.05);
+    --faq-orb-1: radial-gradient(circle, rgba(30, 58, 138, 0.3) 0%, rgba(15, 23, 42, 0) 70%);
+    /* Deep Blue */
+    --faq-orb-2: radial-gradient(circle, rgba(88, 28, 135, 0.2) 0%, rgba(15, 23, 42, 0) 70%);
+    /* Deep Purple */
+    --faq-orb-3: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, rgba(15, 23, 42, 0) 70%);
+    /* Cyan */
+    --faq-shadow-hover: rgba(59, 130, 246, 0.2);
+}
+
+/* Ensure the section has relative positioning and uses theme background */
 #faq {
     position: relative;
     overflow: hidden;
-    background: #ffffff !important;
-    /* Force white background as requested */
+    background: var(--faq-bg) !important;
     z-index: 1;
+    transition: background-color 0.3s ease;
 }
 
 /* Container for the Ambient Orbs */
@@ -29,38 +59,37 @@
     /* Heavy blur for soft ambient look */
     opacity: 0.6;
     animation: orb-float 20s ease-in-out infinite alternate;
+    transition: background 0.5s ease;
 }
 
-/* Orb 1: Warm Orange Accent (Top Left) */
+/* Orb 1: Top Left */
 .orb-1 {
     width: 600px;
     height: 600px;
     top: -200px;
     left: -100px;
-    background: radial-gradient(circle, rgba(255, 237, 213, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
-    /* Orange-100 */
+    background: var(--faq-orb-1);
     animation-duration: 25s;
 }
 
-/* Orb 2: Soft Warm Gray (Bottom Right) */
+/* Orb 2: Bottom Right */
 .orb-2 {
     width: 700px;
     height: 700px;
     bottom: -200px;
     right: -100px;
-    background: radial-gradient(circle, rgba(241, 245, 249, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
-    /* Slate-100/Gray */
+    background: var(--faq-orb-2);
     animation-delay: -5s;
     animation-duration: 30s;
 }
 
-/* Orb 3: Subtle Center Drift (Very light Orange/Gray mix) */
+/* Orb 3: Center Drift */
 .orb-3 {
     width: 500px;
     height: 500px;
     top: 40%;
     left: 30%;
-    background: radial-gradient(circle, rgba(255, 247, 237, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+    background: var(--faq-orb-3);
     animation-delay: -10s;
     animation-duration: 22s;
     opacity: 0.4;
@@ -91,11 +120,10 @@
 
 /* Targeted Card Override */
 .faq .faq-list li {
-    background: rgba(255, 255, 255, 0.8) !important;
-    /* Slight transparency for background blend */
+    background: var(--faq-card-bg) !important;
     backdrop-filter: blur(10px);
     /* Glassmorphism light */
-    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid var(--faq-card-border) !important;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     overflow: hidden;
     /* For pseudo-element glow containment */
@@ -108,15 +136,10 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            rgba(255, 237, 213, 0.4),
-            transparent 40%);
-    /* Interactive subtle orange glow spot - requires JS for xy, 
-         or just static center glow for CSS-only requirement */
-    /* Fallback static gradient since we are CSS-only mostly */
+    /* Interactive subtle glow spot - static center fallback */
     background: radial-gradient(circle at 50% 50%,
-            rgba(255, 247, 237, 0) 0%,
-            rgba(255, 247, 237, 0) 100%);
+            var(--faq-shadow-hover),
+            transparent 70%);
     opacity: 0;
     transition: opacity 0.4s ease;
     z-index: -1;
@@ -125,25 +148,25 @@
 /* Hover State - Lift and Glow */
 .faq .faq-list li:hover {
     transform: translateY(-5px) !important;
-    box-shadow: 0 20px 40px -5px rgba(251, 146, 60, 0.15),
+    box-shadow: 0 20px 40px -5px var(--faq-shadow-hover),
         0 10px 15px -5px rgba(0, 0, 0, 0.05) !important;
-    /* Orange hue shadow */
-    border-color: rgba(253, 186, 116, 0.3) !important;
-    /* Subtle orange border */
+    border-color: var(--faq-card-border) !important;
 }
 
 .faq .faq-list li:hover::before {
     opacity: 1;
-    /* Turn on the inner subtle warmth */
-    background: radial-gradient(circle at 50% 100%,
-            rgba(255, 237, 213, 0.5) 0%,
-            transparent 70%);
 }
 
 /* Expanded State (Active) matching hover slightly */
 .faq .faq-list a[aria-expanded="true"] {
     color: #ea580c !important;
-    /* Orange-600 */
+    /* Keep orange for active text in light mode, logic handled by text color inheritance elsewhere or override if needed */
+}
+
+/* Specific text color overrides for visibility if not handled by inherited body text */
+body.dark-mode .faq .faq-list a[aria-expanded="true"] {
+    color: #60A5FA !important;
+    /* Blue for dark mode active */
 }
 
 /* Accessibility */

@@ -185,6 +185,24 @@ body.dark-mode {
     /* Dark Background */
     color: #E2E8F0;
     /* Light Text */
+
+    /* Redefine variables for components using them */
+    --color-text-dark: #E2E8F0;
+    --color-text-muted: #94A3B8;
+}
+
+body.dark-mode .testimonial-item {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .testimonial-item p {
+    color: var(--color-text-muted);
+}
+
+body.dark-mode .testimonial-item b {
+    color: var(--color-text-dark);
 }
 
 /* Adjust Header for Dark Mode */

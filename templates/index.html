@@ -14,12 +14,12 @@
   <link href="static/assets/img/newlogo.jpg" rel="apple-touch-icon">
 
   <!-- Vendor CSS Files -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/icofont@1.0.0-alpha.1/dist/icofont.min.css" rel="stylesheet">
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/venobox/1.9.3/venobox.min.css" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+  <link href="static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="static/assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
+  <link href="static/assets/vendor/venobox/venobox.min.css" rel="stylesheet">
+  <link href="static/assets/vendor/aos/aos.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
   <!-- Google Fonts -->
@@ -76,7 +76,7 @@
           <li class="d-none d-lg-block">
             <div class="theme-switch-wrapper">
               <label class="theme-switch" for="checkbox">
-                <input type="checkbox" id="checkbox" aria-label="Toggle Dark Theme" />
+                <input type="checkbox" id="checkbox" aria-label="Toggle Dark Theme" autocomplete="off" />
                 <div class="slider round">
                   <div class="clouds">
                     <div class="cloud cloud-1"></div>
@@ -117,8 +117,8 @@
             <form action="/result" method="POST" class="scan-form">
               <div class="input-group neon-box">
                 <div class="input-content-mask">
-                  <input type="url" name="name" class="form-control" placeholder="Paste URL here (https://...)"
-                    required>
+                  <input type="url" name="name" class="form-control" autocomplete="url"
+                    placeholder="Paste URL here (https://...)" required>
                   <div class="input-group-append">
                     <button type="submit" class="btn btn-primary">Scan Website</button>
                   </div>
@@ -449,7 +449,7 @@
 
   </footer><!-- End Footer -->
 
-  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+  <a href="#" class="back-to-top"><i class="bx bx-up-arrow-alt"></i></a>
   <!-- <div id="preloader"></div> -->
 
   <!-- Vendor JS Files -->
