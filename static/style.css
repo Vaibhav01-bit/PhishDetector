@@ -155,23 +155,25 @@ h6 {
 # Header
 --------------------------------------------------------------*/
 #header {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 997;
-  padding: 20px 0;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  padding: 10px 0;
+  /* Slimmer padding */
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
   animation: slideDown 1s cubic-bezier(0.16, 1, 0.3, 1);
   transform-style: preserve-3d;
   perspective: 1200px;
 }
 
 #header.header-scrolled {
-  padding: 12px 0;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 8px 0;
+  /* Ultra slim on scroll */
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
 @keyframes slideDown {
@@ -187,12 +189,13 @@ h6 {
 }
 
 #header .logo-text {
-  font-size: 26px;
+  font-size: 22px;
+  /* Smaller text */
   margin: 0;
   padding: 0;
   line-height: 1;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   font-family: var(--font-heading);
   color: var(--color-text-dark);
   text-transform: none;
@@ -204,7 +207,8 @@ h6 {
 }
 
 #header .logo img {
-  max-height: 40px;
+  max-height: 32px;
+  /* Smaller logo */
   transition: transform 0.3s ease;
 }
 
@@ -243,13 +247,15 @@ h6 {
   position: relative;
   color: var(--color-text-dark);
   transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-  font-size: 15px;
+  font-size: 14px;
+  /* Smaller font */
   font-family: var(--font-body);
   font-weight: 500;
-  padding: 8px 16px;
+  padding: 6px 14px;
+  /* Slimmer padding */
   letter-spacing: 0.01em;
   opacity: 0;
-  border-radius: 8px;
+  border-radius: 6px;
   transform-style: preserve-3d;
   animation: fadeInDown 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
@@ -287,15 +293,15 @@ h6 {
   }
 }
 
-/* 3D Hover Effects */
+/* Modern Hover Effects - Cleaner */
 .nav-menu a:hover,
 .nav-menu .active>a,
 .nav-menu li:hover>a {
   color: var(--color-primary);
-  background: rgba(37, 99, 235, 0.05);
-  transform: translateY(-2px) translateZ(20px);
-  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
-  text-shadow: 0 0 1px rgba(37, 99, 235, 0.1);
+  background: rgba(37, 99, 235, 0.08);
+  transform: translateY(-1px);
+  /* Subtle lift */
+  /* Remove heavy box-shadow for cleaner look */
 }
 
 /* Active Indicator / Pill */
@@ -413,8 +419,8 @@ h6 {
   background: #e2e5fe;
   color: #3b4ef8;
   border-radius: 5px;
-  padding: 8px 25px 10px 25px;
-  white-space: nowrap;
+  padding: 6px 20px 7px 20px;
+  /* Slimmer padding */
   transition: 0.3s;
   font-size: 14px;
   display: inline-block;
@@ -439,7 +445,8 @@ h6 {
 /* Mobile Navigation */
 .mobile-nav-toggle {
   position: fixed;
-  top: 18px;
+  top: 14px;
+  /* Adjusted for slim header */
   right: 15px;
   z-index: 9998;
   border: 0;
@@ -550,12 +557,31 @@ h6 {
 #hero {
   width: 100%;
   min-height: 100vh;
-  background: #f6f7ff;
+  /* Light Mode: Professional Soft Gradient */
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
   padding: 100px 0 60px 0;
   display: flex;
   align-items: center;
   position: relative;
   overflow: hidden;
+}
+
+/* Dark Mode Hero Override */
+body.dark-mode #hero {
+  /* Dark Mode: Deep Navy/Cyber Gradient */
+  background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+}
+
+body.dark-mode #hero::before {
+  /* Ambient Glow for Dark Mode */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 70% 30%, rgba(37, 99, 235, 0.15), transparent 60%);
+  pointer-events: none;
 }
 
 #hero-canvas {
@@ -612,6 +638,13 @@ h6 {
   max-width: 100%;
   height: auto;
   animation: float 6s ease-in-out infinite;
+  /* Soft spread shadow for depth */
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+}
+
+body.dark-mode #hero .hero-img-container img {
+  /* Enhanced glow in dark mode */
+  filter: drop-shadow(0 0 30px rgba(59, 130, 246, 0.3));
 }
 
 @keyframes fadeInUp {
@@ -903,7 +936,7 @@ section {
 # about
 --------------------------------------------------------------*/
 .about {
-  background: #2d405f;
+  background: #F8FAFC;
   padding: 100px 0;
   position: relative;
   overflow: hidden;
@@ -922,29 +955,30 @@ section {
 }
 
 .about .section-title h2 {
-  color: #fff;
+  color: #2d405f;
   margin-bottom: 40px;
 }
 
 .about .section-title h2::after {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(59, 78, 248, 0.3);
 }
 
 .about-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.9);
   padding: 40px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   height: 100%;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   backdrop-filter: blur(5px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .about-card:hover {
   transform: translateY(-10px);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 1);
   border-color: rgba(59, 78, 248, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(59, 78, 248, 0.15);
 }
 
 .about-card .icon-box {
@@ -972,12 +1006,12 @@ section {
 .about-card h3 {
   font-size: 24px;
   font-weight: 700;
-  color: #fff;
+  color: #2d405f;
   margin: 0;
 }
 
 .about-card p {
-  color: rgba(255, 255, 255, 0.7);
+  color: #64748B;
   font-size: 16px;
   line-height: 1.8;
   margin-bottom: 0;
@@ -985,25 +1019,26 @@ section {
 
 .badge-item {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: rgba(59, 78, 248, 0.1);
+  color: #2d405f;
   padding: 8px 16px;
   border-radius: 50px;
   font-size: 13px;
   font-weight: 600;
   margin: 0 8px 12px 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(59, 78, 248, 0.2);
   transition: 0.3s;
 }
 
 .badge-item:hover {
   background: #3b4ef8;
+  color: #fff;
   border-color: #3b4ef8;
   transform: scale(1.05);
 }
 
 .guide-title {
-  color: rgba(255, 255, 255, 0.5);
+  color: #64748B;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 12px;
@@ -1012,7 +1047,7 @@ section {
 }
 
 .guide-names {
-  color: #fff;
+  color: #2d405f;
   font-size: 18px;
   font-weight: 600;
   line-height: 1.4;
@@ -1747,4 +1782,16 @@ section {
   font-weight: 600;
   font-family: "Krub", sans-serif;
   letter-spacing: 0.5px;
+}
+
+/*--------------------------------------------------------------
+# FAQ Icon Hover Animation
+--------------------------------------------------------------*/
+.faq .faq-list .icon-help {
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.faq .faq-list li:hover .icon-help {
+  transform: translateY(-10px);
+  opacity: 0;
 }

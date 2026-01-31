@@ -41,8 +41,8 @@
 .neon-box input.form-control {
     background: transparent !important;
     border: none !important;
-    color: #F1F5F9 !important;
-    /* Slate-100 */
+    color: #1E293B !important;
+    /* Dark color for day mode visibility */
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
     font-weight: 400;
@@ -51,10 +51,13 @@
     /* Fixed slim height */
     box-shadow: none !important;
     width: 100%;
+    position: relative;
+    z-index: 2;
 }
 
 .neon-box input.form-control::placeholder {
-    color: #94A3B8;
+    color: #64748B;
+    /* Darker gray for day mode */
     transition: opacity 0.3s ease;
 }
 
@@ -124,5 +127,9 @@
 
 /* Fix wrapper display from previous interactions */
 .neon-box .input-content-mask {
-    display: contents;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+    z-index: 1;
 }

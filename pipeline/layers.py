@@ -9,6 +9,7 @@ import numpy as np
 from urllib.parse import urlparse
 from datetime import datetime
 from feature import FeatureExtraction
+from .brand_impersonation import BrandImpersonationDetector
 
 # Define risk levels
 SAFE = "Safe"
@@ -55,7 +56,7 @@ class Layer1_Blacklist:
              return SAFE, "Domain analysis skipped (invalid format)."
 
 class Layer2_Domain:
-    # Static whitelist for brand impersonation checks
+    # Static whitelist for brand impersonation checks (kept for backward compatibility)
     BRAND_DOMAINS = {
         'paypal': ['paypal.com', 'paypal-objects.com'],
         'google': ['google.com', 'gmail.com', 'accounts.google.com'],
@@ -77,6 +78,10 @@ class Layer2_Domain:
         'dweb.link'
     ]
 
+    def __init__(self):
+        """Initialize Layer 2 with brand impersonation detector."""
+        self.brand_detector = BrandImpersonationDetector()
+
     def check(self, url):
         parsed = urlparse(url)
         domain = parsed.netloc or url
@@ -90,12 +95,29 @@ class Layer2_Domain:
         score = 0
         reasons = []
 
-        # Feature 1: Long Domain
+        # Feature 1: Brand Impersonation Detection (NEW - Enhanced)
+        # Use the advanced brand impersonation detector
+        brand_result = self.brand_detector.check(url, domain)
+        
+        if brand_result['is_impersonation']:
+            # Strong indicator of phishing attempt
+            score += 2
+            reasons.append(brand_result['message'])
+            # Add specific reasons from the detector
+            if brand_result['details'].get('typosquatting_detected'):
+                reasons.append("Typosquatting pattern detected")
+            if brand_result['details'].get('intent_keywords'):
+                keywords = ', '.join(brand_result['details']['intent_keywords'][:3])  # Limit to 3
+                reasons.append(f"Phishing keywords: {keywords}")
+            if brand_result['details'].get('homoglyphs_detected'):
+                reasons.append("Character substitution detected")
+
+        # Feature 2: Long Domain
         if len(domain) > 50:
             score += 1
             reasons.append("Domain is unusually long.")
 
-        # Feature 2: High Subdomain Count
+        # Feature 3: High Subdomain Count
         subdomains = domain.split('.')
         # Filter out empty strings from split (e.g., trailing dot)
         subdomains = [s for s in subdomains if s]
@@ -103,7 +125,7 @@ class Layer2_Domain:
             score += 1
             reasons.append("High number of subdomains.")
             
-        # Feature 3: Suspicious TLD Weighting
+        # Feature 4: Suspicious TLD Weighting
         high_risk_tlds = ['.xyz', '.top', '.club', '.info', '.cn', '.help', '.work', '.gq']
         low_risk_tlds = ['.gov', '.edu', '.mil']
         
@@ -113,20 +135,6 @@ class Layer2_Domain:
             
         elif any(domain.endswith(tld) for tld in low_risk_tlds):
             score -= 1 # Reduce risk for trusted TLDs
-            
-        # Feature 4: Brand Impersonation Detection
-        # Check if a brand keyword is present in the domain
-        for brand, valid_domains in self.BRAND_DOMAINS.items():
-            if brand in domain:
-                # If the brand is present, check if it matches a valid domain
-                # We need to check if the domain ENDS WITH any of the valid domains
-                # This accounts for subdomains (e.g., auth.paypal.com is valid)
-                is_valid = any(domain == valid or domain.endswith('.' + valid) for valid in valid_domains)
-                
-                if not is_valid:
-                    score += 2 # Strong indicator if brand is used but not authorized
-                    reasons.append(f"Potential impersonation of brand '{brand}'.")
-                break # Stop checking after first match to avoid double counting
 
         # Ensure score floor is 0
         score = max(0, score)

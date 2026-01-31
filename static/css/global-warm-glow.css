@@ -1,0 +1,371 @@
+/* ============================================================
+   GLOBAL WARM GLOW EFFECT - Interactive Elements
+   ============================================================ */
+
+/* Theme Variables for Warm Glow */
+:root {
+    /* Day Mode - Warm Orange Glow */
+    --warm-glow-color: rgba(251, 146, 60, 0.15);
+    --warm-glow-intense: rgba(251, 146, 60, 0.25);
+    --warm-glow-border: rgba(251, 146, 60, 0.3);
+    --warm-glow-shadow: rgba(251, 146, 60, 0.2);
+}
+
+/* Dark Mode - Cool Blue Glow */
+body.dark-mode {
+    --warm-glow-color: rgba(59, 130, 246, 0.15);
+    --warm-glow-intense: rgba(59, 130, 246, 0.25);
+    --warm-glow-border: rgba(59, 130, 246, 0.3);
+    --warm-glow-shadow: rgba(59, 130, 246, 0.2);
+}
+
+/* ============================================================
+   BENEFIT CARDS - Warm Glow on Hover
+   ============================================================ */
+.benefit-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.benefit-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-color),
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.benefit-card:hover::before {
+    opacity: 1;
+}
+
+.benefit-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -5px var(--warm-glow-shadow),
+        0 10px 15px -5px rgba(0, 0, 0, 0.05);
+    border-color: var(--warm-glow-border);
+}
+
+/* ============================================================
+   ABOUT CARDS - Warm Glow on Hover
+   ============================================================ */
+.about-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-color),
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.about-card:hover::before {
+    opacity: 1;
+}
+
+.about-card:hover {
+    box-shadow: 0 20px 40px -5px var(--warm-glow-shadow),
+        0 10px 15px -5px rgba(0, 0, 0, 0.05);
+    border-color: var(--warm-glow-border);
+}
+
+/* Ensure content stays above the glow */
+.about-card>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================================
+   NAVIGATION LINKS - Subtle Warm Glow
+   ============================================================ */
+.nav-menu a {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-menu a::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-color),
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.nav-menu a:hover::before,
+.nav-menu .active>a::before {
+    opacity: 1;
+}
+
+/* ============================================================
+   BUTTONS - Warm Glow Effect
+   ============================================================ */
+.btn,
+.get-started-btn,
+.button3,
+#hero .scan-form .btn-primary {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before,
+.get-started-btn::before,
+.button3::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-intense),
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.btn:hover::before,
+.get-started-btn:hover::before,
+.button3:hover::before {
+    opacity: 1;
+}
+
+.btn:hover,
+.get-started-btn:hover,
+.button3:hover {
+    box-shadow: 0 8px 20px var(--warm-glow-shadow),
+        0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================
+   RESULT CARDS - Warm Glow
+   ============================================================ */
+#hero .result-card {
+    position: relative;
+    overflow: hidden;
+}
+
+#hero .result-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-color),
+            transparent 70%);
+    opacity: 0.3;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+    pointer-events: none;
+}
+
+#hero .result-card:hover::before {
+    opacity: 0.5;
+}
+
+/* Ensure content stays above the glow */
+#hero .result-card>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================================
+   BADGES - Warm Glow on Hover
+   ============================================================ */
+.badge-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.badge-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-intense),
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.badge-item:hover::before {
+    opacity: 1;
+}
+
+.badge-item:hover {
+    box-shadow: 0 4px 12px var(--warm-glow-shadow);
+}
+
+/* ============================================================
+   DROPDOWN MENU ITEMS - Warm Glow
+   ============================================================ */
+.nav-menu .drop-down ul a {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-menu .drop-down ul a::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-color),
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.nav-menu .drop-down ul a:hover::before {
+    opacity: 1;
+}
+
+/* ============================================================
+   MOBILE NAV - Warm Glow
+   ============================================================ */
+.mobile-nav a {
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-nav a::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-color),
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.mobile-nav a:hover::before,
+.mobile-nav .active>a::before {
+    opacity: 1;
+}
+
+/* ============================================================
+   INPUT FOCUS - Warm Glow
+   ============================================================ */
+#hero .scan-form .input-group {
+    position: relative;
+    overflow: hidden;
+}
+
+#hero .scan-form .input-group::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-color),
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+#hero .scan-form .input-group:focus-within::before {
+    opacity: 0.5;
+}
+
+/* Ensure input content stays above the glow */
+#hero .scan-form .input-group>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============================================================
+   FOOTER LINKS - Warm Glow
+   ============================================================ */
+#footer a {
+    position: relative;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+#footer a::before {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    background: radial-gradient(circle at 50% 50%,
+            var(--warm-glow-color),
+            transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    border-radius: 4px;
+}
+
+#footer a:hover::before {
+    opacity: 1;
+}
+
+/* ============================================================
+   ACCESSIBILITY - Reduce Motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+
+    .benefit-card::before,
+    .about-card::before,
+    .nav-menu a::before,
+    .btn::before,
+    .get-started-btn::before,
+    .button3::before,
+    #hero .result-card::before,
+    .badge-item::before,
+    .nav-menu .drop-down ul a::before,
+    .mobile-nav a::before,
+    #hero .scan-form .input-group::before,
+    #footer a::before {
+        transition: none;
+    }
+
+    .benefit-card:hover,
+    .about-card:hover,
+    .btn:hover,
+    .get-started-btn:hover,
+    .button3:hover,
+    .badge-item:hover {
+        transition: none;
+    }
+}
+
+/* ============================================================
+   PERFORMANCE OPTIMIZATION
+   ============================================================ */
+/* Use will-change for elements that will animate */
+.benefit-card,
+.about-card,
+.nav-menu a,
+.btn,
+.get-started-btn,
+.button3,
+#hero .result-card,
+.badge-item {
+    will-change: transform, box-shadow;
+}
+
+/* Remove will-change after animation completes */
+.benefit-card:hover,
+.about-card:hover,
+.nav-menu a:hover,
+.btn:hover,
+.get-started-btn:hover,
+.button3:hover,
+#hero .result-card:hover,
+.badge-item:hover {
+    will-change: auto;
+}

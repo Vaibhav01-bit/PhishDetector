@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warm Glow Effect Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0F172A;
+            margin-bottom: 10px;
+            font-size: 36px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748B;
+            margin-bottom: 40px;
+            font-size: 18px;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Warm Glow Variables */
+        :root {
+            --warm-glow-color: rgba(251, 146, 60, 0.15);
+            --warm-glow-intense: rgba(251, 146, 60, 0.25);
+            --warm-glow-border: rgba(251, 146, 60, 0.3);
+            --warm-glow-shadow: rgba(251, 146, 60, 0.2);
+        }
+
+        /* Demo Card */
+        .demo-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .demo-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%,
+                    var(--warm-glow-color),
+                    transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+        .demo-card:hover::before {
+            opacity: 1;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -5px var(--warm-glow-shadow),
+                0 10px 15px -5px rgba(0, 0, 0, 0.05);
+            border-color: var(--warm-glow-border);
+        }
+
+        .demo-card>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .demo-card h3 {
+            color: #2d405f;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .demo-card p {
+            color: #64748B;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Demo Button */
+        .demo-button {
+            background: #3b4ef8;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .demo-button::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%,
+                    var(--warm-glow-intense),
+                    transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .demo-button:hover::before {
+            opacity: 1;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--warm-glow-shadow),
+                0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Demo Badge */
+        .demo-badge {
+            display: inline-block;
+            background: rgba(59, 78, 248, 0.1);
+            color: #2d405f;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 5px;
+            border: 1px solid rgba(59, 78, 248, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .demo-badge::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%,
+                    var(--warm-glow-intense),
+                    transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .demo-badge:hover::before {
+            opacity: 1;
+        }
+
+        .demo-badge:hover {
+            background: #3b4ef8;
+            color: white;
+            border-color: #3b4ef8;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px var(--warm-glow-shadow);
+        }
+
+        /* Instructions */
+        .instructions {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-top: 40px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .instructions h2 {
+            color: #2d405f;
+            margin-bottom: 15px;
+        }
+
+        .instructions ul {
+            color: #64748B;
+            line-height: 1.8;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+        }
+
+        .color-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .orange {
+            background: rgba(251, 146, 60, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌟 Warm Glow Effect Demo</h1>
+        <p class="subtitle">Hover over the elements below to see the warm glow effect in action</p>
+
+        <div class="demo-grid">
+            <div class="demo-card">
+                <h3>🎯 Interactive Card</h3>
+                <p>Hover over this card to see the warm orange glow appear from the center. Notice how it lifts up with
+                    a shadow.</p>
+                <button class="demo-button">Click Me</button>
+            </div>
+
+            <div class="demo-card">
+                <h3>🚀 Real-Time Analysis</h3>
+                <p>The glow effect creates a premium, engaging feel that encourages user interaction across the website.
+                </p>
+                <button class="demo-button">Learn More</button>
+            </div>
+
+            <div class="demo-card">
+                <h3>🛡️ Security First</h3>
+                <p>All interactive elements respond with the same warm glow, creating a consistent user experience.</p>
+                <button class="demo-button">Get Started</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h2>How It Works</h2>
+            <ul>
+                <li><span class="color-indicator orange"></span><strong>Day Mode:</strong> Warm orange glow (rgba(251,
+                    146, 60, 0.15))</li>
+                <li><strong>Effect Type:</strong> Radial gradient from center, fading to transparent</li>
+                <li><strong>Trigger:</strong> Hover (desktop) or Touch (mobile)</li>
+                <li><strong>Animation:</strong> Smooth 0.4s cubic-bezier transition</li>
+                <li><strong>Elements Affected:</strong> Cards, Buttons, Links, Badges, Inputs, Navigation, FAQ items,
+                    and more</li>
+            </ul>
+
+            <h2 style="margin-top: 30px;">Try These Badges</h2>
+            <div>
+                <span class="demo-badge">Hover Me</span>
+                <span class="demo-badge">Interactive</span>
+                <span class="demo-badge">Warm Glow</span>
+                <span class="demo-badge">Premium Feel</span>
+                <span class="demo-badge">Engaging UX</span>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -3,6 +3,10 @@
     display: flex;
     align-items: center;
     margin-left: 20px;
+    transform: scale(0.8);
+    /* Scale down for slim header */
+    transform-origin: right center;
+    /* Keep alignment */
 }
 
 .theme-switch {
@@ -286,7 +290,11 @@ body.dark-mode #hero .scan-form .input-group {
 }
 
 body.dark-mode #hero .scan-form .form-control {
-    color: #E2E8F0;
+    color: #E2E8F0 !important;
+}
+
+body.dark-mode #hero .scan-form .form-control::placeholder {
+    color: #94A3B8 !important;
 }
 
 body.dark-mode #hero .result-card {
@@ -320,16 +328,38 @@ body.dark-mode .about {
     background: #0F172A;
 }
 
+body.dark-mode .about::before {
+    background: radial-gradient(circle at 10% 20%, rgba(96, 165, 250, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(96, 165, 250, 0.1) 0%, transparent 50%);
+}
+
 body.dark-mode .about .section-title h2 {
     color: #E2E8F0;
 }
 
+body.dark-mode .about .section-title h2::after {
+    background: rgba(96, 165, 250, 0.3);
+}
+
 body.dark-mode .about-card {
-    background: #1E293B;
+    background: rgba(30, 41, 59, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #E2E8F0;
-    padding: 20px;
-    border-radius: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .about-card:hover {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(96, 165, 250, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .about-card h3 {
+    color: #E2E8F0;
+}
+
+body.dark-mode .about-card p {
+    color: #94A3B8;
 }
 
 body.dark-mode .about-card .icon-box i {
@@ -337,18 +367,30 @@ body.dark-mode .about-card .icon-box i {
     background: rgba(96, 165, 250, 0.1);
 }
 
-body.dark-mode .team-info .badge-item {
-    background: #334155;
-    color: #E2E8F0;
-    padding: 5px 10px;
-    border-radius: 5px;
-    margin-right: 5px;
-    display: inline-block;
+body.dark-mode .about-card:hover .icon-box i {
+    background: #60A5FA;
+    color: #0F172A;
 }
 
-body.dark-mode .guide-title,
+body.dark-mode .team-info .badge-item,
+body.dark-mode .badge-item {
+    background: rgba(51, 65, 85, 0.8);
+    color: #E2E8F0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .badge-item:hover {
+    background: #60A5FA;
+    color: #0F172A;
+    border-color: #60A5FA;
+}
+
+body.dark-mode .guide-title {
+    color: #64748B;
+}
+
 body.dark-mode .guide-names {
-    color: #94A3B8;
+    color: #E2E8F0;
 }
 
 /* Footer Dark Mode */

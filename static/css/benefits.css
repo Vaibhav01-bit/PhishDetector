@@ -1,0 +1,358 @@
+/*--------------------------------------------------------------
+# Benefits Section - Premium Enterprise SaaS Redesign
+# Features: Glassmorphism, Gradient Accents, Enhanced Hover,
+# Icon Glow, Scroll Animations, Day/Night Mode Support
+--------------------------------------------------------------*/
+
+.benefits {
+    padding: 100px 0;
+    position: relative;
+    z-index: 2;
+    background-color: transparent;
+    overflow: hidden;
+}
+
+/* Section Title */
+.benefits .section-title {
+    text-align: center;
+    padding-bottom: 60px;
+    position: relative;
+    z-index: 10;
+}
+
+.benefits .section-title h2 {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.03em;
+    color: #0f172a;
+    background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.benefits .section-title p {
+    color: #64748b;
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+    font-weight: 400;
+}
+
+/*--------------------------------------------------------------
+# Premium Glassmorphism Card (Day Mode)
+--------------------------------------------------------------*/
+.benefit-card {
+    /* Glassmorphism Effect */
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+
+    /* Borders & Shadows */
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.06),
+        0 2px 8px rgba(0, 0, 0, 0.03),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+
+    /* Layout */
+    padding: 36px 28px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    /* Smooth Transitions */
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Accent Gradient Line (Left Border) */
+.benefit-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #3b82f6 0%, #06b6d4 50%, #8b5cf6 100%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Subtle Glow Overlay (Hidden by default) */
+.benefit-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+/*--------------------------------------------------------------
+# Premium Hover Interactions
+--------------------------------------------------------------*/
+.benefit-card:hover {
+    /* Lift Effect */
+    transform: translateY(-8px) scale(1.01);
+
+    /* Enhanced Shadow Depth */
+    box-shadow:
+        0 24px 48px rgba(37, 99, 235, 0.12),
+        0 12px 24px rgba(0, 0, 0, 0.08),
+        inset 0 0 0 1px rgba(59, 130, 246, 0.2);
+
+    /* Accent Border Glow */
+    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.benefit-card:hover::before {
+    opacity: 1;
+    width: 5px;
+}
+
+.benefit-card:hover::after {
+    opacity: 1;
+}
+
+/*--------------------------------------------------------------
+# Icon Container - Gradient with Glow
+--------------------------------------------------------------*/
+.benefit-card .icon-box {
+    margin-bottom: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+
+    /* Blue to Cyan Gradient */
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+
+    /* Icon Color */
+    color: #ffffff;
+    font-size: 32px;
+
+    /* Soft Shadow */
+    box-shadow:
+        0 4px 12px rgba(59, 130, 246, 0.25),
+        0 0 0 4px rgba(59, 130, 246, 0.1);
+
+    /* Smooth Transitions */
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Icon Glow Effect */
+.benefit-card .icon-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 2px;
+    background: linear-gradient(135deg, #60a5fa, #06b6d4, #8b5cf6);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+/* Icon Hover - Neon Glow + Scale */
+.benefit-card:hover .icon-box {
+    transform: scale(1.08) rotate(3deg);
+    box-shadow:
+        0 8px 24px rgba(59, 130, 246, 0.4),
+        0 0 32px rgba(6, 182, 212, 0.3),
+        0 0 0 6px rgba(59, 130, 246, 0.15);
+}
+
+.benefit-card:hover .icon-box::before {
+    opacity: 1;
+}
+
+/* Optional Pulse Animation */
+@keyframes iconPulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 4px 12px rgba(59, 130, 246, 0.25),
+            0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    50% {
+        box-shadow:
+            0 4px 12px rgba(59, 130, 246, 0.35),
+            0 0 0 8px rgba(59, 130, 246, 0.15);
+    }
+}
+
+.benefit-card:hover .icon-box {
+    animation: iconPulse 2s ease-in-out infinite;
+}
+
+/*--------------------------------------------------------------
+# Typography Hierarchy
+--------------------------------------------------------------*/
+.benefit-card h3 {
+    font-weight: 700;
+    margin-bottom: 14px;
+    font-size: 1.375rem;
+    color: #0f172a;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+}
+
+.benefit-card p {
+    color: #475569;
+    line-height: 1.75;
+    font-size: 0.9375rem;
+    margin-bottom: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    max-width: 320px;
+}
+
+/*--------------------------------------------------------------
+# Dark Mode - Cyber Theme
+--------------------------------------------------------------*/
+body.dark-mode .benefits .section-title h2 {
+    background: linear-gradient(135deg, #f8fafc 0%, #60a5fa 50%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+}
+
+body.dark-mode .benefits .section-title p {
+    color: #94a3b8;
+}
+
+/* Dark Mode Card - Enhanced Glassmorphism */
+body.dark-mode .benefit-card {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .benefit-card::before {
+    background: linear-gradient(180deg, #3b82f6 0%, #06b6d4 50%, #a855f7 100%);
+}
+
+body.dark-mode .benefit-card:hover {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(59, 130, 246, 0.4);
+    box-shadow:
+        0 24px 48px rgba(0, 0, 0, 0.6),
+        0 0 48px rgba(59, 130, 246, 0.2),
+        inset 0 0 0 1px rgba(59, 130, 246, 0.3);
+    transform: translateY(-8px) scale(1.01);
+}
+
+/* Dark Mode Icon */
+body.dark-mode .benefit-card .icon-box {
+    background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+    box-shadow:
+        0 4px 16px rgba(37, 99, 235, 0.4),
+        0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+body.dark-mode .benefit-card:hover .icon-box {
+    box-shadow:
+        0 8px 32px rgba(37, 99, 235, 0.6),
+        0 0 48px rgba(6, 182, 212, 0.4),
+        0 0 0 6px rgba(59, 130, 246, 0.25);
+}
+
+body.dark-mode .benefit-card h3 {
+    color: #f8fafc;
+}
+
+body.dark-mode .benefit-card p {
+    color: #94a3b8;
+}
+
+/*--------------------------------------------------------------
+# Scroll Animations (AOS Enhancement)
+--------------------------------------------------------------*/
+/* Fade Up Animation */
+[data-aos="fade-up"] {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+[data-aos="fade-up"].aos-animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered Delays Already Applied in HTML */
+
+/*--------------------------------------------------------------
+# Responsive Design
+--------------------------------------------------------------*/
+@media (max-width: 991px) {
+    .benefits {
+        padding: 60px 0;
+    }
+
+    .benefits .section-title h2 {
+        font-size: 32px;
+    }
+
+    .benefit-card {
+        padding: 28px 24px;
+        margin-bottom: 24px;
+    }
+
+    .benefit-card .icon-box {
+        width: 56px;
+        height: 56px;
+        font-size: 28px;
+    }
+
+    .benefit-card h3 {
+        font-size: 1.25rem;
+    }
+
+    .benefit-card p {
+        font-size: 0.9rem;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .benefits .section-title h2 {
+        font-size: 28px;
+    }
+
+    .benefits .section-title p {
+        font-size: 1rem;
+    }
+
+    .benefit-card {
+        padding: 24px 20px;
+    }
+}

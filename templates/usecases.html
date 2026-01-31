@@ -34,6 +34,7 @@
   <link href="static/usecases.css" rel="stylesheet">
   <link href="static/css/theme-toggle.css" rel="stylesheet">
   <link href="static/css/faq-glow.css" rel="stylesheet">
+  <link href="static/css/global-warm-glow.css" rel="stylesheet">
 </head>
 
 <body>
@@ -42,10 +43,13 @@
   <header id="header" class="fixed-top">
     <div class="container d-flex align-items-center">
 
-      <h1 class="logo mr-auto"><a href="{{ url_for('home') }}">PhishDetector</a></h1>
-      <!-- Uncomment below if you prefer to use an image logo -->
-      <a href="{{ url_for('home') }}" class="logo mr-auto"><img src="static/assets/img/newlogo.jpg" alt=""
-          class="img-fluid"></a>
+      <div class="logo mr-auto d-flex align-items-center">
+        <a href="{{ url_for('home') }}" class="d-flex align-items-center">
+          <img src="static/assets/img/newlogo.jpg" alt="PhishDetector Logo" class="img-fluid mr-2"
+            style="border-radius: 8px;">
+          <span class="logo-text">PhishDetector</span>
+        </a>
+      </div>
 
       <nav class="nav-menu d-none d-lg-block">
         <ul>

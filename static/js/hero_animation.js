@@ -18,11 +18,11 @@ const config = {
     connectionDistance: 60,
     colors: {
         palette: [
-            'rgba(6, 182, 212, 1)',   // Cyan
-            'rgba(139, 92, 246, 1)',  // Purple
-            'rgba(59, 130, 246, 1)',  // Blue
-            'rgba(20, 184, 166, 1)',  // Teal
-            'rgba(236, 72, 153, 1)'   // Pink/Rose (for soft accent)
+            'rgba(56, 189, 248, 1)',   // Light Blue (Sky-400)
+            'rgba(129, 140, 248, 1)',  // Indigo (Indigo-400)
+            'rgba(45, 212, 191, 1)',   // Teal (Teal-400)
+            'rgba(37, 99, 235, 1)',    // Blue (Blue-600) - Core Anchor
+            'rgba(168, 85, 247, 1)'    // Purple (Purple-500)
         ],
         bg: 'transparent'
     }
