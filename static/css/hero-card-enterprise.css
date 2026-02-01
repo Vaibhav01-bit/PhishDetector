@@ -1,0 +1,575 @@
+/* ========================================
+   ENTERPRISE HERO CARD - Security Product Standards
+   Following Cloudflare / VirusTotal / Bolster Design
+   ======================================== */
+
+/* ────────────────────────────────────────
+   1. CARD BASE - Glassmorphism & Depth
+   ──────────────────────────────────────── */
+
+.enterprise-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px !important;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+/* Status-Based Soft Glows */
+.enterprise-card:has(.icon-safe) {
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        0 0 40px rgba(34, 197, 94, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: rgba(34, 197, 94, 0.15);
+}
+
+.enterprise-card:has(.icon-warning) {
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        0 0 40px rgba(251, 146, 60, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: rgba(251, 146, 60, 0.15);
+}
+
+.enterprise-card:has(.icon-danger) {
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        0 0 40px rgba(239, 68, 68, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border-color: rgba(239, 68, 68, 0.15);
+}
+
+/* Dark Mode Card */
+body.dark-mode .enterprise-card,
+[data-theme="dark"] .enterprise-card {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ────────────────────────────────────────
+   2. SECURITY ICON - Visual Trust Anchor
+   ──────────────────────────────────────── */
+
+.security-icon {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    animation: icon-pulse 2s ease-in-out infinite;
+    transition: all 0.3s;
+    position: relative;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    margin: 0 20px;
+}
+
+/* Inner glow effect */
+.security-icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 17px;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.3) 0%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.1) 100%);
+    pointer-events: none;
+}
+
+.security-icon i {
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Icon Status Colors */
+.icon-safe {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    box-shadow:
+        0 8px 24px rgba(34, 197, 94, 0.4),
+        0 4px 12px rgba(34, 197, 94, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.icon-warning {
+    background: linear-gradient(135deg, #fb923c, #f97316);
+    color: white;
+    box-shadow:
+        0 8px 24px rgba(251, 146, 60, 0.4),
+        0 4px 12px rgba(251, 146, 60, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.icon-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow:
+        0 8px 24px rgba(239, 68, 68, 0.4),
+        0 4px 12px rgba(239, 68, 68, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Pulse Animation */
+@keyframes icon-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: 0.95;
+    }
+}
+
+/* ────────────────────────────────────────
+   3. VERDICT SECTION - Typography & Layout
+   ──────────────────────────────────────── */
+
+.verdict-section {
+    text-align: center;
+    padding: 0 1rem;
+}
+
+.verdict-section .d-flex {
+    margin-bottom: 1.5rem !important;
+}
+
+.verdict-text {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.verdict-subtext {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto;
+    color: #64748b;
+}
+
+body.dark-mode .verdict-subtext,
+[data-theme="dark"] .verdict-subtext {
+    color: #94a3b8;
+}
+
+/* ────────────────────────────────────────
+   4. PRIMARY CTA - Sandbox Analysis
+   ──────────────────────────────────────── */
+
+.primary-cta-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn-sandbox-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #8b5cf6 100%);
+    background-size: 200% 200%;
+    color: white;
+    padding: 18px 40px;
+    border-radius: 16px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: 0.02em;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 8px 24px rgba(59, 130, 246, 0.35),
+        0 4px 12px rgba(6, 182, 212, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    border: none;
+}
+
+/* Animated gradient background */
+.btn-sandbox-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.2) 100%);
+    background-size: 200% 200%;
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+/* Shimmer effect */
+.btn-sandbox-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 70%);
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    transition: transform 0.6s;
+}
+
+/* Hover State - Lift & Glow Intensify */
+.btn-sandbox-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    background-position: 100% 50%;
+    box-shadow:
+        0 16px 40px rgba(59, 130, 246, 0.5),
+        0 8px 20px rgba(6, 182, 212, 0.4),
+        0 0 60px rgba(139, 92, 246, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    animation: gradient-shift 3s ease infinite;
+}
+
+.btn-sandbox-primary:hover::before {
+    opacity: 1;
+    animation: shimmer 2s ease infinite;
+}
+
+.btn-sandbox-primary:hover::after {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+}
+
+/* Active State */
+.btn-sandbox-primary:active {
+    transform: translateY(-1px) scale(1.01);
+}
+
+/* Button text */
+.btn-sandbox-primary span {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon styling - Arrow Slide */
+.btn-sandbox-primary i {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1.375rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.btn-sandbox-primary:hover i {
+    transform: translateX(6px);
+    animation: arrow-bounce 1s ease infinite;
+}
+
+/* Animations */
+@keyframes gradient-shift {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes shimmer {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes arrow-bounce {
+
+    0%,
+    100% {
+        transform: translateX(6px);
+    }
+
+    50% {
+        transform: translateX(10px);
+    }
+}
+
+/* ────────────────────────────────────────
+   5. TRUST CAPTION - Below Sandbox Button
+   ──────────────────────────────────────── */
+
+.sandbox-caption {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.sandbox-caption i {
+    font-size: 1rem;
+    color: #3b82f6;
+}
+
+body.dark-mode .sandbox-caption,
+[data-theme="dark"] .sandbox-caption {
+    color: #94a3b8;
+}
+
+/* ────────────────────────────────────────
+   6. SECONDARY CTA - Proceed Safely
+   ──────────────────────────────────────── */
+
+.secondary-cta-wrapper {
+    margin-top: 12px;
+}
+
+.btn-proceed-secondary,
+.btn-proceed-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* Proceed Safely (Safe Status) */
+.btn-proceed-secondary {
+    color: #22c55e;
+    border-color: #22c55e;
+}
+
+.btn-proceed-secondary:hover {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: #16a34a;
+    color: #16a34a;
+    transform: translateY(-1px);
+}
+
+.btn-proceed-secondary:active {
+    transform: scale(0.98);
+}
+
+/* View Anyway (Danger Status) */
+.btn-proceed-danger {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+.btn-proceed-danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #dc2626;
+    color: #dc2626;
+    transform: translateY(-1px);
+}
+
+.btn-proceed-danger:active {
+    transform: scale(0.98);
+}
+
+/* Dark Mode Secondary Buttons */
+body.dark-mode .btn-proceed-secondary,
+[data-theme="dark"] .btn-proceed-secondary {
+    color: #4ade80;
+    border-color: #4ade80;
+}
+
+body.dark-mode .btn-proceed-danger,
+[data-theme="dark"] .btn-proceed-danger {
+    color: #f87171;
+    border-color: #f87171;
+}
+
+/* ────────────────────────────────────────
+   7. SANDBOX ERROR MESSAGE
+   ──────────────────────────────────────── */
+
+.sandbox-error-brief {
+    background: linear-gradient(135deg,
+            rgba(251, 146, 60, 0.08),
+            rgba(239, 68, 68, 0.08));
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(251, 146, 60, 0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+}
+
+.sandbox-error-brief p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.sandbox-error-brief i {
+    font-size: 1.5rem;
+    color: #fb923c;
+}
+
+/* ────────────────────────────────────────
+   8. URL TEXT STYLING
+   ──────────────────────────────────────── */
+
+.url-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.url-text i {
+    opacity: 0.7;
+}
+
+.url-text span {
+    word-break: break-all;
+}
+
+/* ────────────────────────────────────────
+   9. RESPONSIVE DESIGN
+   ──────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .security-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 2.25rem;
+        margin: 0 12px;
+    }
+
+    .verdict-text {
+        font-size: 1.5rem;
+    }
+
+    .verdict-subtext {
+        font-size: 0.85rem;
+    }
+
+    .btn-sandbox-primary {
+        width: 100%;
+        max-width: 400px;
+        justify-content: center;
+        padding: 16px 36px;
+        font-size: 1.0625rem;
+    }
+
+    .btn-proceed-secondary,
+    .btn-proceed-danger {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .enterprise-card {
+        padding: 2rem 1.5rem !important;
+        border-radius: 20px !important;
+    }
+
+    .security-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 2rem;
+        margin: 0 8px;
+    }
+
+    .verdict-text {
+        font-size: 1.25rem;
+    }
+
+    .verdict-subtext {
+        font-size: 0.8rem;
+    }
+
+    .btn-sandbox-primary {
+        max-width: 100%;
+        font-size: 1rem;
+        padding: 14px 32px;
+        border-radius: 14px;
+    }
+
+    .btn-sandbox-primary i {
+        font-size: 1.25rem;
+    }
+
+    .sandbox-caption {
+        font-size: 0.8rem;
+    }
+
+    .btn-proceed-secondary,
+    .btn-proceed-danger {
+        max-width: 100%;
+        font-size: 0.9375rem;
+        padding: 10px 24px;
+    }
+}
+
+/* ────────────────────────────────────────
+   10. ACCESSIBILITY & FOCUS STATES
+   ──────────────────────────────────────── */
+
+.btn-sandbox-primary:focus-visible,
+.btn-proceed-secondary:focus-visible,
+.btn-proceed-danger:focus-visible {
+    outline: 3px solid rgba(59, 130, 246, 0.5);
+    outline-offset: 3px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .security-icon,
+    .btn-sandbox-primary,
+    .btn-sandbox-primary::before,
+    .btn-sandbox-primary::after,
+    .btn-sandbox-primary i {
+        animation: none !important;
+        transition: none !important;
+    }
+}

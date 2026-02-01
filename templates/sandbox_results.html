@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandbox Analysis - {{ sandbox.source_url }} | PhishDetector</title>
+
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Sandbox Page CSS -->
+    <link href="{{ url_for('static', filename='css/sandbox-page.css') }}" rel="stylesheet">
+
+    <!-- Theme Toggle CSS -->
+    <link href="{{ url_for('static', filename='css/theme-toggle.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="sandbox-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="{{ url_for('home') }}" class="logo">
+                    <i class='bx bx-shield-check'></i>
+                    <span>PhishDetector</span>
+                </a>
+                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                    <i class='bx bx-moon'></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="sandbox-main">
+        <!-- Verdict Section -->
+        <section class="verdict-section">
+            <div class="container">
+                <div class="verdict-badge {{ verdict }}">
+                    <i class='bx {{ verdict_icon }}'></i>
+                    <span>{{ verdict_text }}</span>
+                </div>
+                <h1>Sandbox Analysis Report</h1>
+                <p class="scanned-url">{{ sandbox.source_url }}</p>
+                <p class="scan-time">
+                    <i class='bx bx-time-five'></i>
+                    Scanned: {{ sandbox.timestamp }}
+                </p>
+            </div>
+        </section>
+
+        <!-- Screenshot Section -->
+        <section class="screenshot-section">
+            <div class="container">
+                <h2>🖼️ Website Screenshot</h2>
+                <div class="browser-frame">
+                    <div class="browser-chrome">
+                        <div class="browser-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="browser-url-bar">
+                            <i class='bx bx-lock-alt'></i>
+                            <span>{{ sandbox.final_url }}</span>
+                        </div>
+                        <div class="browser-actions">
+                            <i class='bx bx-refresh'></i>
+                        </div>
+                    </div>
+                    <div class="browser-viewport">
+                        {% if sandbox.screenshot_path %}
+                        <img src="{{ url_for('serve_screenshot', filename=sandbox.screenshot_path) }}"
+                            alt="Website Screenshot" loading="lazy">
+                        {% else %}
+                        <div class="no-screenshot">
+                            <i class='bx bx-image-alt'></i>
+                            <p>Screenshot not available</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <p class="capture-time">
+                    <i class='bx bx-camera'></i>
+                    Captured: {{ sandbox.timestamp }}
+                </p>
+            </div>
+        </section>
+
+        <!-- Metadata Section -->
+        <section class="metadata-section">
+            <div class="container">
+                <h2>📊 Technical Metadata</h2>
+                <div class="metadata-grid">
+                    <div class="meta-item">
+                        <span class="meta-label">
+                            <i class='bx bx-link-alt'></i>
+                            Final URL
+                        </span>
+                        <span class="meta-value">{{ sandbox.final_url }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">
+                            <i class='bx bx-server'></i>
+                            IP Address
+                        </span>
+                        <span class="meta-value">{{ sandbox.ip_address }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">
+                            <i class='bx bx-globe'></i>
+                            Domain
+                        </span>
+                        <span class="meta-value">{{ sandbox.domain }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">
+                            <i class='bx bx-transfer-alt'></i>
+                            Redirects
+                        </span>
+                        <span class="meta-value">{{ sandbox.redirect_count }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">
+                            <i class='bx bx-time'></i>
+                            Load Time
+                        </span>
+                        <span class="meta-value">{{ sandbox.load_time }}ms</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">
+                            <i class='bx bx-file'></i>
+                            Page Title
+                        </span>
+                        <span class="meta-value">{{ sandbox.page_title or 'N/A' }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Behavioral Signals Section -->
+        <section class="behavioral-section">
+            <div class="container">
+                <h2>🔍 Behavioral Signals</h2>
+                <p class="section-description">
+                    Passive detection of suspicious patterns without interaction
+                </p>
+                <div class="signals-grid">
+                    <div class="signal-item {{ 'detected' if sandbox.has_login_form else 'clear' }}">
+                        <div class="signal-icon">
+                            <i class='bx {{ ' bx-error' if sandbox.has_login_form else 'bx-check-circle' }}'></i>
+                        </div>
+                        <div class="signal-content">
+                            <h4>Login Form</h4>
+                            <p>{{ 'Detected' if sandbox.has_login_form else 'Not Detected' }}</p>
+                        </div>
+                    </div>
+                    <div class="signal-item {{ 'detected' if sandbox.has_password_field else 'clear' }}">
+                        <div class="signal-icon">
+                            <i class='bx {{ ' bx-error' if sandbox.has_password_field else 'bx-check-circle' }}'></i>
+                        </div>
+                        <div class="signal-content">
+                            <h4>Password Field</h4>
+                            <p>{{ 'Detected' if sandbox.has_password_field else 'Not Detected' }}</p>
+                        </div>
+                    </div>
+                    <div class="signal-item {{ 'detected' if sandbox.has_email_field else 'clear' }}">
+                        <div class="signal-icon">
+                            <i class='bx {{ ' bx-error' if sandbox.has_email_field else 'bx-check-circle' }}'></i>
+                        </div>
+                        <div class="signal-content">
+                            <h4>Email Input</h4>
+                            <p>{{ 'Detected' if sandbox.has_email_field else 'Not Detected' }}</p>
+                        </div>
+                    </div>
+                    <div class="signal-item {{ 'detected' if sandbox.suspicious_keywords else 'clear' }}">
+                        <div class="signal-icon">
+                            <i class='bx {{ ' bx-error' if sandbox.suspicious_keywords else 'bx-check-circle' }}'></i>
+                        </div>
+                        <div class="signal-content">
+                            <h4>Suspicious Keywords</h4>
+                            <p>
+                                {% if sandbox.suspicious_keywords %}
+                                {{ sandbox.suspicious_keywords|join(', ') }}
+                                {% else %}
+                                None Detected
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {% if layers %}
+        <!-- 5-Layer Security Analysis Section -->
+        <section class="layers-section">
+            <div class="container">
+                <h2>🛡️ 5-Layer Security Analysis</h2>
+                <p class="section-description">
+                    Comprehensive multi-layer detection system breakdown
+                </p>
+                <div class="layers-accordion">
+                    <!-- Layer 1: Blacklist Check -->
+                    <div
+                        class="layer-item {{ 'safe' if layers.layer1.status == 'Safe' else ('warning' if layers.layer1.status == 'Warning' else 'danger') }}">
+                        <div class="layer-header">
+                            <div class="layer-title">
+                                <span class="layer-number">1</span>
+                                <div class="layer-info">
+                                    <h4>Blacklist Check</h4>
+                                    <p>{{ layers.layer1.description }}</p>
+                                </div>
+                            </div>
+                            <span
+                                class="layer-status {{ 'safe' if layers.layer1.status == 'Safe' else ('warning' if layers.layer1.status == 'Warning' else 'danger') }}">
+                                <i class='bx {{ ' bx-check-circle' if layers.layer1.status=='Safe' else 'bx-error'
+                                    }}'></i>
+                                {{ layers.layer1.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Layer 2: Domain Analysis -->
+                    <div
+                        class="layer-item {{ 'safe' if layers.layer2.status == 'Safe' else ('warning' if layers.layer2.status == 'Warning' else 'danger') }}">
+                        <div class="layer-header">
+                            <div class="layer-title">
+                                <span class="layer-number">2</span>
+                                <div class="layer-info">
+                                    <h4>Domain Analysis</h4>
+                                    <p>{{ layers.layer2.description }}</p>
+                                </div>
+                            </div>
+                            <span
+                                class="layer-status {{ 'safe' if layers.layer2.status == 'Safe' else ('warning' if layers.layer2.status == 'Warning' else 'danger') }}">
+                                <i class='bx {{ ' bx-check-circle' if layers.layer2.status=='Safe' else 'bx-error'
+                                    }}'></i>
+                                {{ layers.layer2.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Layer 3: SSL Certificate -->
+                    <div
+                        class="layer-item {{ 'safe' if layers.layer3.status == 'Safe' else ('warning' if layers.layer3.status == 'Warning' else 'danger') }}">
+                        <div class="layer-header">
+                            <div class="layer-title">
+                                <span class="layer-number">3</span>
+                                <div class="layer-info">
+                                    <h4>SSL Certificate</h4>
+                                    <p>{{ layers.layer3.description }}</p>
+                                </div>
+                            </div>
+                            <span
+                                class="layer-status {{ 'safe' if layers.layer3.status == 'Safe' else ('warning' if layers.layer3.status == 'Warning' else 'danger') }}">
+                                <i class='bx {{ ' bx-check-circle' if layers.layer3.status=='Safe' else 'bx-error'
+                                    }}'></i>
+                                {{ layers.layer3.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Layer 4: ML Model -->
+                    <div
+                        class="layer-item {{ 'safe' if layers.layer4.status == 'Safe' else ('warning' if layers.layer4.status == 'Warning' else 'danger') }}">
+                        <div class="layer-header">
+                            <div class="layer-title">
+                                <span class="layer-number">4</span>
+                                <div class="layer-info">
+                                    <h4>Machine Learning Model</h4>
+                                    <p>{{ layers.layer4.description }}</p>
+                                </div>
+                            </div>
+                            <span
+                                class="layer-status {{ 'safe' if layers.layer4.status == 'Safe' else ('warning' if layers.layer4.status == 'Warning' else 'danger') }}">
+                                <i class='bx {{ ' bx-check-circle' if layers.layer4.status=='Safe' else 'bx-error'
+                                    }}'></i>
+                                {{ layers.layer4.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Layer 5: Behavioral Analysis -->
+                    <div
+                        class="layer-item {{ 'safe' if layers.layer5.status == 'Safe' else ('warning' if layers.layer5.status == 'Warning' else 'danger') }}">
+                        <div class="layer-header">
+                            <div class="layer-title">
+                                <span class="layer-number">5</span>
+                                <div class="layer-info">
+                                    <h4>Behavioral Analysis</h4>
+                                    <p>{{ layers.layer5.description }}</p>
+                                </div>
+                            </div>
+                            <span
+                                class="layer-status {{ 'safe' if layers.layer5.status == 'Safe' else ('warning' if layers.layer5.status == 'Warning' else 'danger') }}">
+                                <i class='bx {{ ' bx-check-circle' if layers.layer5.status=='Safe' else 'bx-error'
+                                    }}'></i>
+                                {{ layers.layer5.status }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Trust & Transparency Section -->
+        <section class="trust-section">
+            <div class="container">
+                <div class="trust-card">
+                    <div class="trust-header">
+                        <i class='bx bx-info-circle'></i>
+                        <h3>Trust & Transparency</h3>
+                    </div>
+                    <p class="trust-intro">
+                        We help you assess risk — not blindly trust. Please understand the following:
+                    </p>
+                    <ul class="trust-list">
+                        <li>
+                            <i class='bx bx-check-circle'></i>
+                            <span>This analysis reflects the website state at scan time</span>
+                        </li>
+                        <li>
+                            <i class='bx bx-check-circle'></i>
+                            <span>Attackers may change content after scanning</span>
+                        </li>
+                        <li>
+                            <i class='bx bx-check-circle'></i>
+                            <span>No personal data was accessed during analysis</span>
+                        </li>
+                        <li>
+                            <i class='bx bx-check-circle'></i>
+                            <span>No interaction was performed in the sandbox</span>
+                        </li>
+                        <li>
+                            <i class='bx bx-info-circle'></i>
+                            <span>HTTPS encrypts traffic but does not guarantee legitimacy</span>
+                        </li>
+                        <li>
+                            <i class='bx bx-info-circle'></i>
+                            <span>Website opened in a secure, isolated sandbox environment</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Actions Section -->
+        <section class="actions-section">
+            <div class="container">
+                <div class="actions-card">
+                    <a href="{{ url_for('home') }}" class="btn btn-secondary">
+                        <i class='bx bx-home-alt'></i>
+                        Back to Home
+                    </a>
+                    <form action="{{ url_for('rescan_url') }}" method="POST" style="display: inline;">
+                        <input type="hidden" name="url" value="{{ sandbox.source_url }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class='bx bx-refresh'></i>
+                            Re-scan URL
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="sandbox-footer">
+        <div class="container">
+            <p>&copy; 2026 PhishDetector. Helping you assess risk, not blindly trust.</p>
+        </div>
+    </footer>
+
+    <!-- Theme Toggle Script -->
+    <script src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
+</body>
+
+</html>

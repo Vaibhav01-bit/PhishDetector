@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "scan_id": "scan_1769955927_f9b30ef8",
+  "source_url": "https://phishtank.org",
+  "final_url": "https://phishtank.org/",
+  "redirect_count": 8,
+  "ip_address": "104.18.43.231",
+  "domain": "phishtank.org",
+  "page_title": "PhishTank | Join the fight against phishing",
+  "load_time": 6257,
+  "total_time": 11875,
+  "screenshot_path": "scan_1769955927_f9b30ef8.jpg",
+  "has_login_form": true,
+  "has_password_field": true,
+  "has_email_field": false,
+  "suspicious_keywords": [],
+  "timestamp": "2026-02-01 19:55:39"
+}

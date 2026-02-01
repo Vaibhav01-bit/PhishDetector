@@ -13,6 +13,9 @@
   <link href="static/assets/img/newlogo.jpg" rel="icon">
   <link href="static/assets/img/newlogo.jpg" rel="apple-touch-icon">
 
+  <!-- Preload above-the-fold hero image -->
+  <link rel="preload" as="image" href="static/assets/img/Phishing.gif">
+
   <!-- Vendor CSS Files -->
   <link href="static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
@@ -37,6 +40,19 @@
   <link href="static/css/footer-particles.css" rel="stylesheet">
   <link href="static/css/benefits.css" rel="stylesheet">
   <link href="static/css/global-warm-glow.css" rel="stylesheet">
+  <link href="static/css/sandbox-results.css" rel="stylesheet">
+  <link href="static/css/hero-card-enterprise.css" rel="stylesheet">
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
 </head>
 
 <body>
@@ -48,7 +64,7 @@
       <div class="logo mr-auto d-flex align-items-center">
         <a href="{{ url_for('home') }}" class="d-flex align-items-center">
           <img src="static/assets/img/newlogo.jpg" alt="PhishDetector Logo" class="img-fluid mr-2"
-            style="border-radius: 8px;">
+            style="border-radius: 8px;" loading="eager" decoding="async" width="32" height="32">
           <span class="logo-text">PhishDetector</span>
         </a>
       </div>
@@ -131,73 +147,85 @@
 
             <div class="scan-result mt-4">
               {% if name %}
-              <div class="result-card p-4 rounded shadow-lg">
-                <p class="url-text mb-2 text-muted">Scanning: <span>{{name[0]}}</span></p>
-                <h3 class="{% if name[3] %}text-success{% else %}text-danger{% endif %} fw-bold mb-3">
-                  This website is {{name[1]}}
-                </h3>
-                <div class="d-flex gap-3">
-                  {% if name[3] %}
-                  <button class="btn btn-success px-4 py-2" onclick="window.open('{{name[0]}}')" target="_blank">Proceed
-                    Safely</button>
-                  {% else %}
-                  <button class="btn btn-danger px-4 py-2" onclick="window.open('{{name[0]}}')" target="_blank">View
-                    Anyway (Risk)</button>
+              <div class="result-card enterprise-card p-5 rounded-4 shadow-lg">
+                <!-- Scanning URL (Small, Muted) -->
+                <p class="url-text mb-3 text-muted">
+                  <i class='bx bx-link-alt me-1'></i>
+                  Scanning: <span class="fw-medium">{{name[0]}}</span>
+                </p>
+
+                <!-- Security Icon + Verdict -->
+                <div class="verdict-section mb-3">
+                  <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
+                    <!-- Security Icon with Pulse -->
+                    <div
+                      class="security-icon {% if name[3] %}icon-safe{% elif name[2] == 'Warning' %}icon-warning{% else %}icon-danger{% endif %}">
+                      {% if name[3] %}
+                      <i class='bx bxs-shield-alt-2'></i>
+                      {% elif name[2] == 'Warning' %}
+                      <i class='bx bxs-error-alt'></i>
+                      {% else %}
+                      <i class='bx bxs-shield-x'></i>
+                      {% endif %}
+                    </div>
+
+                    <!-- Verdict Text (Honest Language) -->
+                    <h3
+                      class="verdict-text {% if name[3] %}text-success{% elif name[2] == 'Warning' %}text-warning{% else %}text-danger{% endif %} fw-bold mb-0">
+                      This website appears {{name[1]}}
+                    </h3>
+                  </div>
+
+                  <!-- Subtext Disclaimer (Anti-Overconfidence) -->
+                  <p class="verdict-subtext text-muted mb-0">
+                    Based on automated 5-layer analysis. HTTPS encryption alone does not guarantee legitimacy.
+                  </p>
+                </div>
+                <!-- CTA Section: Sandbox Primary, Proceed Secondary -->
+                <div class="cta-section mt-4">
+
+                  {% if details and details.layers.get('sandbox') and details.layers.sandbox.success %}
+
+                  <!-- PRIMARY CTA: Sandbox Analysis -->
+                  <div class="primary-cta-wrapper mb-3">
+                    <a href="{{ url_for('sandbox_results', scan_id=details.layers.sandbox.scan_id) }}"
+                      class="btn-sandbox-primary">
+                      <span>View Sandbox Analysis</span>
+                      <i class='bx bx-right-arrow-alt'></i>
+                    </a>
+
+                    <!-- Trust Caption -->
+                    <p class="sandbox-caption mt-2 mb-0 text-center">
+                      <i class='bx bxs-lock-alt'></i>
+                      Secure sandbox environment • No user interaction performed
+                    </p>
+                  </div>
+                  {% elif details and details.layers.get('sandbox') and not details.layers.sandbox.success %}
+                  <!-- Sandbox Error (Brief) -->
+                  <div class="sandbox-error-brief mb-3">
+                    <p class="mb-0 text-center">
+                      <i class='bx bx-info-circle'></i>
+                      Sandbox analysis unavailable for this URL
+                    </p>
+                  </div>
                   {% endif %}
+
+                  <!-- SECONDARY CTA: Proceed/View Anyway -->
+                  <div class="secondary-cta-wrapper text-center">
+                    {% if name[3] %}
+                    <button class="btn-proceed-secondary" onclick="window.open('{{name[0]}}')" target="_blank">
+                      <i class='bx bx-check-circle me-1'></i>
+                      Proceed Safely
+                    </button>
+                    {% else %}
+                    <button class="btn-proceed-danger" onclick="window.open('{{name[0]}}')" target="_blank">
+                      <i class='bx bx-error-circle me-1'></i>
+                      View Anyway (Risk)
+                    </button>
+                    {% endif %}
+                  </div>
                 </div>
 
-                {% if details %}
-                <div class="layer-breakdown mt-4 text-left">
-                  <h5 class="border-bottom pb-2">5-Layer Security Analysis</h5>
-                  <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <div>
-                        <strong>Layer 1: Blacklist Check</strong><br>
-                        <small class="text-muted">{{ details.layers.layer1.message }}</small>
-                      </div>
-                      <span
-                        class="badge badge-{% if details.layers.layer1.status == 'Safe' %}success{% elif details.layers.layer1.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
-                        details.layers.layer1.status }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <div>
-                        <strong>Layer 2: Domain Analysis</strong><br>
-                        <small class="text-muted">{{ details.layers.layer2.message }}</small>
-                      </div>
-                      <span
-                        class="badge badge-{% if details.layers.layer2.status == 'Safe' %}success{% elif details.layers.layer2.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
-                        details.layers.layer2.status }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <div>
-                        <strong>Layer 3: SSL Certificate</strong><br>
-                        <small class="text-muted">{{ details.layers.layer3.message }}</small>
-                      </div>
-                      <span
-                        class="badge badge-{% if details.layers.layer3.status == 'Safe' %}success{% elif details.layers.layer3.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
-                        details.layers.layer3.status }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <div>
-                        <strong>Layer 4: AI/ML Model</strong><br>
-                        <small class="text-muted">{{ details.layers.layer4.message }}</small>
-                      </div>
-                      <span
-                        class="badge badge-{% if details.layers.layer4.status == 'Safe' %}success{% elif details.layers.layer4.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
-                        details.layers.layer4.status }}</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <div>
-                        <strong>Layer 5: Behavioral Analysis</strong><br>
-                        <small class="text-muted">{{ details.layers.layer5.message }}</small>
-                      </div>
-                      <span
-                        class="badge badge-{% if details.layers.layer5.status == 'Safe' %}success{% elif details.layers.layer5.status == 'Warning' %}warning{% else %}danger{% endif %}">{{
-                        details.layers.layer5.status }}</span>
-                    </li>
-                  </ul>
-                </div>
-                {% endif %}
 
               </div>
               {% endif %}
@@ -205,7 +233,8 @@
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img-container" data-aos="zoom-in" data-aos-delay="200">
-          <img src="static/assets/img/Phishing.gif" class="img-fluid animated" alt="Cyber Security Protection">
+          <img src="static/assets/img/Phishing.gif" class="img-fluid animated" alt="Cyber Security Protection"
+            loading="eager" decoding="async">
         </div>
       </div>
     </div>
@@ -528,7 +557,7 @@
 
       <div class="text-center text-md-center">
         <div class="copyright">
-          <img src="static/assets/img/google.png" alt="">
+          <img src="static/assets/img/google.png" alt="" loading="lazy" decoding="async" width="24" height="24">
           <a href="https://phishingquiz.withgoogle.com/" target="_blank" class="get-started-btn scrollto">Take a
             Phishing Test by GOOGLE</a> <br>
           <hr />
@@ -547,24 +576,28 @@
   <!-- <div id="preloader"></div> -->
 
   <!-- Vendor JS Files -->
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/venobox/1.9.3/venobox.min.js"></script>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" defer></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/venobox/1.9.3/venobox.min.js" defer></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
   <script>
     function scrolldiv() {
       var elem = document.getElementById("about");
-      elem.scrollIntoView();
+      if (elem && elem.scrollIntoView) {
+        elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
-    AOS.init();
+    window.addEventListener('DOMContentLoaded', function () {
+      if (window.AOS && AOS.init) { AOS.init(); }
+    });
   </script>
 
   <!-- Template Main JS File -->
-  <script src="static/assets/js/main.js"></script>
-  <script src="static/js/hero_animation.js"></script>
-  <script src="static/js/theme-toggle.js"></script>
+  <script src="static/assets/js/main.js" defer></script>
+  <script src="static/js/hero_animation.js" defer></script>
+  <script src="static/js/theme-toggle.js" defer></script>
 </body>
 
 </html>
