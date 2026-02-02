@@ -187,12 +187,39 @@ input:checked+.slider .stars {
 body.dark-mode {
     background-color: #0F172A;
     /* Dark Background */
-    color: #E2E8F0;
+    color: #CBD5E1;
     /* Light Text */
 
-    /* Redefine variables for components using them */
-    --color-text-dark: #E2E8F0;
-    --color-text-muted: #94A3B8;
+    /* ═══════════════════════════════════════
+       TEXT COLORS - NIGHT MODE (Dark)
+       Brighter for better contrast on dark
+       ═══════════════════════════════════════ */
+
+    /* Primary Text Hierarchy */
+    --text-heading-primary: #F1F5F9;
+    /* Slate-100 - Main headings */
+    --text-heading-secondary: #E2E8F0;
+    /* Slate-200 - Subheadings */
+    --text-body: #CBD5E1;
+    /* Slate-300 - Body text */
+    --text-muted: #94A3B8;
+    /* Slate-400 - Helper text */
+    --text-metadata: #64748B;
+    /* Slate-500 - Labels, timestamps */
+
+    /* Interactive Elements */
+    --text-link: #60A5FA;
+    /* Blue-400 - Links (brighter for dark) */
+    --text-link-hover: #93C5FD;
+    /* Blue-300 - Link hover */
+
+    /* Status Text Colors (brighter for dark mode) */
+    --text-safe: #4ADE80;
+    /* Green-400 - Safe status */
+    --text-warning: #FB923C;
+    /* Orange-400 - Warning status */
+    --text-danger: #F87171;
+    /* Red-400 - Danger status */
 
     /* Footer Particle Overrides */
     --particle-color-primary: rgba(255, 255, 255, 0.9);
@@ -201,6 +228,7 @@ body.dark-mode {
     /* Orange for Dark Mode */
 }
 
+
 body.dark-mode .testimonial-item {
     background: rgba(30, 41, 59, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -208,11 +236,11 @@ body.dark-mode .testimonial-item {
 }
 
 body.dark-mode .testimonial-item p {
-    color: var(--color-text-muted);
+    color: var(--text-muted);
 }
 
 body.dark-mode .testimonial-item b {
-    color: var(--color-text-dark);
+    color: var(--text-heading-secondary);
 }
 
 /* Adjust Header for Dark Mode */
@@ -222,13 +250,12 @@ body.dark-mode #header {
 }
 
 body.dark-mode .nav-menu a {
-    color: #E2E8F0;
+    color: var(--text-heading-secondary);
 }
 
 body.dark-mode .nav-menu a:hover,
 body.dark-mode .nav-menu .active>a {
-    color: #60A5FA;
-    /* Blue-400 */
+    color: var(--text-link);
 }
 
 /* Adjust Dropdown for Dark Mode */
@@ -238,13 +265,13 @@ body.dark-mode .nav-menu .drop-down ul {
 }
 
 body.dark-mode .nav-menu .drop-down ul a {
-    color: #CBD5E1;
+    color: var(--text-body);
 }
 
 body.dark-mode .nav-menu .drop-down ul a:hover,
 body.dark-mode .nav-menu .drop-down ul .active>a,
 body.dark-mode .nav-menu .drop-down ul li:hover>a {
-    color: #60A5FA;
+    color: var(--text-link);
     background: #334155;
 }
 
@@ -255,17 +282,17 @@ body.dark-mode .mobile-nav {
 }
 
 body.dark-mode .mobile-nav a {
-    color: #E2E8F0;
+    color: var(--text-heading-secondary);
 }
 
 body.dark-mode .mobile-nav a:hover,
 body.dark-mode .mobile-nav .active>a {
-    color: #60A5FA;
+    color: var(--text-link);
     background: #334155;
 }
 
 body.dark-mode .mobile-nav-toggle i {
-    color: #E2E8F0;
+    color: var(--text-heading-secondary);
 }
 
 /* Hero Section Dark Mode */
@@ -274,14 +301,14 @@ body.dark-mode #hero {
 }
 
 body.dark-mode .main-heading {
-    background: linear-gradient(135deg, #E2E8F0 0%, #60A5FA 100%);
+    background: linear-gradient(135deg, var(--text-heading-secondary) 0%, var(--text-link) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 body.dark-mode .sub-heading {
-    color: #94A3B8;
+    color: var(--text-muted);
 }
 
 body.dark-mode #hero .scan-form .input-group {
@@ -290,11 +317,11 @@ body.dark-mode #hero .scan-form .input-group {
 }
 
 body.dark-mode #hero .scan-form .form-control {
-    color: #E2E8F0 !important;
+    color: var(--text-heading-secondary) !important;
 }
 
 body.dark-mode #hero .scan-form .form-control::placeholder {
-    color: #94A3B8 !important;
+    color: var(--text-muted) !important;
 }
 
 body.dark-mode #hero .result-card {
@@ -306,7 +333,7 @@ body.dark-mode #hero .result-card h3,
 body.dark-mode #hero .result-card p,
 body.dark-mode #hero .result-card strong,
 body.dark-mode .list-group-item {
-    color: #E2E8F0;
+    color: var(--text-heading-secondary);
     background-color: transparent;
 }
 
@@ -316,11 +343,11 @@ body.dark-mode .faq {
 }
 
 body.dark-mode .faq .faq-list a {
-    color: #60A5FA;
+    color: var(--text-link);
 }
 
 body.dark-mode .faq .faq-list p {
-    color: #94A3B8;
+    color: var(--text-muted);
 }
 
 /* About Section Dark Mode */

@@ -28,9 +28,27 @@
                     <i class='bx bx-shield-check'></i>
                     <span>PhishDetector</span>
                 </a>
-                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
-                    <i class='bx bx-moon'></i>
-                </button>
+                <div class="theme-switch-wrapper">
+                    <label class="theme-switch" for="checkbox">
+                        <input type="checkbox" id="checkbox" aria-label="Toggle Dark Theme" autocomplete="off" />
+                        <div class="slider round">
+                            <div class="clouds">
+                                <div class="cloud cloud-1"></div>
+                                <div class="cloud cloud-2"></div>
+                                <div class="cloud cloud-3"></div>
+                            </div>
+                            <div class="stars">
+                                <div class="star star-1"></div>
+                                <div class="star star-2"></div>
+                                <div class="star star-3"></div>
+                                <div class="star star-4"></div>
+                                <div class="star star-5"></div>
+                            </div>
+                            <div class="moon"></div>
+                            <div class="sun"></div>
+                        </div>
+                    </label>
+                </div>
             </div>
         </div>
     </header>
@@ -50,6 +68,36 @@
                     <i class='bx bx-time-five'></i>
                     Scanned: {{ sandbox.timestamp }}
                 </p>
+            </div>
+        </section>
+
+        <!-- Trust Banner -->
+        <section class="trust-banner">
+            <div class="container">
+                <div class="trust-content">
+                    <div class="trust-icon">
+                        <i class='bx bxs-lock-alt'></i>
+                    </div>
+                    <div class="trust-text">
+                        <h3>Secure Sandbox Environment</h3>
+                        <p>This URL was opened in an isolated, read-only browser. No data was submitted, and your device
+                            was never exposed to risk.</p>
+                    </div>
+                    <div class="trust-badges">
+                        <span class="trust-badge">
+                            <i class='bx bx-shield-check'></i>
+                            Isolated
+                        </span>
+                        <span class="trust-badge">
+                            <i class='bx bx-lock'></i>
+                            Read-only
+                        </span>
+                        <span class="trust-badge">
+                            <i class='bx bx-check-circle'></i>
+                            Secure
+                        </span>
+                    </div>
+                </div>
             </div>
         </section>
 

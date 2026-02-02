@@ -2,33 +2,186 @@
 # Variables
 --------------------------------------------------------------*/
 :root {
+  /* ═══════════════════════════════════════
+     TYPOGRAPHY - Professional SaaS System
+     ═══════════════════════════════════════ */
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Inter', sans-serif;
 
-  /* Primary Colors */
+  /* ═══════════════════════════════════════
+     TEXT COLORS - DAY MODE (Light)
+     Calm, trustworthy, enterprise-grade
+     ═══════════════════════════════════════ */
+
+  /* Primary Text Hierarchy */
+  --text-heading-primary: #0F172A;
+  /* Slate-900 - Main headings */
+  --text-heading-secondary: #1E293B;
+  /* Slate-800 - Subheadings */
+  --text-body: #334155;
+  /* Slate-700 - Body text */
+  --text-muted: #64748B;
+  /* Slate-500 - Helper text */
+  --text-metadata: #94A3B8;
+  /* Slate-400 - Labels, timestamps */
+
+  /* Interactive Elements */
+  --text-link: #2563EB;
+  /* Blue-600 - Links (calm, not bright) */
+  --text-link-hover: #1D4ED8;
+  /* Blue-700 - Link hover */
+
+  /* Status Text Colors */
+  --text-safe: #16A34A;
+  /* Green-600 - Safe status */
+  --text-warning: #EA580C;
+  /* Orange-600 - Warning status */
+  --text-danger: #DC2626;
+  /* Red-600 - Danger status */
+
+  /* ═══════════════════════════════════════
+     STATUS COLORS - Semantic Tokens
+     Enterprise-grade status system
+     ═══════════════════════════════════════ */
+
+  /* SAFE STATUS - Calm Green (Not Bright) */
+  --color-safe-primary: #16A34A;
+  /* Green-600 */
+  --color-safe-secondary: #22C55E;
+  /* Green-500 */
+  --color-safe-bg: rgba(34, 197, 94, 0.08);
+  --color-safe-border: rgba(34, 197, 94, 0.2);
+  --color-safe-glow: rgba(34, 197, 94, 0.15);
+  --color-safe-text: #16A34A;
+
+  /* WARNING STATUS - Amber/Orange (Not Harsh) */
+  --color-warning-primary: #EA580C;
+  /* Orange-600 */
+  --color-warning-secondary: #FB923C;
+  /* Orange-400 */
+  --color-warning-bg: rgba(251, 146, 60, 0.08);
+  --color-warning-border: rgba(251, 146, 60, 0.2);
+  --color-warning-glow: rgba(251, 146, 60, 0.15);
+  --color-warning-text: #EA580C;
+
+  /* PHISHING/DANGER STATUS - Muted Red (Professional) */
+  --color-danger-primary: #DC2626;
+  /* Red-600 */
+  --color-danger-secondary: #EF4444;
+  /* Red-500 */
+  --color-danger-bg: rgba(239, 68, 68, 0.08);
+  --color-danger-border: rgba(239, 68, 68, 0.2);
+  --color-danger-glow: rgba(239, 68, 68, 0.15);
+  --color-danger-text: #DC2626;
+
+  /* INFO/NEUTRAL - Cybersecurity Blue */
+  --color-info-primary: #2563EB;
+  /* Blue-600 */
+  --color-info-secondary: #06B6D4;
+  /* Cyan-500 */
+  --color-info-bg: rgba(37, 99, 235, 0.08);
+  --color-info-border: rgba(37, 99, 235, 0.2);
+  --color-info-glow: rgba(37, 99, 235, 0.15);
+
+  /* ═══════════════════════════════════════
+     BRAND COLORS
+     ═══════════════════════════════════════ */
   --color-primary: #2563EB;
   --color-primary-dark: #1D4ED8;
   --color-accent: #06B6D4;
+  --color-accent-purple: #8B5CF6;
 
-  /* Neutral Colors */
-  --color-text-dark: #0F172A;
-  --color-text-muted: #64748B;
+  /* ═══════════════════════════════════════
+     BACKGROUNDS
+     ═══════════════════════════════════════ */
   --color-bg-light: #F8FAFC;
   --color-white: #FFFFFF;
+  --color-bg-elevated: #FFFFFF;
 
-  /* Shadows & Glass */
+  /* ═══════════════════════════════════════
+     SHADOWS & GLASS
+     ═══════════════════════════════════════ */
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 16px -2px rgba(0, 0, 0, 0.08), 0 4px 8px -1px rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 10px 15px -3px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(37, 99, 235, 0.05);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: 1px solid rgba(255, 255, 255, 0.5);
   --glass-blur: blur(12px);
 
   /* Footer Particles */
   --particle-color-primary: rgba(0, 0, 0, 0.7);
-  /* High Contrast Black for Day Mode */
   --particle-color-secondary: rgba(249, 115, 22, 0.8);
-  /* High Contrast Orange for Day Mode */
 }
+
+/* ═══════════════════════════════════════
+   DARK MODE - Deep Cyber Theme
+   ═══════════════════════════════════════ */
+body.dark-mode,
+[data-theme="dark"] {
+  /* Backgrounds - Deep Navy/Cyber */
+  --color-bg-light: #0F172A;
+  /* Slate-900 - Deep navy */
+  --color-bg-elevated: #1E293B;
+  /* Slate-800 - Elevated surfaces */
+  --color-bg-tertiary: #334155;
+  /* Slate-700 - Cards */
+  --color-white: #1E293B;
+
+  /* Dark Mode Text - Higher Contrast */
+  --text-heading-primary: #F8FAFC;
+  /* Slate-50 */
+  --text-heading-secondary: #E2E8F0;
+  /* Slate-200 */
+  --text-body: #CBD5E1;
+  /* Slate-300 */
+  --text-muted: #94A3B8;
+  /* Slate-400 */
+  --text-metadata: #64748B;
+  /* Slate-500 */
+
+  /* Cyber Accents - Brighter in Dark Mode */
+  --color-primary: #3B82F6;
+  /* Blue-500 */
+  --color-accent: #06B6D4;
+  /* Cyan-500 */
+  --color-accent-purple: #A78BFA;
+  /* Purple-400 */
+
+  /* Status Colors - Adjusted for Dark Mode */
+  --color-safe-primary: #22C55E;
+  /* Green-500 */
+  --color-safe-secondary: #4ADE80;
+  /* Green-400 */
+  --color-safe-text: #4ADE80;
+
+  --color-warning-primary: #FB923C;
+  /* Orange-400 */
+  --color-warning-secondary: #FDBA74;
+  /* Orange-300 */
+  --color-warning-text: #FDBA74;
+
+  --color-danger-primary: #EF4444;
+  /* Red-500 */
+  --color-danger-secondary: #F87171;
+  /* Red-400 */
+  --color-danger-text: #F87171;
+
+  /* Shadows - Darker for depth */
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 8px 16px -2px rgba(0, 0, 0, 0.4), 0 4px 8px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6), 0 4px 16px rgba(0, 0, 0, 0.5);
+
+  /* Glass - Darker backdrop */
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* Particles - Lighter for visibility */
+  --particle-color-primary: rgba(255, 255, 255, 0.6);
+  --particle-color-secondary: rgba(59, 130, 246, 0.7);
+}
+
 
 /*--------------------------------------------------------------
 # General
@@ -39,22 +192,23 @@ html {
 
 body {
   font-family: var(--font-body);
-  color: var(--color-text-dark);
+  color: var(--text-body);
   background-color: var(--color-bg-light);
   overflow-x: hidden;
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--text-link);
   text-decoration: none;
   transition: all 0.3s ease;
 }
 
 a:hover {
-  color: var(--color-accent);
+  color: var(--text-link-hover);
   text-decoration: none;
 }
 
+/* Typography Hierarchy - Enterprise Grade */
 h1,
 h2,
 h3,
@@ -62,7 +216,76 @@ h4,
 h5,
 h6 {
   font-family: var(--font-heading);
-  color: var(--color-text-dark);
+  color: var(--text-heading-primary);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: 3.5rem;
+  /* 56px */
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: 2.25rem;
+  /* 36px */
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+h3 {
+  font-size: 1.875rem;
+  /* 30px */
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+h4 {
+  font-size: 1.5rem;
+  /* 24px */
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Body Text - Optimized Readability */
+p {
+  line-height: 1.7;
+  /* Increased from default */
+  max-width: 65ch;
+  /* Optimal reading width */
+}
+
+/* Utility Text Classes */
+.text-small {
+  font-size: 0.875rem;
+  /* 14px */
+  line-height: 1.6;
+}
+
+.text-metadata {
+  font-size: 0.8125rem;
+  /* 13px */
+  color: var(--text-metadata);
+  font-weight: 500;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+/* Content Width Constraints */
+.content-text {
+  max-width: 65ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.content-wide {
+  max-width: 80ch;
 }
 
 /*--------------------------------------------------------------
@@ -601,13 +824,82 @@ body.dark-mode #hero::before {
   z-index: 2;
 }
 
+/* Hero Badge - Trust Indicator */
+#hero .hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  border-radius: 24px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-info-primary);
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+#hero .hero-badge i {
+  font-size: 1.125rem;
+}
+
+body.dark-mode #hero .hero-badge {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: var(--color-primary);
+}
+
+/* Trust Indicators */
+#hero .trust-indicators {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+#hero .trust-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 6px 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  transition: all 0.3s ease;
+}
+
+#hero .trust-item i {
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+
+#hero .trust-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-primary);
+}
+
+body.dark-mode #hero .trust-item {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-body);
+}
+
+body.dark-mode #hero .trust-item:hover {
+  border-color: var(--color-primary);
+}
+
 #hero .main-heading {
   margin: 0 0 16px 0;
   font-size: 56px;
   /* Larger impact */
   font-weight: 700;
   line-height: 1.1;
-  background: linear-gradient(135deg, var(--color-text-dark) 0%, var(--color-primary) 100%);
+  background: linear-gradient(135deg, var(--text-heading-primary) 0%, var(--color-primary) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -617,10 +909,10 @@ body.dark-mode #hero::before {
 }
 
 #hero .sub-heading {
-  color: var(--color-text-muted);
+  color: var(--text-muted);
   margin-bottom: 32px;
   font-size: 18px;
-  line-height: 1.6;
+  line-height: 1.7;
   font-weight: 400;
   max-width: 90%;
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;

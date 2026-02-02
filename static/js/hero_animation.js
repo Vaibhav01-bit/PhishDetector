@@ -10,12 +10,13 @@ let width, height;
 let dots = [];
 
 // Configuration
+const isMobile = window.innerWidth < 768;
 const config = {
     sphereRadius: 280,
-    dotCount: 180,
+    dotCount: isMobile ? 100 : 180, // Reduced dots on mobile
     rotationSpeed: 0.003,
     perspective: 800,
-    connectionDistance: 60,
+    connectionDistance: isMobile ? 50 : 60, // Shorter connections on mobile
     colors: {
         palette: [
             'rgba(56, 189, 248, 1)',   // Light Blue (Sky-400)
@@ -231,9 +232,10 @@ function init() {
         dots.push(new Dot());
     }
 
-    // Init Icons
+    // Init Icons - Reduced on mobile for performance
     securityIcons = [];
-    for (let i = 0; i < 25; i++) { // Increase density
+    const iconCount = isMobile ? 12 : 25;
+    for (let i = 0; i < iconCount; i++) {
         securityIcons.push(new SecurityIcon());
     }
 }

@@ -39,6 +39,8 @@
   <link href="static/css/faq-glow.css" rel="stylesheet">
   <link href="static/css/footer-particles.css" rel="stylesheet">
   <link href="static/css/benefits.css" rel="stylesheet">
+  <link href="static/css/how-it-works.css" rel="stylesheet">
+  <link href="static/css/phishing-education.css" rel="stylesheet">
   <link href="static/css/global-warm-glow.css" rel="stylesheet">
   <link href="static/css/sandbox-results.css" rel="stylesheet">
   <link href="static/css/hero-card-enterprise.css" rel="stylesheet">
@@ -124,20 +126,43 @@
 
   <!-- ======= Hero Section ======= -->
   <section id="hero" class="d-flex align-items-center">
-    <canvas id="hero-canvas"></canvas>
+    <canvas id="hero-canvas" aria-label="Animated cybersecurity network visualization"></canvas>
     <div class="container" data-aos="fade-up">
       <div class="row gy-4">
         <div class="col-lg-6 d-flex flex-column justify-content-center order-2 order-lg-1">
-          <h1 class="main-heading">PhishDetector: AI-Powered Protection</h1>
-          <p class="sub-heading">Safeguard your digital presence with real-time website scanning. Our advanced
-            algorithms detect phishing threats before they strike.</p>
+          <!-- Trust Badge -->
+          <div class="hero-badge mb-3" data-aos="fade-up" data-aos-delay="100">
+            <i class='bx bx-shield-check'></i>
+            <span>Privacy-first security analysis</span>
+          </div>
+
+          <h1 class="main-heading">Detect phishing threats before they strike</h1>
+          <p class="sub-heading">Multi-layer AI analysis powered by 5 security checks. Assess risk with evidence, not
+            blind trust. No account required.</p>
+
+          <!-- Trust Indicators -->
+          <div class="trust-indicators mb-4" data-aos="fade-up" data-aos-delay="200">
+            <span class="trust-item">
+              <i class='bx bx-lock-alt'></i>
+              No account required
+            </span>
+            <span class="trust-item">
+              <i class='bx bx-shield'></i>
+              Privacy-first
+            </span>
+            <span class="trust-item">
+              <i class='bx bx-brain'></i>
+              97.4% accuracy
+            </span>
+          </div>
 
           <div class="hero-actions mt-4">
             <form action="/result" method="POST" class="scan-form">
               <div class="input-group neon-box">
                 <div class="input-content-mask">
-                  <input type="url" name="name" class="form-control" autocomplete="url"
-                    placeholder="Paste URL here (https://...)" required>
+                  <input type="url" id="url-input" name="name" class="form-control" autocomplete="url"
+                    placeholder="Paste URL here (https://...)" required
+                    aria-label="Enter URL to scan for phishing threats">
                   <div class="input-group-append">
                     <button type="submit" class="btn btn-primary">Scan Website</button>
                   </div>
@@ -172,13 +197,20 @@
                     <!-- Verdict Text (Honest Language) -->
                     <h3
                       class="verdict-text {% if name[3] %}text-success{% elif name[2] == 'Warning' %}text-warning{% else %}text-danger{% endif %} fw-bold mb-0">
-                      This website appears {{name[1]}}
+                      {% if name[3] %}
+                      This website appears safe
+                      {% elif name[2] == 'Warning' %}
+                      Suspicious patterns detected
+                      {% else %}
+                      High-risk phishing indicators found
+                      {% endif %}
                     </h3>
                   </div>
 
                   <!-- Subtext Disclaimer (Anti-Overconfidence) -->
                   <p class="verdict-subtext text-muted mb-0">
-                    Based on automated 5-layer analysis. HTTPS encryption alone does not guarantee legitimacy.
+                    Based on automated 5-layer analysis. HTTPS encryption alone does not guarantee legitimacy. Always
+                    verify URLs manually.
                   </p>
                 </div>
                 <!-- CTA Section: Sandbox Primary, Proceed Secondary -->
@@ -249,14 +281,14 @@
         <p>Enterprise-grade security simplified for everyone.</p>
       </div>
 
-      <div class="row">
+      <div class="benefits-grid">
 
         <!-- Benefit 1 -->
-        <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
-          <div class="benefit-card">
-            <div class="icon-box">
-              <i class="bx bx-rocket"></i>
-            </div>
+        <div class="benefit-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="icon-container">
+            <i class="bx bx-rocket"></i>
+          </div>
+          <div class="content">
             <h3>Real-Time Analysis</h3>
             <p>Instant URL scanning capabilities that detect malicious links in milliseconds before you click. Speed
               meets security.</p>
@@ -264,11 +296,11 @@
         </div>
 
         <!-- Benefit 2 -->
-        <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
-          <div class="benefit-card">
-            <div class="icon-box">
-              <i class="bx bx-brain"></i>
-            </div>
+        <div class="benefit-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="icon-container">
+            <i class="bx bx-brain"></i>
+          </div>
+          <div class="content">
             <h3>AI-Powered Core</h3>
             <p>Advanced machine learning models trained to recognize zero-day threats and evolving phishing patterns
               that traditional tools miss.</p>
@@ -276,11 +308,11 @@
         </div>
 
         <!-- Benefit 3 -->
-        <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
-          <div class="benefit-card">
-            <div class="icon-box">
-              <i class="bx bx-layer"></i>
-            </div>
+        <div class="benefit-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="icon-container">
+            <i class="bx bx-layer"></i>
+          </div>
+          <div class="content">
             <h3>5-Layer Defense</h3>
             <p>Comprehensive security stack including SSL checks, domain reputation, behavioral analysis, and blacklist
               verification.</p>
@@ -288,11 +320,11 @@
         </div>
 
         <!-- Benefit 4 -->
-        <div class="col-lg-3 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="400">
-          <div class="benefit-card">
-            <div class="icon-box">
-              <i class="bx bx-shield-quarter"></i>
-            </div>
+        <div class="benefit-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="icon-container">
+            <i class="bx bx-shield-quarter"></i>
+          </div>
+          <div class="content">
             <h3>Privacy First</h3>
             <p>No account required. We scan URLs anonymously without storing your personal data or browsing history.
               Your safety is our priority.</p>
@@ -303,6 +335,186 @@
 
     </div>
   </section><!-- End Benefits Section -->
+
+  <!-- ======= How It Works Section ======= -->
+  <section id="how-it-works" class="how-it-works">
+    <div class="container" data-aos="fade-up">
+
+      <div class="section-title">
+        <h2>How PhishDetector Protects You</h2>
+        <p class="section-intro">Our 5-layer security pipeline analyzes URLs through multiple detection methods to
+          identify phishing threats with 97.4% accuracy.</p>
+      </div>
+
+      <div class="process-flow">
+        <!-- Layer 1 -->
+        <div class="process-step" data-aos="fade-up" data-aos-delay="100">
+          <div class="step-number">1</div>
+          <div class="step-icon">
+            <i class='bx bx-list-check'></i>
+          </div>
+          <h4>Blacklist Check</h4>
+          <p>Instantly blocks known malicious domains from PhishTank and Google Safe Browsing databases.</p>
+        </div>
+
+        <!-- Layer 2 -->
+        <div class="process-step" data-aos="fade-up" data-aos-delay="200">
+          <div class="step-number">2</div>
+          <div class="step-icon">
+            <i class='bx bx-globe'></i>
+          </div>
+          <h4>Domain Analysis</h4>
+          <p>Detects typosquatting, suspicious TLDs, and brand impersonation attempts through heuristic analysis.</p>
+        </div>
+
+        <!-- Layer 3 -->
+        <div class="process-step" data-aos="fade-up" data-aos-delay="300">
+          <div class="step-number">3</div>
+          <div class="step-icon">
+            <i class='bx bx-lock-alt'></i>
+          </div>
+          <h4>SSL Certificate</h4>
+          <p>Validates HTTPS certificates and secure connections to ensure encrypted communication.</p>
+
+          <!-- HTTPS Education Callout -->
+          <div class="education-callout warning">
+            <i class='bx bx-info-circle'></i>
+            <div>
+              <strong>Important:</strong> HTTPS encrypts your connection but doesn't guarantee the site is trustworthy.
+              Attackers can obtain valid certificates.
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer 4 -->
+        <div class="process-step" data-aos="fade-up" data-aos-delay="400">
+          <div class="step-number">4</div>
+          <div class="step-icon">
+            <i class='bx bx-brain'></i>
+          </div>
+          <h4>AI/ML Model</h4>
+          <p>Gradient Boosting Classifier analyzes deep content features with 97.4% accuracy to detect zero-day threats.
+          </p>
+        </div>
+
+        <!-- Layer 5 -->
+        <div class="process-step" data-aos="fade-up" data-aos-delay="500">
+          <div class="step-number">5</div>
+          <div class="step-icon">
+            <i class='bx bx-search-alt'></i>
+          </div>
+          <h4>Behavioral Analysis</h4>
+          <p>Checks for obfuscation techniques, IP-based URLs, and suspicious redirect patterns.</p>
+        </div>
+
+        <!-- Layer 6 - Sandbox (Highlighted) -->
+        <div class="process-step highlight" data-aos="fade-up" data-aos-delay="600">
+          <div class="step-number">6</div>
+          <div class="step-icon">
+            <i class='bx bx-desktop'></i>
+          </div>
+          <h4>Sandbox Analysis</h4>
+          <p>Opens URLs in an isolated browser to capture screenshots and detect behavioral patterns—without exposing
+            you to risk.</p>
+          <div class="sandbox-badge">
+            <i class='bx bxs-lock-alt'></i>
+            <span>Secure • Isolated • Read-only</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section><!-- End How It Works Section -->
+
+  <!-- ======= Phishing Education Section ======= -->
+  <section id="phishing-education" class="phishing-education">
+    <div class="container" data-aos="fade-up">
+
+      <div class="section-title">
+        <h2>Recognize Phishing Attempts</h2>
+        <p class="section-intro">Learn to identify common phishing tactics used by attackers to steal your information.
+        </p>
+      </div>
+
+      <div class="trick-grid">
+        <!-- Trick 1: Typosquatting -->
+        <div class="trick-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="trick-icon">🔗</div>
+          <h4>Typosquatting</h4>
+          <p>Attackers register domains with slight misspellings to trick users:</p>
+          <div class="example-box">
+            <div class="example-item bad">
+              <i class='bx bx-x-circle'></i>
+              <span>paypa<strong>1</strong>.com</span>
+            </div>
+            <div class="example-divider">instead of</div>
+            <div class="example-item good">
+              <i class='bx bx-check-circle'></i>
+              <span>paypal.com</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trick 2: HTTPS Deception -->
+        <div class="trick-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="trick-icon">🔒</div>
+          <h4>HTTPS Deception</h4>
+          <p>Phishing sites can have valid SSL certificates. HTTPS only encrypts data—it doesn't verify legitimacy.</p>
+          <div class="warning-badge">
+            <i class='bx bx-error-alt'></i>
+            <span>HTTPS ≠ Safe</span>
+          </div>
+        </div>
+
+        <!-- Trick 3: Urgency Tactics -->
+        <div class="trick-card" data-aos="fade-up" data-aos-delay="300">
+          <div class="trick-icon">⚡</div>
+          <h4>Urgency Tactics</h4>
+          <p>"Your account will be closed in 24 hours!" Legitimate companies don't create panic.</p>
+          <div class="tip-box">
+            <i class='bx bx-bulb'></i>
+            <span>Take your time. Verify independently.</span>
+          </div>
+        </div>
+
+        <!-- Trick 4: Email Spoofing -->
+        <div class="trick-card" data-aos="fade-up" data-aos-delay="400">
+          <div class="trick-icon">📧</div>
+          <h4>Email Spoofing</h4>
+          <p>Display names can be faked. Always check the actual sender email address, not just the name.</p>
+          <div class="example-box">
+            <div class="example-item bad">
+              <i class='bx bx-x-circle'></i>
+              <span>support@<strong>paypa1-secure</strong>.com</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trick 5: Suspicious Links -->
+        <div class="trick-card" data-aos="fade-up" data-aos-delay="500">
+          <div class="trick-icon">🎣</div>
+          <h4>Suspicious Links</h4>
+          <p>Hover over links before clicking. The displayed text may not match the actual URL destination.</p>
+          <div class="tip-box">
+            <i class='bx bx-bulb'></i>
+            <span>Use PhishDetector to scan before clicking!</span>
+          </div>
+        </div>
+
+        <!-- Trick 6: Brand Impersonation -->
+        <div class="trick-card" data-aos="fade-up" data-aos-delay="600">
+          <div class="trick-icon">🎭</div>
+          <h4>Brand Impersonation</h4>
+          <p>Fake websites copy logos and designs from legitimate companies to appear trustworthy.</p>
+          <div class="warning-badge">
+            <i class='bx bx-error-alt'></i>
+            <span>Always verify the domain</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section><!-- End Phishing Education Section -->
 
   <!-- ======= Frequently Asked Questions Section ======= -->
   <section id="faq" class="faq">
