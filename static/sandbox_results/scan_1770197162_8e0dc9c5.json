@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "scan_id": "scan_1770197162_8e0dc9c5",
+  "source_url": "https://www.youtube.com",
+  "final_url": "https://www.youtube.com/",
+  "redirect_count": 20,
+  "ip_address": "142.250.70.78",
+  "domain": "youtube.com",
+  "page_title": "YouTube",
+  "load_time": 3532,
+  "total_time": 12548,
+  "screenshot_path": "scan_1770197162_8e0dc9c5.jpg",
+  "has_login_form": false,
+  "has_password_field": false,
+  "has_email_field": false,
+  "suspicious_keywords": [],
+  "timestamp": "2026-02-04 14:56:14"
+}

@@ -1,0 +1,68 @@
+{
+  "status": "Safe",
+  "layers": {
+    "layer1": {
+      "status": "Safe",
+      "message": "Domain not in blacklist."
+    },
+    "layer2": {
+      "status": "Safe",
+      "message": "Domain analysis passed."
+    },
+    "layer3": {
+      "status": "Safe",
+      "message": "Valid HTTPS Scheme."
+    },
+    "layer4": {
+      "status": "Safe",
+      "message": "ML Model predicts Safe."
+    },
+    "layer5": {
+      "status": "Safe",
+      "message": "Behavioral analysis passed."
+    },
+    "sandbox": {
+      "success": true,
+      "scan_id": "scan_1770198527_1336786b",
+      "source_url": "https://chatgpt.com",
+      "final_url": "https://chatgpt.com/",
+      "redirect_count": 67,
+      "ip_address": "172.64.155.209",
+      "domain": "chatgpt.com",
+      "page_title": "ChatGPT",
+      "load_time": 6418,
+      "total_time": 12223,
+      "screenshot_path": "scan_1770198527_1336786b.jpg",
+      "has_login_form": false,
+      "has_password_field": false,
+      "has_email_field": false,
+      "suspicious_keywords": [],
+      "timestamp": "2026-02-04 15:18:59"
+    }
+  },
+  "forensics": {
+    "input_url": "https://chatgpt.com/",
+    "normalized_url": "https://chatgpt.com/",
+    "final_url": "https://chatgpt.com/",
+    "redirect_chain": [
+      {
+        "url": "https://chatgpt.com/",
+        "status": 403
+      }
+    ],
+    "redirect_count": 0,
+    "domain": "chatgpt.com",
+    "root_domain": "chatgpt.com",
+    "ip_address": "172.64.155.209",
+    "geo_location": "server-dependent",
+    "asn": "Unknown",
+    "whois": {
+      "registrar": "Unknown",
+      "creation_date": "Unknown",
+      "expiration_date": "Unknown",
+      "domain_age_days": "Unknown",
+      "error": "module 'whois' has no attribute 'whois'"
+    },
+    "scan_time": "2026-02-04 15:18:41"
+  }
+}

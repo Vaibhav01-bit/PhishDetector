@@ -119,7 +119,9 @@ def sandbox_results(scan_id):
                          verdict=verdict,
                          verdict_text=verdict_text,
                          verdict_icon=verdict_icon,
-                         layers=full_results.get('layers') if full_results else None)
+                         result=full_results,
+                         layers=full_results.get('layers') if full_results else None,
+                         forensics=full_results.get('forensics') if full_results else None)
 
 @app.route('/rescan', methods=['POST'])
 def rescan_url():

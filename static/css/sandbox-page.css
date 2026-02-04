@@ -1104,3 +1104,203 @@ h2 {
         padding: 16px;
     }
 }
+/* ========================================
+   FORENSIC INTELLIGENCE SECTION
+   ======================================== */
+
+.forensics-section {
+    padding: 60px 0;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-card) 100%);
+}
+
+.forensics-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.forensics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-top: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+.forensic-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px var(--shadow-soft);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.forensic-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px var(--shadow-medium);
+    border-color: var(--accent-blue);
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.card-title i {
+    font-size: 1.3rem;
+    color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 8px;
+    border-radius: 8px;
+}
+
+/* Info Table Styling */
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.info-table tr td {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+[data-theme='dark'] .info-table tr td {
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.info-table tr:last-child td {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.info-value {
+    text-align: right;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+/* Redirect Flow Styling */
+.redirect-container {
+    background: var(--bg-primary);
+    border: 1px dashed var(--border-light);
+    border-radius: 12px;
+    padding: 16px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.redirect-flow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 4px; /* Scrollbar spacing */
+}
+
+.flow-step {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px var(--shadow-soft);
+    min-width: 120px;
+}
+
+.flow-step i {
+    color: var(--text-secondary);
+}
+
+.flow-step .badge {
+    margin-left: auto;
+}
+
+.flow-arrow {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    opacity: 0.5;
+}
+
+/* Risk Analysis List */
+.risk-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.risk-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.risk-item:hover {
+    background: var(--bg-primary);
+}
+
+.risk-item.safe {
+    border-left: 3px solid var(--status-safe-border);
+}
+
+.risk-item.danger {
+    border-left: 3px solid var(--status-danger-border);
+    background: rgba(239, 68, 68, 0.03);
+}
+
+.risk-item.warning {
+    border-left: 3px solid var(--status-warning-border);
+    background: rgba(251, 146, 60, 0.03);
+}
+
+.risk-icon {
+    margin-top: 2px;
+    font-size: 1.1rem;
+}
+
+.risk-content strong {
+    display: block;
+    margin-bottom: 2px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.risk-content p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+

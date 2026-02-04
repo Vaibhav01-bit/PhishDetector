@@ -357,6 +357,141 @@
         </section>
         {% endif %}
 
+        {% if forensics %}
+        <!-- Forensic Analysis Section -->
+        <section class="forensics-section">
+            <div class="container">
+                <div class="section-header text-center mb-5">
+                    <h2>🕵️ Forensic Intelligence</h2>
+                    <p class="section-description">Deep network analysis and infrastructure patterns</p>
+                </div>
+
+                <div class="forensics-grid">
+                    <!-- Redirect Chain Card -->
+                    <div class="forensic-card" style="grid-column: 1 / -1;">
+                        <div class="card-title">
+                            <i class='bx bx-git-branch'></i>
+                            <span>Redirect Chain Analysis</span>
+                        </div>
+                        {% if forensics.redirect_count > 0 %}
+                        <div class="redirect-container">
+                            <div class="redirect-flow">
+                                <div class="flow-step">
+                                    <i class='bx bx-globe'></i>
+                                    <span>Input URL</span>
+                                </div>
+                                {% for hop in forensics.redirect_chain %}
+                                <i class='bx bx-right-arrow-alt flow-arrow'></i>
+                                <div class="flow-step" title="{{ hop.url }}">
+                                    <span>{{ hop.url }}</span>
+                                    <span class="badge bg-secondary">{{ hop.status }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="mt-3 text-muted small"><i class='bx bx-info-circle'></i> Chain contains {{
+                            forensics.redirect_count }} hops.</p>
+                        {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class='bx bx-check-circle' style="font-size: 2rem; color: var(--status-safe-text);"></i>
+                            <p class="mt-2">Direct connection. No redirects detected.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Infrastructure Card -->
+                    <div class="forensic-card">
+                        <div class="card-title">
+                            <i class='bx bx-server'></i>
+                            <span>Infrastructure Data</span>
+                        </div>
+                        <table class="info-table">
+                            <tr>
+                                <td class="info-label">Root Domain</td>
+                                <td class="info-value">{{ forensics.root_domain }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Server IP</td>
+                                <td class="info-value">{{ forensics.ip_address }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Registrar</td>
+                                <td class="info-value">{{ forensics.whois.registrar }}</td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Domain Age</td>
+                                <td class="info-value">
+                                    {% if forensics.whois.domain_age_days != 'Unknown' %}
+                                    {{ forensics.whois.domain_age_days }} days
+                                    {% else %}
+                                    Unknown
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Risk Analysis Card -->
+                    <div class="forensic-card">
+                        <div class="card-title">
+                            <i class='bx bx-pulse'></i>
+                            <span>Risk Assessment</span>
+                        </div>
+                        <ul class="risk-list">
+                            {% if result and result.status == 'Safe' %}
+                            <li class="risk-item safe">
+                                <i class='bx bx-check-circle risk-icon text-success'></i>
+                                <div class="risk-content">
+                                    <strong>Clean Status</strong>
+                                    <p>No malicious indicators found.</p>
+                                </div>
+                            </li>
+                            <li class="risk-item safe">
+                                <i class='bx bx-shield-quarter risk-icon text-success'></i>
+                                <div class="risk-content">
+                                    <strong>Legitimate Structure</strong>
+                                    <p>Domain patterns match legitimate sites.</p>
+                                </div>
+                            </li>
+                            {% else %}
+                            <li class="risk-item danger">
+                                <i class='bx bx-error risk-icon text-danger'></i>
+                                <div class="risk-content">
+                                    <strong>Automated Verdict: {{ result.status }}</strong>
+                                    <p>Pipeline flagged high-risk attributes.</p>
+                                </div>
+                            </li>
+
+                            {% if forensics.redirect_count > 1 %}
+                            <li class="risk-item warning">
+                                <i class='bx bx-git-branch risk-icon text-warning'></i>
+                                <div class="risk-content">
+                                    <strong>Complex Redirects</strong>
+                                    <p>{{ forensics.redirect_count }} hops detected in chain.</p>
+                                </div>
+                            </li>
+                            {% endif %}
+
+                            {% if forensics.whois.domain_age_days != 'Unknown' and forensics.whois.domain_age_days < 30
+                                %} <li class="risk-item danger">
+                                <i class='bx bx-time risk-icon text-danger'></i>
+                                <div class="risk-content">
+                                    <strong>Newly Registered</strong>
+                                    <p>Domain is less than 30 days old.</p>
+                                </div>
+                                </li>
+                                {% endif %}
+                                {% endif %}
+                        </ul>
+                        <div class="mt-auto pt-3 text-end">
+                            <small class="text-muted">Analyzed: {{ forensics.scan_time }}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
         <!-- Trust & Transparency Section -->
         <section class="trust-section">
             <div class="container">

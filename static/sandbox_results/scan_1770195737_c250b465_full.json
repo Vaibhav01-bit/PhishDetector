@@ -1,0 +1,68 @@
+{
+  "status": "Safe",
+  "layers": {
+    "layer1": {
+      "status": "Safe",
+      "message": "Domain not in blacklist."
+    },
+    "layer2": {
+      "status": "Safe",
+      "message": "Domain analysis passed."
+    },
+    "layer3": {
+      "status": "Safe",
+      "message": "Valid HTTPS Scheme."
+    },
+    "layer4": {
+      "status": "Safe",
+      "message": "ML Model predicts Safe."
+    },
+    "layer5": {
+      "status": "Safe",
+      "message": "Behavioral analysis passed."
+    },
+    "sandbox": {
+      "success": true,
+      "scan_id": "scan_1770195737_c250b465",
+      "source_url": "https://www.youtube.com/watch?v=grk6tkgu0ni",
+      "final_url": "https://www.youtube.com/watch?v=grk6tkgu0ni",
+      "redirect_count": 39,
+      "ip_address": "142.250.76.174",
+      "domain": "youtube.com",
+      "page_title": "YouTube",
+      "load_time": 5130,
+      "total_time": 36825,
+      "screenshot_path": "scan_1770195737_c250b465.jpg",
+      "has_login_form": false,
+      "has_password_field": false,
+      "has_email_field": false,
+      "suspicious_keywords": [],
+      "timestamp": "2026-02-04 14:32:54"
+    }
+  },
+  "forensics": {
+    "input_url": "https://www.youtube.com/watch?v=grK6tkgu0nI",
+    "normalized_url": "https://www.youtube.com/watch?v=grK6tkgu0nI",
+    "final_url": "https://www.youtube.com/watch?v=grK6tkgu0nI",
+    "redirect_chain": [
+      {
+        "url": "https://www.youtube.com/watch?v=grK6tkgu0nI",
+        "status": 200
+      }
+    ],
+    "redirect_count": 0,
+    "domain": "www.youtube.com",
+    "root_domain": "youtube.com",
+    "ip_address": "142.250.76.174",
+    "geo_location": "Unknown",
+    "asn": "Unknown",
+    "whois": {
+      "registrar": "Lookup Failed",
+      "creation_date": "Unknown",
+      "domain_age_days": "Unknown",
+      "error": "module 'whois' has no attribute 'whois'",
+      "available": false
+    },
+    "scan_time": "2026-02-04 14:32:10"
+  }
+}
