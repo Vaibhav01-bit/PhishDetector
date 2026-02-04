@@ -1,11 +1,22 @@
-# Phishing URL Detection 
+# Phishing Website Detector 🛡️
+
+A state-of-the-art, enterprise-grade phishing detection system that combines **Machine Learning**, **Heuristic Analysis**, and **Sandboxed Browser Automation** to identify malicious websites with 97.4% accuracy.
 
 ![image2](https://github.com/asrith-reddy/Phishing-detector/assets/76733972/da226de9-dfe6-4f0c-a8bc-b92d4cc08e53)
 
-![image1](https://github.com/asrith-reddy/Phishing-detector/assets/76733972/fe706a06-84fe-493f-abb8-34d3fbc594b5)
+## 🚀 Key Features
 
-## System Architecture: 6-Layer Phishing Detection
-The project features a robust, enterprise-grade security pipeline consisting of 6 sequential layers:
+*   **6-Layer Security Pipeline**: From instant blacklist checks to deep ML content analysis.
+*   **Forensic Intelligence**: Deep-dive analysis of redirects, WHOIS data, and infrastructure.
+*   **Sandbox Analysis**: Safely detonates URLs in a headless browser to capture screenshots and behavioral data.
+*   **Enterprise UI**: A premium, responsive dashboard with Dark/Light mode, animations, and glassmorphism design.
+*   **Real-time scanning**: Analyzes live URLs in seconds.
+
+---
+
+## 🏗️ System Architecture: 6-Layer Pipeline
+
+This project employs a defense-in-depth approach:
 
 ```mermaid
 graph TD
@@ -29,124 +40,96 @@ graph TD
     Warning --> FinalEvaluator{Final Risk Evaluation}
     FinalEvaluator -- High Risk --> Phishing
     FinalEvaluator -- Medium Risk --> Suspicious[Classified as SUSPICIOUS]
-    FinalEvaluator -- Low Risk --> L6{Layer 6: Sandbox Analysis}
+    FinalEvaluator -- Low Risk --> L6{Layer 6: Sandbox & Forensics}
     
     L6 --> Screenshot[Capture Screenshot]
-    Screenshot --> Metadata[Extract Metadata]
-    Metadata --> Behavioral[Behavioral Inspection]
-    Behavioral --> Safe[Classified as SAFE + Visual Evidence]
+    L6 --> Forensics[Forensic Intelligence]
+    Forensics --> Redirects[Redirect Chain]
+    Forensics --> Whois[WHOIS & Infra Data]
+    Screenshot --> Safe[Classified as SAFE + Evidence]
     
     style L6 fill:#e1f5ff
-    style Screenshot fill:#fff4e6
-    style Metadata fill:#fff4e6
-    style Behavioral fill:#fff4e6
+    style Forensics fill:#e1f5ff,stroke:#005c99
 ```
 
-### Detection Layers
-1. **Layer 1 - Blacklist Check**: Instantly blocks known malicious domains from a local or remote blacklist.
-2. **Layer 2 - Domain Analysis**: Heuristic analysis of domain length, subdomain count, TLD reputation, and brand impersonation.
-3. **Layer 3 - SSL/TLS Verification**: Checks for valid HTTPS certificates and secure connections.
-4. **Layer 4 - AI/ML Model**: Uses the trained gradient boosting classifier to analyze deep content features.
-5. **Layer 5 - Behavioral Analysis**: Checks for obfuscation techniques (e.g., using IP instead of domain, multiple redirects).
-6. **Layer 6 - Sandbox Analysis** ⭐ NEW: Safely opens URLs in an isolated headless browser to capture screenshots and inspect behavioral patterns.
+### 🔬 The 6 Layers Explained
 
-### 🆕 Sandbox Analysis Features
-The Sandbox Analysis layer provides **visual evidence** and **behavioral inspection** without exposing users to risk:
+1.  **Blacklist Check**: Instant blocking of known malicious domains.
+2.  **Domain Analysis**: Typosquatting detection, high-entropy domains, and brand impersonation checks.
+3.  **SSL/TLS Verification**: Validates certificate chain and issuer trust.
+4.  **AI/ML Model**: A **Gradient Boosting Classifier** trained on 11,000+ URLs to analyze content features (forms, javascript, obfuscation).
+5.  **Behavioral Analysis**: Detects evasion techniques like multiple redirects or IP-based hosting.
+6.  **Sandbox & Forensics**:
+    *   **Forensic Intelligence**: Traces redirect chains, analyzes WHOIS properties (registrar, domain age), and identifies server infrastructure.
+    *   **Visual Evidence**: Captures full-page screenshots in a secure, headless container.
 
-#### What It Does:
-- ✅ Opens URLs in an isolated headless browser (Playwright)
-- ✅ Captures full-page screenshots
-- ✅ Tracks redirects and final destination
-- ✅ Extracts metadata (IP address, page title, load time)
-- ✅ Detects login forms and password fields
-- ✅ Scans for suspicious phishing keywords
-- ✅ Blocks private IPs and localhost (SSRF protection)
+---
 
-#### Security Measures:
-- 🔒 Incognito browser context (no cookies/cache)
-- 🔒 Downloads disabled
-- 🔒 Strict 15-second timeout
-- 🔒 Private IP blocking (127.0.0.1, 10.x.x.x, 192.168.x.x)
-- 🔒 No form submission or interaction
-- 🔒 Automatic browser cleanup
+## 💻 Tech Stack
 
-#### Limitations:
-- ⚠️ Cannot detect time-delayed attacks
-- ⚠️ May be blocked by bot detection systems
-- ⚠️ Attackers may serve different content to sandbox IPs
-- ⚠️ HTTPS does not guarantee safety
+*   **Backend**: Python, Flask
+*   **Machine Learning**: Scikit-learn (Gradient Boosting, Random Forest), Pandas, NumPy
+*   **Browser Automation**: Playwright (Chromium)
+*   **Network Analysis**: Python-Whois, Requests, Socket
+*   **Frontend**: HTML5, CSS3 (Variables, Flexbox/Grid), JavaScript (Vanilla)
 
-## Objective
-A phishing website is a common social engineering method that mimics trustful uniform resource locators (URLs) and webpages. The objective of this project is to train machine learning models and deep neural nets on the dataset created to predict phishing websites. Both phishing and benign URLs of websites are gathered to form a dataset and from them required URL and website content-based features are extracted. The performance level of each model is measures and compared.
+---
 
-## Installation
-To install the required packages and libraries, run this command in the project directory after Forking and cloning this repository:
-```bash
-pip install -r requirements.txt
-```
+## 🛠️ Installation
 
-### Additional Setup for Sandbox Analysis
-To enable the Sandbox Analysis feature, install Playwright:
-```bash
-pip install playwright
-playwright install chromium
-```
+### Prerequisites
+*   Python 3.8+
+*   Pip
 
-**Note**: Sandbox analysis will gracefully degrade if Playwright is not installed. The main 5-layer pipeline will continue to work normally.
+### Setup
 
-## Technologies Used
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/yourusername/Phishing-Website-Detector.git
+    cd Phishing-Website-Detector
+    ```
 
-![](https://forthebadge.com/images/badges/made-with-python.svg)
+2.  **Install Dependencies**:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-[<img target="_blank" src="https://upload.wikimedia.org/wikipedia/commons/3/31/NumPy_logo_2020.svg" width=200>](https://numpy.org/doc/) [<img target="_blank" src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Pandas_logo.svg" width=200>](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)
-[<img target="_blank" src="https://upload.wikimedia.org/wikipedia/commons/8/84/Matplotlib_icon.svg" width=100>](https://matplotlib.org/)
-[<img target="_blank" src="https://scikit-learn.org/stable/_static/scikit-learn-logo-small.png" width=200>](https://scikit-learn.org/stable/) 
-[<img target="_blank" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScq-xocLctL07Jy0tpR_p9w0Q42_rK1aAkNfW6sm3ucjFKWML39aaJPgdhadyCnEiK7vw&usqp=CAU" width=200>](https://flask.palletsprojects.com/en/2.0.x/) 
+3.  **Install Playwright Browsers** (Required for Sandbox):
+    ```bash
+    playwright install chromium
+    ```
 
-**New**: [Playwright](https://playwright.dev/) - Headless browser automation for sandbox analysis
+4.  **Run the Application**:
+    ```bash
+    python app.py
+    ```
+    Access the app at `http://localhost:5000`
 
-## Feature Extraction
-The system starts by retrieving URLs to be checked for phishing. These URLs can be collected from user input in the webpage created. Once the URLs are obtained, the system extracts relevant features from the web pages. These features are essential for training and evaluating the machine learning models. Various features were extracted from the URL database based on Domain, HTML and Address bar of the URLs. 
+---
 
-## Machine Learning Models
+## 📊 Performance
 
-Various machine learning models are compared and The machine learning model with high accuracy is selected which predicts whether the URL is a phishing site or not. It provides a probability score or a binary classification (phishing or not phishing) based on the trained model's decision boundary. The system categorize URLs into "phishing" or "legitimate" and the result is finally displayed on the webpage. 
-#### Refer Phishingproject.ipynb for more details.
+The model was trained and evaluated on a diverse dataset of legitimate and phishing URLs.
 
-## Result
+| Model | Accuracy | Precision | Recall | F1 Score |
+|-------|----------|-----------|--------|----------|
+| **Gradient Boosting** | **97.4%** | **98.6%** | **99.4%** | **97.7%** |
+| CatBoost | 97.2% | 98.9% | 99.4% | 97.5% |
+| Random Forest | 96.7% | 99.0% | 99.3% | 97.1% |
+| SVM | 96.4% | 96.5% | 98.0% | 96.8% |
 
-Accuracy of various model used for URL detection
-<br>
+---
 
-<br>
+## 🕵️‍♂️ Forensic Capabilities
 
-||ML Model|	Accuracy|  	f1_score|	Recall|	Precision|
-|---|---|---|---|---|---|
-0|	Gradient Boosting Classifier|	0.974|	0.977|	0.994|	0.986|
-1|	CatBoost Classifier|	        0.972|	0.975|	0.994|	0.989|
-2|	Multi-layer Perceptron|	        0.969|	0.973|	0.995|	0.981|
-3|	Random Forest|	                0.967|	0.971|	0.993|	0.990|
-4|	Support Vector Machine|	        0.964|	0.968|	0.980|	0.965|
-5|	Decision Tree|      	        0.960|	0.964|	0.991|	0.993|
-6|	K-Nearest Neighbors|        	0.956|	0.961|	0.991|	0.989|
-7|	Logistic Regression|        	0.934|	0.941|	0.943|	0.927|
-8|	Naive Bayes Classifier|     	0.605|	0.454|	0.292|	0.997|
+The new **Forensic Intelligence** module provides:
 
-## Testing Sandbox Analysis
+*   **Redirect Map**: Visualizes every hop in the redirection chain to detect cloaking.
+*   **Infrastructure Data**: Extracts Root Domain, Server IP, and Registrar.
+*   **Risk Indicators**: Automatically flags risks like "Newly Registered Domain" (< 30 days) or "Complex Redirects".
 
-Run the test script to verify the sandbox implementation:
-```bash
-python test_sandbox.py
-```
+---
 
-This will test:
-- URL validation and normalization
-- IP address checking
-- Sandbox analyzer functionality (if Playwright is installed)
+## 📜 License
 
-## Conclusion
-1. The final take away form this project is to explore various machine learning models, perform Exploratory Data Analysis on phishing dataset and understanding their features. 
-2. Creating this notebook helped me to learn a lot about the features affecting the models to detect whether URL is safe or not, also I came to know how to tuned model and how they affect the model performance.
-3. The final conclusion on the Phishing dataset is that the some feature like "HTTTPS", "AnchorURL", "WebsiteTraffic" have more importance to classify URL is phishing URL or not.
-4. Gradient Boosting Classifier currectly classify URL upto 97.4% respective classes and hence reduces the chance of malicious attachments.
-5. **NEW**: The Sandbox Analysis layer adds visual evidence and behavioral inspection, making the system comparable to enterprise SaaS tools like VirusTotal and urlscan.io.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
