@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "scan_id": "scan_1770283719_c2edea8e",
+  "source_url": "https://facebook.com",
+  "final_url": "https://www.facebook.com/",
+  "redirect_count": 51,
+  "ip_address": "57.144.40.1",
+  "domain": "facebook.com",
+  "page_title": "Facebook - लॉग इन किंवा साइन अप",
+  "load_time": 7366,
+  "total_time": 12955,
+  "screenshot_path": "scan_1770283719_c2edea8e.jpg",
+  "has_login_form": true,
+  "has_password_field": true,
+  "has_email_field": true,
+  "suspicious_keywords": [],
+  "timestamp": "2026-02-05 14:58:52"
+}

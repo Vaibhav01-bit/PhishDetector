@@ -30,10 +30,21 @@ def predict():
         # Analyze using the 5-layer pipeline (+ sandbox)
         result = pipeline.analyze(url)
         
-        # Map pipeline result to the legacy format expected by the template
-        # format: [url, status_text, button_text, is_safe_flag]
-        
+        # Determine Verdict Flags
         status = result['status']
+        is_safe = (status == SAFE)
+        
+        # AJAX Response (For Progressive Timeline)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            from flask import jsonify
+            return jsonify({
+                "status": status,
+                "is_safe": is_safe,
+                "url": url,
+                "details": result # Pass full details if needed later
+            })
+
+        # Fallback: Legacy Template Rendering
         if status == SAFE:
             name = [url, "Safe", "Continue", 1]
         elif status == WARNING:
@@ -122,6 +133,59 @@ def sandbox_results(scan_id):
                          result=full_results,
                          layers=full_results.get('layers') if full_results else None,
                          forensics=full_results.get('forensics') if full_results else None)
+
+@app.route('/scan_email', methods=['POST'])
+def scan_email():
+    """
+    Endpoint for identifying and scanning URLs within email text.
+    """
+    from pipeline.email_utils import extract_urls_from_text
+    
+    email_text = request.form.get('email_text', '')
+    if not email_text:
+        return render_template('index.html', error="No text provided")
+        
+    extracted_urls = extract_urls_from_text(email_text)
+    
+    # Limit number of URLs to prevent abuse
+    extracted_urls = extracted_urls[:10]
+    
+    scan_results = []
+    
+    for url in extracted_urls:
+        # Run pipeline on each URL
+        try:
+            res = pipeline.analyze(url)
+            status = res['status']
+            
+            # Simple verdict for the summary list
+            verdict_class = "text-success"
+            icon = "bx-check-circle"
+            
+            if status == "Phishing":
+                verdict_class = "text-danger"
+                icon = "bx-x-circle"
+            elif status == "Warning":
+                verdict_class = "text-warning"
+                icon = "bx-error"
+                
+            scan_results.append({
+                'url': url,
+                'status': status,
+                'class': verdict_class,
+                'icon': icon,
+                'details': res
+            })
+        except Exception as e:
+            scan_results.append({
+                'url': url,
+                'status': "Error",
+                'class': "text-secondary",
+                'icon': "bx-help-circle",
+                'details': str(e)
+            })
+            
+    return render_template('index.html', email_results=scan_results, email_text_preview=email_text[:100] + "...")
 
 @app.route('/rescan', methods=['POST'])
 def rescan_url():

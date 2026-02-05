@@ -7,8 +7,11 @@ A state-of-the-art, enterprise-grade phishing detection system that combines **M
 ## 🚀 Key Features
 
 *   **6-Layer Security Pipeline**: From instant blacklist checks to deep ML content analysis.
-*   **Forensic Intelligence**: Deep-dive analysis of redirects, WHOIS data, and infrastructure.
+*   **Brand Impersonation Scanner**: Detects typosquatting (e.g., `paypa1.com`) and homoglyphs with improved accuracy.
+*   **Email Link Scanner**: Extracts and analyzes multiple URLs from email text without storing content.
+*   **Forensic Intelligence**: Deep-dive analysis of redirects, shorteners (bit.ly, t.co), WHOIS data, and infrastructure.
 *   **Sandbox Analysis**: Safely detonates URLs in a headless browser to capture screenshots and behavioral data.
+*   **Decentralized Platform Detection**: Identifies hosting on IPFS, Vercel, etc., to warn about dynamic content.
 *   **Enterprise UI**: A premium, responsive dashboard with Dark/Light mode, animations, and glassmorphism design.
 *   **Real-time scanning**: Analyzes live URLs in seconds.
 

@@ -1,0 +1,76 @@
+{
+  "status": "Safe",
+  "layers": {
+    "forensics_check": {
+      "status": "Safe",
+      "message": "Redirect chain normal"
+    },
+    "layer1": {
+      "status": "Safe",
+      "message": "Domain not in blacklist."
+    },
+    "layer2": {
+      "status": "Safe",
+      "message": "Domain analysis passed."
+    },
+    "layer3": {
+      "status": "Safe",
+      "message": "Valid HTTPS Scheme."
+    },
+    "layer4": {
+      "status": "Safe",
+      "message": "ML Model predicts Safe."
+    },
+    "layer5": {
+      "status": "Safe",
+      "message": "Behavioral analysis passed."
+    },
+    "sandbox": {
+      "success": true,
+      "scan_id": "scan_1770283032_e7c482cc",
+      "source_url": "https://bit.ly/verify-now",
+      "final_url": "https://bit.ly/verify-now",
+      "redirect_count": 33,
+      "ip_address": "67.199.248.11",
+      "domain": "bit.ly",
+      "page_title": "Bitly | bit.ly/2qaqvFf",
+      "load_time": 6705,
+      "total_time": 42720,
+      "screenshot_path": "scan_1770283032_e7c482cc.jpg",
+      "has_login_form": false,
+      "has_password_field": false,
+      "has_email_field": false,
+      "suspicious_keywords": [],
+      "timestamp": "2026-02-05 14:47:54"
+    }
+  },
+  "forensics": {
+    "input_url": "https://bit.ly/verify-now",
+    "normalized_url": "https://bit.ly/verify-now",
+    "final_url": "https://www.verifycaptcha.com/cl.php?id=c5eac6237314170c3baa161d442a7ab1",
+    "redirect_chain": [
+      {
+        "url": "https://bit.ly/verify-now",
+        "status": 301
+      },
+      {
+        "url": "https://www.verifycaptcha.com/cl.php?id=c5eac6237314170c3baa161d442a7ab1",
+        "status": 200
+      }
+    ],
+    "redirect_count": 1,
+    "is_shortener": false,
+    "domain": "www.verifycaptcha.com",
+    "root_domain": "verifycaptcha.com",
+    "ip_address": "23.22.126.183",
+    "geo_location": "server-dependent",
+    "asn": "Unknown",
+    "whois": {
+      "registrar": "NAMECHEAP INC",
+      "creation_date": "2016-11-28",
+      "expiration_date": "2026-11-28",
+      "domain_age_days": 3356
+    },
+    "scan_time": "2026-02-05 14:46:52"
+  }
+}

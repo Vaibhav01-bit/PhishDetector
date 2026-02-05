@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "scan_id": "scan_1770295991_de473a31",
+  "source_url": "https://www.youtube.com",
+  "final_url": "https://www.youtube.com/",
+  "redirect_count": 133,
+  "ip_address": "216.58.203.14",
+  "domain": "youtube.com",
+  "page_title": "YouTube",
+  "load_time": 9472,
+  "total_time": 14546,
+  "screenshot_path": "scan_1770295991_de473a31.jpg",
+  "sandbox_message": "Rendered in an isolated sandbox. No user interaction.",
+  "has_login_form": false,
+  "has_password_field": false,
+  "has_email_field": false,
+  "suspicious_keywords": [],
+  "timestamp": "2026-02-05 18:23:25"
+}

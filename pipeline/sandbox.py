@@ -207,6 +207,7 @@ class SandboxAnalyzer:
                     'load_time': load_result.get('load_time', 0),
                     'total_time': total_time,
                     'screenshot_path': screenshot_path,
+                    'sandbox_message': "Rendered in an isolated sandbox. No user interaction.", # Feature 5 requirement
                     'has_login_form': behavioral.get('has_login_form', False),
                     'has_password_field': behavioral.get('has_password_field', False),
                     'has_email_field': behavioral.get('has_email_field', False),

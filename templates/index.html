@@ -41,9 +41,14 @@
   <link href="static/css/benefits.css" rel="stylesheet">
   <link href="static/css/how-it-works.css" rel="stylesheet">
   <link href="static/css/phishing-education.css" rel="stylesheet">
+  <link href="static/css/cyber-segmented-control.css" rel="stylesheet">
+  <link href="static/css/premium-hero.css" rel="stylesheet">
   <link href="static/css/global-warm-glow.css" rel="stylesheet">
   <link href="static/css/sandbox-results.css" rel="stylesheet">
   <link href="static/css/hero-card-enterprise.css" rel="stylesheet">
+  <link href="static/css/hero-dashboard.css" rel="stylesheet">
+  <link href="static/css/scan-timeline.css" rel="stylesheet">
+  <link href="static/css/modern-hero-bg.css" rel="stylesheet">
 
   <style>
     html {
@@ -94,31 +99,31 @@
               </li>
             </ul>
           </li>
-          <li class="d-none d-lg-block">
-            <div class="theme-switch-wrapper">
-              <label class="theme-switch" for="checkbox">
-                <input type="checkbox" id="checkbox" aria-label="Toggle Dark Theme" autocomplete="off" />
-                <div class="slider round">
-                  <div class="clouds">
-                    <div class="cloud cloud-1"></div>
-                    <div class="cloud cloud-2"></div>
-                    <div class="cloud cloud-3"></div>
-                  </div>
-                  <div class="stars">
-                    <div class="star star-1"></div>
-                    <div class="star star-2"></div>
-                    <div class="star star-3"></div>
-                    <div class="star star-4"></div>
-                  </div>
-                </div>
-              </label>
-            </div>
-          </li>
           <!-- Mobile Only: Download Guide -->
           <li class="d-lg-none"><a href="static/assets/Phishing Website Identification.pdf"
               download="nofallmagaguide">Download Guide <i class='bx bxs-download'></i></a></li>
         </ul>
-      </nav><!-- .nav-menu -->
+      </nav>
+
+      <!-- Theme Toggle Switch -->
+      <div class="theme-switch-wrapper">
+        <label class="theme-switch">
+          <input type="checkbox" id="theme-toggle-check" aria-label="Toggle Dark Mode">
+          <div class="slider round">
+            <div class="clouds">
+              <span class="cloud cloud-1"></span>
+              <span class="cloud cloud-2"></span>
+              <span class="cloud cloud-3"></span>
+            </div>
+            <div class="stars">
+              <span class="star star-1"></span>
+              <span class="star star-2"></span>
+              <span class="star star-3"></span>
+              <span class="star star-4"></span>
+            </div>
+          </div>
+        </label>
+      </div>
 
 
     </div>
@@ -131,54 +136,95 @@
       <div class="row gy-4">
         <div class="col-lg-6 d-flex flex-column justify-content-center order-2 order-lg-1">
           <!-- Trust Badge -->
-          <div class="hero-badge mb-3" data-aos="fade-up" data-aos-delay="100">
-            <i class='bx bx-shield-check'></i>
-            <span>Privacy-first security analysis</span>
+          <div class="hero-badge mb-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="badge-content">
+              <i class='bx bx-shield-check'></i>
+              <span>Privacy-first security analysis</span>
+            </div>
+            <div class="badge-glow"></div>
           </div>
 
-          <h1 class="main-heading">Detect phishing threats before they strike</h1>
-          <p class="sub-heading">Multi-layer AI analysis powered by 5 security checks. Assess risk with evidence, not
-            blind trust. No account required.</p>
+          <h1 class="main-heading">Detect <span class="text-gradient-primary">phishing threats</span> before they strike
+          </h1>
+          <p class="sub-heading mt-3 mb-4">Multi-layer AI analysis powered by 5 security checks.
+            Assess risk with evidence, not blind trust.</p>
 
           <!-- Trust Indicators -->
-          <div class="trust-indicators mb-4" data-aos="fade-up" data-aos-delay="200">
-            <span class="trust-item">
-              <i class='bx bx-lock-alt'></i>
-              No account required
+          <div class="trust-indicators d-flex gap-3 mb-4" data-aos="fade-up" data-aos-delay="200">
+            <span class="trust-pill">
+              <i class='bx bx-user-check'></i> No account required
             </span>
-            <span class="trust-item">
-              <i class='bx bx-shield'></i>
-              Privacy-first
+            <span class="trust-pill">
+              <i class='bx bx-lock-alt'></i> Privacy-first
             </span>
-            <span class="trust-item">
-              <i class='bx bx-brain'></i>
-              97.4% accuracy
+            <span class="trust-pill">
+              <i class='bx bx-target-lock'></i> 98.4% Accuracy
             </span>
           </div>
 
           <div class="hero-actions mt-4">
-            <form action="/result" method="POST" class="scan-form">
-              <div class="input-group neon-box">
-                <div class="input-content-mask">
-                  <input type="url" id="url-input" name="name" class="form-control" autocomplete="url"
-                    placeholder="Paste URL here (https://...)" required
-                    aria-label="Enter URL to scan for phishing threats">
-                  <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary">Scan Website</button>
+            <!-- Scan Tabs -->
+            <ul class="nav nav-pills justify-content-center mb-4" id="scanTabs" role="tablist" data-aos="fade-up"
+              data-aos-delay="150">
+              <li class="nav-item">
+                <a class="nav-link active" id="url-tab" data-toggle="pill" href="#url-scan" role="tab">Website URL</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="email-tab" data-toggle="pill" href="#email-scan" role="tab">Email Content</a>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="scanTabsContent">
+              <!-- URL Scan Form -->
+              <div class="tab-pane fade show active" id="url-scan" role="tabpanel">
+                <form action="{{ url_for('predict')}}" method="post" class="scan-form p-1" id="url-scan-form">
+                  <div class="input-group neon-box">
+                    <div class="input-content-mask">
+                      <input type="url" id="url-input" name="name" class="form-control" autocomplete="url"
+                        placeholder="Paste URL here (https://...)" required
+                        aria-label="Enter URL to scan for phishing threats">
+                      <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary">Scan Website</button>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </form>
               </div>
-            </form>
+
+              <!-- Email Scan Form -->
+              <div class="tab-pane fade" id="email-scan" role="tabpanel">
+                <form action="/scan_email" method="POST" class="scan-form">
+                  <div class="input-group neon-box">
+                    <div class="input-content-mask">
+                      <textarea name="email_text" class="form-control" rows="3"
+                        placeholder="Paste email content here to scan for links..." required
+                        style="min-height: 80px; resize: none;"></textarea>
+                      <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary" style="height: auto;">Scan Email</button>
+                      </div>
+                    </div>
+                  </div>
+                  <small class="text-white-50 mt-2 d-block text-center"><i class='bx bx-check-shield'></i> Content is
+                    processed securely and never stored.</small>
+                </form>
+              </div>
+            </div>
 
             <div class="scan-result mt-4">
-              {% if name %}
-              <div class="result-card enterprise-card p-5 rounded-4 shadow-lg">
+              <!-- Progressive Scan Timeline removed -->
+
+              <!-- Legacy Result Card (Hidden by default or if timeline is active) -->
+              <div id="legacy-result-card" class="result-card enterprise-card p-5 rounded-4 shadow-lg" {% if not name
+                %}style="display: none;" {% endif %}>
                 <!-- Scanning URL (Small, Muted) -->
+                {% if name %}
                 <p class="url-text mb-3 text-muted">
                   <i class='bx bx-link-alt me-1'></i>
                   Scanning: <span class="fw-medium">{{name[0]}}</span>
                 </p>
+                {% endif %}
 
+                {% if name %}
                 <!-- Security Icon + Verdict -->
                 <div class="verdict-section mb-3">
                   <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
@@ -208,10 +254,78 @@
                   </div>
 
                   <!-- Subtext Disclaimer (Anti-Overconfidence) -->
-                  <p class="verdict-subtext text-muted mb-0">
+                  <p class="verdict-subtext text-muted mb-4">
                     Based on automated 5-layer analysis. HTTPS encryption alone does not guarantee legitimacy. Always
                     verify URLs manually.
                   </p>
+
+                  <!-- Detailed Risk Analysis (Feature 6) -->
+                  <div class="risk-analysis text-left mb-4 p-3 rounded">
+                    <h5 class="section-header mb-3" style="font-size: 1rem;"><i class='bx bx-analyse'></i> Security
+                      Analysis Details</h5>
+
+                    <ul class="list-unstyled mb-0" style="font-size: 0.9rem;">
+                      <!-- Forensics -->
+                      {% if details.layers.forensics_check.status != 'Safe' %}
+                      <li class="mb-2 text-warning"><i class='bx bx-search-alt'></i> <strong>Forensics:</strong> {{
+                        details.layers.forensics_check.message }}</li>
+                      {% endif %}
+
+                      <!-- Domain Layer -->
+                      {% if details.layers.layer2.status != 'Safe' %}
+                      <li class="mb-2 text-warning"><i class='bx bx-globe'></i> <strong>Domain:</strong> {{
+                        details.layers.layer2.message }}</li>
+                      {% endif %}
+
+                      <!-- SSL Layer -->
+                      {% if details.layers.layer3.status != 'Safe' %}
+                      <li class="mb-2 text-warning"><i class='bx bx-lock-open-alt'></i> <strong>SSL:</strong> {{
+                        details.layers.layer3.message }}</li>
+                      {% endif %}
+
+                      <!-- Behavioral Layer -->
+                      {% if details.layers.layer5.status != 'Safe' %}
+                      <li class="mb-2 text-warning"><i class='bx bx-radar'></i> <strong>Behavior:</strong> {{
+                        details.layers.layer5.message }}</li>
+                      {% endif %}
+
+                      <!-- ML Layer -->
+                      {% if details.layers.layer4.status == 'Phishing' %}
+                      <li class="mb-2 text-danger"><i class='bx bx-brain'></i> <strong>AI Detection:</strong> High
+                        confidence phishing pattern detected.</li>
+                      {% endif %}
+
+                      <!-- Trust Signals (If Safe) -->
+                      {% if name[3] %}
+                      <li class="mb-2 text-success"><i class='bx bx-check-shield'></i> <strong>Domain:</strong> No
+                        obvious brand impersonation detected.</li>
+                      <li class="mb-2 text-success"><i class='bx bx-lock-alt'></i> <strong>SSL:</strong> Valid HTTPS
+                        connection.</li>
+                      <li class="mb-2 text-success"><i class='bx bx-data'></i> <strong>Reputation:</strong> Not found in
+                        active blacklists.</li>
+                      {% endif %}
+                    </ul>
+
+                    <!-- Redirect Chain Visualization (Feature 2) -->
+                    {% if details.forensics.redirect_chain and details.forensics.redirect_chain|length > 1 %}
+                    <div class="redirect-chain mt-3 pt-3 border-top border-secondary">
+                      <h6 class="section-header mb-2" style="font-size: 0.85rem;"><i class='bx bx-git-branch'></i>
+                        Redirect Path:</h6>
+                      <div class="chain-visual pl-2" style="border-left: 2px solid rgba(59, 130, 246, 0.3);">
+                        {% for hop in details.forensics.redirect_chain %}
+                        <div class="chain-node py-1" style="font-size: 0.85rem;">
+                          <span class="{{ 'text-success font-weight-bold' if loop.last else 'text-muted' }}">
+                            {{ hop.url[:50] }}{{ '...' if hop.url|length > 50 else '' }}
+                          </span>
+                          {% if not loop.last %}
+                          <div class="text-muted small ml-1"><i class='bx bx-down-arrow-alt'></i></div>
+                          {% endif %}
+                        </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
                 </div>
                 <!-- CTA Section: Sandbox Primary, Proceed Secondary -->
                 <div class="cta-section mt-4">
@@ -257,7 +371,64 @@
                     {% endif %}
                   </div>
                 </div>
+                {% endif %}
 
+
+              </div>
+
+            </div>
+
+            <!-- Email Scan Results -->
+            <div class="email-result mt-4">
+              {% if email_results %}
+              <div class="result-card enterprise-card p-4 rounded-4 shadow-lg">
+                <h4 class="mb-3 section-header">Email Scan Report</h4>
+                <div class="mb-3 p-3 bg-light-alt rounded border border-secondary source-preview">
+                  <p class="text-muted small mb-0">Preview:</p>
+                  <p class="text-preview font-italic mb-0">"{{ email_text_preview }}"</p>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0" style="background: transparent;">
+                    <thead>
+                      <tr>
+                        <th>URL Found</th>
+                        <th>Verdict</th>
+                        <th>Risk</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for item in email_results %}
+                      <tr>
+                        <td class="text-truncate" style="max-width: 250px;" title="{{ item.url }}">
+                          <a href="{{ item.url }}" target="_blank" class="email-link text-decoration-none">{{ item.url
+                            }}</a>
+                        </td>
+                        <td>
+                          <span
+                            class="badge {{ 'badge-success' if item.status == 'Safe' else 'badge-danger' if item.status == 'Phishing' else 'badge-warning' }}">
+                            {{ item.status }}
+                          </span>
+                        </td>
+                        <td class="{{ item.class }}">
+                          <i class='bx {{ item.icon }}'></i>
+                          {% if item.status == 'Safe' %}
+                          Low
+                          {% elif item.status == 'Phishing' %}
+                          High
+                          {% else %}
+                          Medium
+                          {% endif %}
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+
+                {% if not email_results %}
+                <p class="text-center text-muted mt-3">No URLs found in the text.</p>
+                {% endif %}
 
               </div>
               {% endif %}
@@ -265,7 +436,14 @@
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img-container" data-aos="zoom-in" data-aos-delay="200">
-          <img src="static/assets/img/Phishing.gif" class="img-fluid animated" alt="Cyber Security Protection"
+          <!-- Light Mode Image -->
+          <img src="static/assets/img/hero-dashboard-light.png"
+            class="img-fluid animated floating-dashboard hero-img-light"
+            alt="Enterprise Security Dashboard - Light Mode" loading="eager" decoding="async">
+
+          <!-- Dark Mode Image -->
+          <img src="static/assets/img/hero-dashboard-dark.png"
+            class="img-fluid animated floating-dashboard hero-img-dark" alt="Enterprise Security Dashboard - Dark Mode"
             loading="eager" decoding="async">
         </div>
       </div>
@@ -808,8 +986,11 @@
 
   <!-- Template Main JS File -->
   <script src="static/assets/js/main.js" defer></script>
-  <script src="static/js/hero_animation.js" defer></script>
-  <script src="static/js/theme-toggle.js" defer></script>
+  <script src="static/js/hero_animation.js"></script>
+  <script src="static/js/cyber-segmented-control.js"></script>
+  <script src="static/js/hero-parallax.js"></script>
+  <script src="static/js/theme-toggle.js"></script>
+  <script src="static/js/scan-timeline.js"></script>
 </body>
 
 </html>

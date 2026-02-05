@@ -96,6 +96,12 @@ class BrandImpersonationDetector:
         # Normalize domain
         domain = domain.lower().strip()
         
+        # Convert punycode to unicode if present
+        try:
+            domain = domain.encode('ascii').decode('idna')
+        except:
+            pass # Keep original if conversion fails
+        
         # Remove www. prefix for analysis
         domain_without_www = domain[4:] if domain.startswith('www.') else domain
         

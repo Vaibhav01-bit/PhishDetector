@@ -1,0 +1,73 @@
+{
+  "status": "Safe",
+  "layers": {
+    "forensics_check": {
+      "status": "Safe",
+      "message": "Shortened URL detected. Final destination analyzed."
+    },
+    "layer1": {
+      "status": "Safe",
+      "message": "Domain not in blacklist."
+    },
+    "layer2": {
+      "status": "Safe",
+      "message": "Domain analysis passed."
+    },
+    "layer3": {
+      "status": "Safe",
+      "message": "Valid HTTPS Scheme."
+    },
+    "layer4": {
+      "status": "Safe",
+      "message": "ML Model predicts Safe."
+    },
+    "layer5": {
+      "status": "Safe",
+      "message": "Behavioral analysis passed."
+    },
+    "sandbox": {
+      "success": true,
+      "scan_id": "scan_1770284239_95d41c0e",
+      "source_url": "https://bit.ly/3ktqx9m",
+      "final_url": "https://bit.ly/3ktqx9m",
+      "redirect_count": 4,
+      "ip_address": "67.199.248.11",
+      "domain": "bit.ly",
+      "page_title": "Bitly | Page Not Found | 404",
+      "load_time": 1803,
+      "total_time": 7184,
+      "screenshot_path": "scan_1770284239_95d41c0e.jpg",
+      "sandbox_message": "Rendered in an isolated sandbox. No user interaction.",
+      "has_login_form": false,
+      "has_password_field": false,
+      "has_email_field": false,
+      "suspicious_keywords": [],
+      "timestamp": "2026-02-05 15:07:26"
+    }
+  },
+  "forensics": {
+    "input_url": "https://bit.ly/3kTQx9M",
+    "normalized_url": "https://bit.ly/3kTQx9M",
+    "final_url": "https://bit.ly/3kTQx9M",
+    "redirect_chain": [
+      {
+        "url": "https://bit.ly/3kTQx9M",
+        "status": 404
+      }
+    ],
+    "redirect_count": 0,
+    "is_shortener": true,
+    "domain": "bit.ly",
+    "root_domain": "bit.ly",
+    "ip_address": "67.199.248.11",
+    "geo_location": "server-dependent",
+    "asn": "Unknown",
+    "whois": {
+      "registrar": "Libyan Spider Network (int)",
+      "creation_date": "2008-05-17",
+      "expiration_date": "2032-05-17",
+      "domain_age_days": 6472
+    },
+    "scan_time": "2026-02-05 15:07:12"
+  }
+}

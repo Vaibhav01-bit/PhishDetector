@@ -20,6 +20,20 @@ class PhishingDetectionPipeline:
         forensics_data = self.forensics.analyze(url)
         target_url = forensics_data['final_url']
         
+        # Feature 2: URL Shortener & Redirects
+        redirect_count = forensics_data.get('redirect_count', 0)
+        is_shortener = forensics_data.get('is_shortener', False)
+        
+        if redirect_count > 3:
+             results['forensics_check'] = {'status': WARNING, 'message': f'Excessive redirects detected ({redirect_count}). Risk of obfuscation.'}
+        elif is_shortener:
+             # We mark as SAFE because we successfully resolved it, but we inform the user.
+             results['forensics_check'] = {'status': SAFE, 'message': 'Shortened URL detected. Final destination analyzed.'}
+        elif redirect_count > 0:
+             results['forensics_check'] = {'status': SAFE, 'message': f'Redirects followed ({redirect_count}). Final destination analyzed.'}
+        else:
+             results['forensics_check'] = {'status': SAFE, 'message': 'Direct link. No redirects.'}
+        
         # Layer 1: Blacklist
         status, message = self.l1.check(target_url)
         results['layer1'] = {'status': status, 'message': message}

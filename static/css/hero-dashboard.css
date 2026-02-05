@@ -1,0 +1,61 @@
+/* Dashboard Floating Animation */
+.floating-dashboard {
+    filter: drop-shadow(0 20px 50px rgba(59, 130, 246, 0.2));
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px) perspective(1000px) rotateY(0deg);
+    }
+
+    50% {
+        transform: translateY(-20px) perspective(1000px) rotateY(2deg);
+    }
+
+    100% {
+        transform: translateY(0px) perspective(1000px) rotateY(0deg);
+    }
+}
+
+/* Enhancing dark mode glow */
+body.dark-mode .floating-dashboard {
+    filter: drop-shadow(0 20px 60px rgba(59, 130, 246, 0.4));
+}
+
+/* ────────────────────────────────────────
+   THEME SWITCHING LOGIC
+   ──────────────────────────────────────── */
+
+/* Default (Light Mode) */
+.hero-img-light {
+    position: relative;
+    opacity: 1;
+    display: block;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.hero-img-dark {
+    position: absolute;
+    top: 0;
+    left: 15px;
+    /* Offset for container padding/grid */
+    width: calc(100% - 30px);
+    /* Match container width */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease-in-out;
+}
+
+/* Dark Mode Active */
+body.dark-mode .hero-img-light,
+[data-theme="dark"] .hero-img-light {
+    opacity: 0;
+    pointer-events: none;
+}
+
+body.dark-mode .hero-img-dark,
+[data-theme="dark"] .hero-img-dark {
+    opacity: 1;
+    pointer-events: auto;
+}

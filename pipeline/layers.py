@@ -75,7 +75,12 @@ class Layer2_Domain:
         'ipfs.io',
         'cloudflare-ipfs.com',
         'gateway.pinata.cloud',
-        'dweb.link'
+        'dweb.link',
+        'github.io',
+        'vercel.app',
+        'netlify.app',
+        'pages.dev',
+        'on.fleek.co'
     ]
 
     def __init__(self):
@@ -90,7 +95,7 @@ class Layer2_Domain:
         # 0. Check for Decentralized Gateway
         # If matched, treat as neutral infrastructure (WARNING/Suspicious mainly for opacity)
         if any(domain == gateway or domain.endswith('.' + gateway) for gateway in self.DECENTRALIZED_GATEWAYS):
-            return WARNING, "Hosted on a Decentralized Platform – Proceed with Caution"
+            return WARNING, "Hosted on a decentralized or shared platform. Content may change dynamically."
             
         score = 0
         reasons = []

@@ -7,6 +7,10 @@
     /* Scale down for slim header */
     transform-origin: right center;
     /* Keep alignment */
+    z-index: 1050;
+    /* Ensure above header content */
+    position: relative;
+    pointer-events: auto;
 }
 
 .theme-switch {

@@ -7,7 +7,12 @@ from urllib.parse import urlparse
 class ForensicAnalyzer:
     def __init__(self):
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        self.SHORTENER_DOMAINS = {
+            'bit.ly', 'tinyurl.com', 'is.gd', 't.co', 'goo.gl', 'shorte.st',
+            'go.gl', 'tr.im', 'ow.ly', 'youtu.be', 'mcaf.ee', 'shorturl.at',
+            'bl.ink', 'cutt.ly', 'clck.ru', 'rb.gy'
         }
 
     def analyze(self, url):
@@ -27,6 +32,7 @@ class ForensicAnalyzer:
             'final_url': final_url,
             'redirect_chain': redirect_chain,
             'redirect_count': len(redirect_chain) - 1 if redirect_chain else 0,
+            'is_shortener': domain in self.SHORTENER_DOMAINS,
             'domain': domain,
             'root_domain': self._get_root_domain(domain),
             'ip_address': ip_address,

@@ -573,3 +573,195 @@ body.dark-mode .btn-proceed-danger,
         transition: none !important;
     }
 }
+
+/* ────────────────────────────────────────
+   11. THEME ADAPTIVE TEXT & COLORS
+   ──────────────────────────────────────── */
+
+/* Section Headers (Risk Analysis, Email Report) */
+.section-header {
+    color: #1e293b;
+    /* Slate 800 - Dark for Light Mode */
+    font-weight: 600;
+}
+
+body.dark-mode .section-header,
+[data-theme="dark"] .section-header {
+    color: #f8fafc;
+    /* Slate 50 - White for Dark Mode */
+}
+
+/* Risk Analysis Container Background */
+.risk-analysis {
+    background: rgba(0, 0, 0, 0.03);
+    /* Subtle grey for Light Mode */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .risk-analysis,
+[data-theme="dark"] .risk-analysis {
+    background: rgba(255, 255, 255, 0.05);
+    /* Subtle white for Dark Mode */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Text Warning Contrast Fix */
+.enterprise-card .text-warning {
+    color: #d97706 !important;
+    /* Darker Amber for White Background */
+}
+
+body.dark-mode .enterprise-card .text-warning,
+[data-theme="dark"] .enterprise-card .text-warning {
+    color: #fbbf24 !important;
+    /* Bright Amber for Dark Background */
+}
+
+/* Email Source Preview Box */
+.bg-light-alt {
+    background: #f1f5f9;
+    /* Slate 100 */
+}
+
+body.dark-mode .bg-light-alt,
+[data-theme="dark"] .bg-light-alt {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.text-preview {
+    color: #475569;
+    /* Slate 600 */
+}
+
+body.dark-mode .text-preview,
+[data-theme="dark"] .text-preview {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Table Text Colors */
+.enterprise-card .table {
+    color: #334155;
+    /* Slate 700 */
+}
+
+body.dark-mode .enterprise-card .table,
+[data-theme="dark"] .enterprise-card .table {
+    color: #e2e8f0;
+    /* Slate 200 */
+}
+
+.enterprise-card .table thead th {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    color: #64748b;
+}
+
+body.dark-mode .enterprise-card .table thead th,
+[data-theme="dark"] .enterprise-card .table thead th {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.enterprise-card .table td {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.dark-mode .enterprise-card .table td,
+[data-theme="dark"] .enterprise-card .table td {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Email Links */
+.email-link {
+    color: #3b82f6;
+    /* Blue 500 */
+    transition: color 0.2s;
+    font-weight: 500;
+}
+
+.email-link:hover {
+    color: #2563eb;
+    /* Blue 600 */
+    text-decoration: underline !important;
+}
+
+body.dark-mode .email-link,
+[data-theme="dark"] .email-link {
+    color: #60a5fa;
+    /* Blue 400 */
+}
+
+body.dark-mode .email-link:hover,
+[data-theme="dark"] .email-link:hover {
+    color: #93c5fd;
+    /* Blue 300 */
+}
+
+/* Table Row Animations & Hover */
+.enterprise-card tbody tr {
+    transition: background-color 0.2s, transform 0.2s;
+    animation: fadeInUp 0.5s ease backwards;
+}
+
+/* Staggered animation delay for up to 10 rows */
+.enterprise-card tbody tr:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.enterprise-card tbody tr:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.enterprise-card tbody tr:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.enterprise-card tbody tr:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.enterprise-card tbody tr:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.enterprise-card tbody tr:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+.enterprise-card tbody tr:nth-child(7) {
+    animation-delay: 0.7s;
+}
+
+.enterprise-card tbody tr:nth-child(8) {
+    animation-delay: 0.8s;
+}
+
+.enterprise-card tbody tr:nth-child(9) {
+    animation-delay: 0.9s;
+}
+
+.enterprise-card tbody tr:nth-child(10) {
+    animation-delay: 1.0s;
+}
+
+.enterprise-card tbody tr:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+    transform: translateX(4px);
+}
+
+body.dark-mode .enterprise-card tbody tr:hover,
+[data-theme="dark"] .enterprise-card tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

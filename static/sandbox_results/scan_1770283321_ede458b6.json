@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "scan_id": "scan_1770283321_ede458b6",
+  "source_url": "https://bit.ly/verify-now",
+  "final_url": "https://bit.ly/verify-now",
+  "redirect_count": 33,
+  "ip_address": "67.199.248.11",
+  "domain": "bit.ly",
+  "page_title": "Bitly | bit.ly/2qaqvFf",
+  "load_time": 8265,
+  "total_time": 13231,
+  "screenshot_path": "scan_1770283321_ede458b6.jpg",
+  "has_login_form": false,
+  "has_password_field": false,
+  "has_email_field": false,
+  "suspicious_keywords": [],
+  "timestamp": "2026-02-05 14:52:14"
+}
