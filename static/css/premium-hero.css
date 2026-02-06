@@ -4,6 +4,14 @@
    ──────────────────────────────────────── */
 
 /* 1. TYPOGRAPHY & GRADIENTS */
+
+#hero {
+    position: relative;
+    overflow: hidden;
+    /* Ensure canvas doesn't overflow */
+}
+
+
 .text-gradient-primary {
     background: linear-gradient(135deg, #2563EB 0%, #7C3AED 100%);
     -webkit-background-clip: text;
@@ -199,4 +207,47 @@ body.dark-mode .input-content-mask {
     .main-heading {
         font-size: 4rem;
     }
+}
+
+/* 5. EMAIL SCAN SPECIFIC STYLES */
+/* Fix for text cutoff and layout issues in email textarea */
+.input-content-mask.email-input-mask {
+    height: auto !important;
+    /* Override fixed 56px height */
+    min-height: 60px;
+    align-items: stretch;
+    padding: 6px;
+    /* Give some breathing room */
+}
+
+.email-input-mask textarea.form-control {
+    height: 120px !important;
+    /* Force taller height */
+    min-height: 100px;
+    padding-top: 14px !important;
+    /* Push text down from top edge */
+    padding-bottom: 14px;
+    line-height: 1.5;
+    resize: none;
+    margin-right: 8px;
+    /* Space between text and button */
+}
+
+.email-input-mask .input-group-append {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    /* Align button to bottom right */
+}
+
+.email-input-mask .btn-primary {
+    height: auto !important;
+    /* Allow button to size specifically */
+    min-height: 44px;
+    border-radius: 8px;
+    /* Softer look inside the mask */
+    padding: 10px 24px;
+    align-self: flex-end;
+    /* Stick to bottom */
+    margin-bottom: 2px;
 }

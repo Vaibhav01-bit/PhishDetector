@@ -1,126 +1,170 @@
 /* PROGRESSIVE SCAN TIMELINE - PREMIUM SAAS STYLE */
 
+/* Container - Glassmorphism & Depth */
 .scan-timeline-container {
     display: none;
-    /* Hidden by default */
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid rgba(226, 232, 240, 0.6);
-    border-radius: 20px;
-    padding: 30px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    padding: 2.5rem;
     box-shadow:
-        0 12px 40px rgba(0, 0, 0, 0.08),
-        0 4px 12px rgba(0, 0, 0, 0.04);
-    margin-top: 2rem;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    transition: all 0.4s ease;
+        0 20px 50px rgba(0, 0, 0, 0.05),
+        0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    margin: 2rem auto;
+    max-width: 550px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* Floating Animation */
+@keyframes floatTimeline {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.scan-timeline-container.active-scan {
+    animation: floatTimeline 6s ease-in-out infinite;
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow:
+        0 20px 50px rgba(59, 130, 246, 0.1),
+        0 0 0 1px rgba(59, 130, 246, 0.1) inset;
+}
+
+/* Cyber Gradient Edges (Subtle) */
+.scan-timeline-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+    opacity: 0.5;
 }
 
 body.dark-mode .scan-timeline-container {
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     box-shadow:
-        0 12px 40px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.05);
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+body.dark-mode .scan-timeline-container.active-scan {
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
 }
 
 /* Timeline Layout */
 .timeline-steps {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.5rem;
     position: relative;
-    padding-left: 10px;
+    padding-left: 12px;
 }
 
 /* Connecting Line */
 .timeline-steps::before {
     content: '';
     position: absolute;
-    top: 15px;
-    bottom: 25px;
-    left: 22px;
-    /* Center of icon (24px + padding) */
+    top: 20px;
+    bottom: 30px;
+    left: 24px;
+    /* Center of icon */
     width: 2px;
-    background: #e2e8f0;
+    background: linear-gradient(180deg,
+            rgba(59, 130, 246, 0.8) 0%,
+            rgba(59, 130, 246, 0.1) 100%);
     z-index: 0;
-}
-
-body.dark-mode .timeline-steps::before {
-    background: #334155;
+    opacity: 0.3;
 }
 
 /* Individual Step */
 .scan-step {
     display: flex;
-    align-items: flex-start;
-    gap: 16px;
+    align-items: center;
+    gap: 1.25rem;
     position: relative;
     z-index: 1;
-    opacity: 0.5;
-    /* Dimmed by default */
-    transition: all 0.3s ease;
+    opacity: 0.4;
+    transition: all 0.4s ease;
+    padding: 4px 0;
 }
 
 .scan-step.active,
 .scan-step.completed {
     opacity: 1;
+    transform: translateX(4px);
 }
 
-/* Step Icon Box */
+/* Step Icon */
 .step-icon {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: #f1f5f9;
-    border: 2px solid #cbd5e1;
+    background: var(--bg-card);
+    /* Theme aware */
+    border: 2px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     font-size: 14px;
-    color: #64748b;
-    transition: all 0.3s ease;
-    background-color: var(--color-white);
+    color: var(--text-muted);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-body.dark-mode .step-icon {
-    background: #1e293b;
-    border-color: #475569;
-    color: #94a3b8;
-}
-
-/* Active State (Pulsing) */
+/* Active State - Pulse */
 .scan-step.active .step-icon {
     border-color: #3b82f6;
     color: #3b82f6;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-    animation: pulse 1.5s infinite;
+    background: rgba(59, 130, 246, 0.05);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
 
-/* Completed State */
+.scan-step.active .step-icon i {
+    animation: rotateIcon 2s linear infinite;
+}
+
+@keyframes rotateIcon {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Completed State - Checkmark */
 .scan-step.completed .step-icon {
     background: #10b981;
-    /* Green */
     border-color: #10b981;
     color: white;
     transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-/* Warning State */
-.scan-step.warning .step-icon {
-    background: #f59e0b;
-    /* Amber */
-    border-color: #f59e0b;
-    color: white;
-}
-
-/* Step Content */
+/* Text Styling */
 .step-content {
-    padding-top: 2px;
+    display: flex;
+    flex-direction: column;
 }
 
 .step-title {
@@ -128,67 +172,47 @@ body.dark-mode .step-icon {
     font-weight: 600;
     color: var(--text-heading-primary);
     margin-bottom: 2px;
-    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
 }
 
 .step-description {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
-    line-height: 1.4;
+    font-weight: 400;
 }
 
-/* Animations */
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
-    }
-
-    70% {
-        box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
-    }
-
-    100% {
-        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
-    }
+/* Active Text Highlight */
+.scan-step.active .step-title {
+    color: #3b82f6;
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+/* Timeline Exit Animation */
+.scan-timeline-container.scan-complete {
+    transform: scale(0.95) translateY(10px);
+    opacity: 0;
+    pointer-events: none;
+    filter: blur(4px);
 }
 
-.bx-loader-alt {
-    animation: spin 1s linear infinite;
+/* Dark Mode Specifics */
+body.dark-mode .step-icon {
+    background: #0f172a;
+    border-color: #334155;
 }
 
-/* Success Verdict Banner (Above Timeline) */
-.verdict-banner {
-    display: none;
-    text-align: center;
-    margin-bottom: 25px;
-    padding: 20px;
-    border-radius: 12px;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+body.dark-mode .scan-step.active .step-icon {
+    background: rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
-.verdict-banner.danger {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.3);
+/* Header Text */
+.timeline-header h5 {
+    color: #3b82f6;
+    letter-spacing: -0.02em;
 }
 
-.verdict-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-    font-family: 'Outfit', sans-serif;
-}
-
-.text-success-bold {
-    color: #10b981;
-}
-
-.text-danger-bold {
-    color: #ef4444;
+body.dark-mode .timeline-header h5 {
+    color: #60a5fa;
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
 }

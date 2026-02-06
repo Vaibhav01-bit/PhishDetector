@@ -22,6 +22,23 @@
     overflow: hidden;
 }
 
+/* Card Entrance Animation */
+.slide-up-entrance {
+    animation: slideUpReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 /* Status-Based Soft Glows */
 .enterprise-card:has(.icon-safe) {
     box-shadow:

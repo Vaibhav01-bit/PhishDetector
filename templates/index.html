@@ -13,8 +13,7 @@
   <link href="static/assets/img/newlogo.jpg" rel="icon">
   <link href="static/assets/img/newlogo.jpg" rel="apple-touch-icon">
 
-  <!-- Preload above-the-fold hero image -->
-  <link rel="preload" as="image" href="static/assets/img/Phishing.gif">
+
 
   <!-- Vendor CSS Files -->
   <link href="static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -41,7 +40,7 @@
   <link href="static/css/benefits.css" rel="stylesheet">
   <link href="static/css/how-it-works.css" rel="stylesheet">
   <link href="static/css/phishing-education.css" rel="stylesheet">
-  <link href="static/css/cyber-segmented-control.css" rel="stylesheet">
+
   <link href="static/css/premium-hero.css" rel="stylesheet">
   <link href="static/css/global-warm-glow.css" rel="stylesheet">
   <link href="static/css/sandbox-results.css" rel="stylesheet">
@@ -131,7 +130,6 @@
 
   <!-- ======= Hero Section ======= -->
   <section id="hero" class="d-flex align-items-center">
-    <canvas id="hero-canvas" aria-label="Animated cybersecurity network visualization"></canvas>
     <div class="container" data-aos="fade-up">
       <div class="row gy-4">
         <div class="col-lg-6 d-flex flex-column justify-content-center order-2 order-lg-1">
@@ -195,7 +193,7 @@
               <div class="tab-pane fade" id="email-scan" role="tabpanel">
                 <form action="/scan_email" method="POST" class="scan-form">
                   <div class="input-group neon-box">
-                    <div class="input-content-mask">
+                    <div class="input-content-mask email-input-mask">
                       <textarea name="email_text" class="form-control" rows="3"
                         placeholder="Paste email content here to scan for links..." required
                         style="min-height: 80px; resize: none;"></textarea>
@@ -211,9 +209,71 @@
             </div>
 
             <div class="scan-result mt-4">
-              <!-- Progressive Scan Timeline removed -->
+              <!-- PROGRESSIVE SCAN TIMELINE -->
+              <div id="scan-timeline" class="scan-timeline-container" style="display: none;">
+                <div class="timeline-header text-center mb-4">
+                  <h5 class="text-primary font-weight-bold">Security Analysis in Progress</h5>
+                  <p class="text-muted small">Analyzing URL across 5 security layers...</p>
+                </div>
 
-              <!-- Legacy Result Card (Hidden by default or if timeline is active) -->
+                <div class="timeline-steps">
+                  <!-- Step 1: URL Validation -->
+                  <div class="scan-step" id="step-1">
+                    <div class="step-icon"><i class='bx bx-circle'></i></div>
+                    <div class="step-content">
+                      <div class="step-title">URL Validation</div>
+                      <div class="step-description">Checking format and reachability...</div>
+                    </div>
+                  </div>
+
+                  <!-- Step 2: Domain Parsing -->
+                  <div class="scan-step" id="step-2">
+                    <div class="step-icon"><i class='bx bx-circle'></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Domain & Structure Parsing</div>
+                      <div class="step-description">Analyzing TLD and subdomains...</div>
+                    </div>
+                  </div>
+
+                  <!-- Step 3: Redirects -->
+                  <div class="scan-step" id="step-3">
+                    <div class="step-icon"><i class='bx bx-circle'></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Redirect Resolution</div>
+                      <div class="step-description">Tracing detailed redirect path...</div>
+                    </div>
+                  </div>
+
+                  <!-- Step 4: Brand Impersonation -->
+                  <div class="scan-step" id="step-4">
+                    <div class="step-icon"><i class='bx bx-circle'></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Brand Impersonation Check</div>
+                      <div class="step-description">Detecting fake brand signatures...</div>
+                    </div>
+                  </div>
+
+                  <!-- Step 5: AI Evaluation -->
+                  <div class="scan-step" id="step-5">
+                    <div class="step-icon"><i class='bx bx-circle'></i></div>
+                    <div class="step-content">
+                      <div class="step-title">AI / ML Risk Evaluation</div>
+                      <div class="step-description">Running behavioral model...</div>
+                    </div>
+                  </div>
+
+                  <!-- Step 6: Sandbox -->
+                  <div class="scan-step" id="step-6">
+                    <div class="step-icon"><i class='bx bx-circle'></i></div>
+                    <div class="step-content">
+                      <div class="step-title">Secure Sandbox Execution</div>
+                      <div class="step-description">Isolating environment...</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Result Card (Hidden by default) -->
               <div id="legacy-result-card" class="result-card enterprise-card p-5 rounded-4 shadow-lg" {% if not name
                 %}style="display: none;" {% endif %}>
                 <!-- Scanning URL (Small, Muted) -->
@@ -351,7 +411,8 @@
                   <div class="sandbox-error-brief mb-3">
                     <p class="mb-0 text-center">
                       <i class='bx bx-info-circle'></i>
-                      Sandbox analysis unavailable for this URL
+                      Sandbox analysis unavailable: {{ details.layers.sandbox.error if details.layers.sandbox.error else
+                      "Unknown error" }}
                     </p>
                   </div>
                   {% endif %}
@@ -986,9 +1047,7 @@
 
   <!-- Template Main JS File -->
   <script src="static/assets/js/main.js" defer></script>
-  <script src="static/js/hero_animation.js"></script>
-  <script src="static/js/cyber-segmented-control.js"></script>
-  <script src="static/js/hero-parallax.js"></script>
+
   <script src="static/js/theme-toggle.js"></script>
   <script src="static/js/scan-timeline.js"></script>
 </body>

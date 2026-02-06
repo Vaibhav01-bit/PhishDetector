@@ -4,13 +4,12 @@ Safely opens and analyzes URLs in an isolated headless browser environment.
 Captures screenshots, extracts metadata, and performs behavioral inspection.
 """
 
-import asyncio
 import os
 import time
 import json
 from datetime import datetime
 from urllib.parse import urlparse
-from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeout
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 from .sandbox_utils import (
     is_private_ip,
     normalize_url,
@@ -28,11 +27,12 @@ from .sandbox_utils import (
 class SandboxAnalyzer:
     """
     Analyzes URLs in a secure sandbox environment.
+    Uses Synchronous Playwright API for stability in threaded Flask environments.
     """
     
     def __init__(self, screenshot_dir="static/sandbox_screenshots", 
                  results_dir="static/sandbox_results",
-                 timeout_ms=15000):
+                 timeout_ms=30000):
         """
         Initialize the sandbox analyzer.
         
@@ -52,7 +52,7 @@ class SandboxAnalyzer:
     
     def analyze(self, url, scan_id=None):
         """
-        Main analysis entry point (synchronous wrapper).
+        Main analysis entry point.
         
         Args:
             url (str): URL to analyze
@@ -66,8 +66,8 @@ class SandboxAnalyzer:
             if not scan_id:
                 scan_id = generate_scan_id()
             
-            # Run async analysis
-            result = asyncio.run(self._analyze_async(url, scan_id))
+            # Run analysis
+            result = self._analyze_sync(url, scan_id)
             
             # Save result to JSON file for later retrieval
             if result.get('success'):
@@ -121,9 +121,9 @@ class SandboxAnalyzer:
         except Exception as e:
             print(f"Warning: Failed to save full results: {e}")
     
-    async def _analyze_async(self, url, scan_id):
+    def _analyze_sync(self, url, scan_id):
         """
-        Async analysis implementation.
+        Synchronous analysis implementation.
         
         Args:
             url (str): URL to analyze
@@ -155,41 +155,53 @@ class SandboxAnalyzer:
             return self._error_result(ip_error)
         
         # Step 4: Initialize browser and analyze
-        browser = None
-        try:
-            async with async_playwright() as p:
+        with sync_playwright() as p:
+            browser = None
+            try:
                 # Launch browser
-                browser = await self._init_browser(p)
-                context = await browser.new_context(
+                browser = p.chromium.launch(
+                    headless=True,
+                    args=[
+                        '--no-sandbox',
+                        '--disable-setuid-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-accelerated-2d-canvas',
+                        '--disable-gpu',
+                        '--disable-web-security',  # For CORS issues
+                        '--disable-features=IsolateOrigins,site-per-process'
+                    ]
+                )
+                
+                context = browser.new_context(
                     viewport={'width': 1280, 'height': 720},
                     user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    ignore_https_errors=False,
+                    ignore_https_errors=True,
                     accept_downloads=False,
                     java_script_enabled=True,
-                    bypass_csp=False
+                    bypass_csp=True
                 )
                 
                 # Create page
-                page = await context.new_page()
+                page = context.new_page()
                 
                 # Load page and track redirects
-                load_result = await self._load_page(page, url)
+                load_result = self._load_page(page, url)
                 
                 if load_result.get('error'):
-                    await browser.close()
+                    browser.close()
                     return self._error_result(load_result['error'])
                 
                 # Capture screenshot
-                screenshot_path = await self._capture_screenshot(page, scan_id)
+                screenshot_path = self._capture_screenshot(page, scan_id)
                 
                 # Extract metadata
-                metadata = await self._extract_metadata(page, url, load_result)
+                metadata = self._extract_metadata(page, url, load_result)
                 
                 # Behavioral inspection
-                behavioral = await self._inspect_behavior(page, domain)
+                behavioral = self._inspect_behavior(page, domain)
                 
                 # Close browser
-                await browser.close()
+                browser.close()
                 
                 # Calculate total time
                 total_time = int((time.time() - start_time) * 1000)
@@ -207,7 +219,7 @@ class SandboxAnalyzer:
                     'load_time': load_result.get('load_time', 0),
                     'total_time': total_time,
                     'screenshot_path': screenshot_path,
-                    'sandbox_message': "Rendered in an isolated sandbox. No user interaction.", # Feature 5 requirement
+                    'sandbox_message': "Rendered in an isolated sandbox. No user interaction.",
                     'has_login_form': behavioral.get('has_login_form', False),
                     'has_password_field': behavioral.get('has_password_field', False),
                     'has_email_field': behavioral.get('has_email_field', False),
@@ -217,60 +229,24 @@ class SandboxAnalyzer:
                 
                 return result
                 
-        except Exception as e:
-            if browser:
-                try:
-                    await browser.close()
-                except:
-                    pass
-            
-            return self._error_result(f"Browser error: {str(e)}")
+            except Exception as e:
+                if browser:
+                    try:
+                        browser.close()
+                    except:
+                        pass
+                
+                return self._error_result(f"Browser error: {str(e)}")
     
-    async def _init_browser(self, playwright):
-        """
-        Initialize headless browser with security settings.
-        
-        Args:
-            playwright: Playwright instance
-            
-        Returns:
-            Browser instance
-        """
-        browser = await playwright.chromium.launch(
-            headless=True,
-            args=[
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-accelerated-2d-canvas',
-                '--disable-gpu',
-                '--disable-web-security',  # For CORS issues
-                '--disable-features=IsolateOrigins,site-per-process'
-            ]
-        )
-        
-        return browser
-    
-    async def _load_page(self, page, url):
+    def _load_page(self, page, url):
         """
         Load page with redirect tracking and timeout.
-        
-        Args:
-            page: Playwright page instance
-            url (str): URL to load
-            
-        Returns:
-            dict: Load result with final URL, redirects, and timing
         """
         start_time = time.time()
-        redirect_chain = []
-        
-        # Track redirects
-        page.on('response', lambda response: redirect_chain.append(response.url))
         
         try:
             # Navigate to URL
-            response = await page.goto(
+            response = page.goto(
                 url,
                 timeout=self.timeout_ms,
                 wait_until='networkidle'
@@ -279,49 +255,42 @@ class SandboxAnalyzer:
             # Get final URL
             final_url = page.url
             
-            # Count unique redirects
-            unique_redirects = list(dict.fromkeys(redirect_chain))
-            redirect_count = len(unique_redirects) - 1  # Subtract original
+            # Calculate redirects properly from request chain
+            redirect_count = 0
+            if response:
+                r = response.request
+                while r.redirected_from:
+                    redirect_count += 1
+                    r = r.redirected_from
             
             # Calculate load time
             load_time = int((time.time() - start_time) * 1000)
             
             return {
                 'final_url': final_url,
-                'redirect_count': max(0, redirect_count),
+                'redirect_count': redirect_count,
                 'load_time': load_time,
                 'status_code': response.status if response else None
             }
             
         except PlaywrightTimeout:
-            return {'error': 'Page load timeout (15 seconds exceeded)'}
+            return {'error': 'Page load timeout (30 seconds exceeded)'}
         except Exception as e:
             return {'error': f'Page load failed: {str(e)}'}
     
-    async def _capture_screenshot(self, page, scan_id):
-        """
-        Capture full-page screenshot.
-        
-        Args:
-            page: Playwright page instance
-            scan_id (str): Unique scan identifier
-            
-        Returns:
-            str: Screenshot filename
-        """
+    def _capture_screenshot(self, page, scan_id):
+        """Capture full-page screenshot."""
         try:
             filename = f"{scan_id}.jpg"
             filepath = os.path.join(self.screenshot_dir, filename)
             
-            # Capture screenshot
-            await page.screenshot(
+            page.screenshot(
                 path=filepath,
                 full_page=True,
                 type='jpeg',
                 quality=85
             )
             
-            # Optimize screenshot
             optimize_screenshot(filepath, max_width=1200, quality=85)
             
             return filename
@@ -330,23 +299,10 @@ class SandboxAnalyzer:
             print(f"Screenshot capture failed: {e}")
             return None
     
-    async def _extract_metadata(self, page, original_url, load_result):
-        """
-        Extract page metadata.
-        
-        Args:
-            page: Playwright page instance
-            original_url (str): Original URL
-            load_result (dict): Load result data
-            
-        Returns:
-            dict: Metadata
-        """
+    def _extract_metadata(self, page, original_url, load_result):
+        """Extract page metadata."""
         try:
-            # Get page title
-            title = await page.title()
-            
-            # Get final URL
+            title = page.title()
             final_url = load_result.get('final_url', original_url)
             
             return {
@@ -360,17 +316,8 @@ class SandboxAnalyzer:
                 'final_url': original_url
             }
     
-    async def _inspect_behavior(self, page, domain):
-        """
-        Perform behavioral inspection without executing actions.
-        
-        Args:
-            page: Playwright page instance
-            domain (str): Domain name
-            
-        Returns:
-            dict: Behavioral flags
-        """
+    def _inspect_behavior(self, page, domain):
+        """Perform behavioral inspection."""
         result = {
             'has_login_form': False,
             'has_password_field': False,
@@ -380,7 +327,7 @@ class SandboxAnalyzer:
         
         try:
             # Check for password fields
-            password_fields = await page.query_selector_all('input[type="password"]')
+            password_fields = page.query_selector_all('input[type="password"]')
             result['has_password_field'] = len(password_fields) > 0
             
             # Check for email fields
@@ -391,7 +338,7 @@ class SandboxAnalyzer:
             ]
             
             for selector in email_selectors:
-                elements = await page.query_selector_all(selector)
+                elements = page.query_selector_all(selector)
                 if len(elements) > 0:
                     result['has_email_field'] = True
                     break
@@ -405,7 +352,7 @@ class SandboxAnalyzer:
             ]
             
             for selector in login_selectors:
-                element = await page.query_selector(selector)
+                element = page.query_selector(selector)
                 if element:
                     result['has_login_form'] = True
                     break
@@ -416,7 +363,7 @@ class SandboxAnalyzer:
             
             # Scan for suspicious keywords
             try:
-                body_text = await page.inner_text('body')
+                body_text = page.inner_text('body')
                 keywords = detect_suspicious_keywords(body_text)
                 result['keywords'] = keywords
             except:
@@ -429,15 +376,7 @@ class SandboxAnalyzer:
             return result
     
     def _error_result(self, error_message):
-        """
-        Generate error result structure.
-        
-        Args:
-            error_message (str): Error description
-            
-        Returns:
-            dict: Error result
-        """
+        """Generate error result structure."""
         return {
             'success': False,
             'error': error_message,

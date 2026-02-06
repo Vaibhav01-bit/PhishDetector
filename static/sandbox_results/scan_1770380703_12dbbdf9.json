@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "scan_id": "scan_1770380703_12dbbdf9",
+  "source_url": "https://example.com",
+  "final_url": "https://example.com/",
+  "redirect_count": 0,
+  "ip_address": "104.18.26.120",
+  "domain": "example.com",
+  "page_title": "Example Domain",
+  "load_time": 841,
+  "total_time": 5142,
+  "screenshot_path": "scan_1770380703_12dbbdf9.jpg",
+  "sandbox_message": "Rendered in an isolated sandbox. No user interaction.",
+  "has_login_form": false,
+  "has_password_field": false,
+  "has_email_field": false,
+  "suspicious_keywords": [],
+  "timestamp": "2026-02-06 17:55:08"
+}

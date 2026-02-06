@@ -94,7 +94,7 @@ def sandbox_results(scan_id):
     full_results = None
     try:
         # Check if there's a corresponding full result file
-        result_path = os.path.join('static', 'sandbox_results', f"{scan_id}_full.json")
+        result_path = os.path.join(app.root_path, 'static', 'sandbox_results', f"{scan_id}_full.json")
         if os.path.exists(result_path):
             with open(result_path, 'r', encoding='utf-8') as f:
                 full_results = json.load(f)

@@ -1,166 +1,230 @@
 /**
- * PROGRESSIVE SCAN TIMELINE LOGIC - DISABLED
- * Timeline feature has been removed
+ * PROGRESSIVE SCAN TIMELINE LOGIC
+ * Cinematic security analysis with step-by-step visualization
  */
 
-/* DISABLED - Timeline removed
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('url-scan-form');
     const timeline = document.getElementById('scan-timeline');
     const legacyCard = document.getElementById('legacy-result-card');
 
-    // Scan Steps Data
+    // Steps Configuration (Must match HTML)
     const steps = [
-        { id: 'step-1', text: 'Validating URL' },
-        { id: 'step-2', text: 'Parsing Domain' },
-        { id: 'step-3', text: 'Resolving Redirects' },
-        { id: 'step-4', text: 'Brand Analysis' },
-        { id: 'step-5', text: 'AI Threat Detection' },
-        { id: 'step-6', text: 'Sandbox Execution' }
+        { id: 'step-1', delay: 600 },  // URL Validation
+        { id: 'step-2', delay: 800 },  // Domain Parsing
+        { id: 'step-3', delay: 1000 }, // Redirect Resolution
+        { id: 'step-4', delay: 800 },  // Brand Impersonation
+        { id: 'step-5', delay: 900 },  // AI Evaluation
+        { id: 'step-6', delay: 600 }   // Sandbox
     ];
 
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // 1. UI RESET
-            if (legacyCard) legacyCard.style.display = 'none';
+            // 1. UI INITIALIZATION
+            if (legacyCard) {
+                legacyCard.style.display = 'none';
+                legacyCard.classList.remove('slide-up-entrance');
+            }
             timeline.style.display = 'block';
+            timeline.classList.remove('scan-complete'); // Reset exit animation
+            timeline.classList.add('active-scan');
+
+            // Reset all steps
             resetTimeline();
 
+            // Get URL
             const formData = new FormData(form);
             const url = formData.get('name');
 
-            // 2. START PROGRESSIVE ANIMATION (Steps 1-3)
-            // We simulate early steps immediately to feel responsive
-            await simulateStep(0, 600);  // URL
-            await simulateStep(1, 800);  // Domain
-            await simulateStep(2, 1000); // Redirects (Simulated wait)
-
-            // 3. TRIGGER BACKEND SCAN (AJAX)
             try {
-                // Mark Step 4 (AI/Brand) as Loading while we fetch
-                setActive(3);
+                // 2. START PROGRESSIVE ANIMATION (Steps 1-3: "Fast" checks)
+                // We show these running immediately to provide instant feedback
+                await runStep(0);
+                await runStep(1);
 
-                const response = await fetch('/result', {
+                // Start backend request in parallel with Step 3
+                // This makes it feel faster but maintains the illusion of sequential work
+                const scanPromise = fetch('/result', {
                     method: 'POST',
                     body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
 
+                await runStep(2); // Redirects
+
+                // 3. WAIT FOR BACKEND (Simulate "Deep Analysis")
+                // Activate Step 4 (Brand Check) to show we are working
+                setActive(3, "Deep scanning...");
+
+                const response = await scanPromise;
                 if (!response.ok) throw new Error("Scan failed");
                 const result = await response.json();
 
-                // 4. HANDLE SUCCESS (Fast-forward remaining steps)
-                markCompleted(3);     // Brand done
-                await simulateStep(4, 500); // AI
-                await simulateStep(5, 500); // Sandbox
+                // 4. COMPLETE REMAINING STEPS
+                markCompleted(3); // Finish Brand Check
+                await runStep(4); // AI
+                await runStep(5); // Sandbox
 
-                // 5. SHOW VERDICT
-                showVerdict(result);
+                // 5. CRITICAL TRANSITION PHASE
+                await new Promise(r => setTimeout(r, 400)); // Pause for impact
+
+                // Mark timeline as finished visually
+                timeline.classList.remove('active-scan');
+
+                // Fade out timeline
+                timeline.classList.add('scan-complete');
+
+                // Wait for fade out
+                await new Promise(r => setTimeout(r, 500));
+
+                // 6. REVEAL VERDICT
+                timeline.style.display = 'none';
+                populateResultCard(result);
+                legacyCard.style.display = 'block';
+                legacyCard.classList.add('slide-up-entrance');
 
             } catch (error) {
                 console.error("Scan Error:", error);
-                showError();
+                // In case of error, just fallback to standard submit or show error
+                // For now, we'll reload the page with standard submit if JS fails
+                form.submit();
             }
         });
     }
 
-
-    // --- HELPER FUNCTIONS ---
+    // --- ANIMATION HELPERS ---
 
     function resetTimeline() {
-        document.getElementById('verdict-banner').style.display = 'none';
-        document.getElementById('timeline-actions').style.display = 'none';
-
-        steps.forEach((s, index) => {
+        steps.forEach(s => {
             const el = document.getElementById(s.id);
-            el.className = 'scan-step'; // Reset classes
-            el.style.opacity = '0.5';
-
-            // Reset Icon
-            const icon = el.querySelector('.step-icon');
-            icon.innerHTML = "<i class='bx bx-circle'></i>";
+            if (el) {
+                el.className = 'scan-step';
+                el.querySelector('.step-icon').innerHTML = "<i class='bx bx-circle'></i>";
+                // Reset text if we changed it
+                if (s.id === 'step-4') el.querySelector('.step-description').innerText = "Detecting fake brand signatures...";
+            }
         });
-
-        // Set Step 1 Active
-        const step1 = document.getElementById('step-1');
-        step1.classList.add('active');
-        step1.style.opacity = '1';
     }
 
-    function setActive(index) {
+    async function runStep(index) {
         if (index >= steps.length) return;
-        const el = document.getElementById(steps[index].id);
-        el.classList.add('active');
-        el.style.opacity = '1';
-        el.querySelector('.step-icon').innerHTML = "<i class='bx bx-radio-circle-marked'></i>";
-        el.querySelector('.step-description').innerText = "Processing...";
-    }
+        const s = steps[index];
 
-    function markCompleted(index) {
-        if (index >= steps.length) return;
-        const el = document.getElementById(steps[index].id);
-        el.classList.remove('active');
-        el.classList.add('completed');
-        el.querySelector('.step-icon').innerHTML = "<i class='bx bx-check'></i>";
-        el.querySelector('.step-description').innerText = "Completed";
-    }
-
-    function markWarning(index, msg) {
-        const el = document.getElementById(steps[index].id);
-        el.classList.remove('active');
-        el.classList.add('warning'); // You need CSS for this
-        el.querySelector('.step-icon').innerHTML = "<i class='bx bx-error'></i>";
-        el.querySelector('.step-description').innerText = msg || "Suspicious";
-    }
-
-    // Returns a promise that resolves after 'ms' time
-    // Also handles UI updates for that step
-    async function simulateStep(index, ms) {
+        // Active Phase
         setActive(index);
-        await new Promise(r => setTimeout(r, ms));
+
+        // Wait
+        await new Promise(r => setTimeout(r, s.delay));
+
+        // Complete Phase
         markCompleted(index);
     }
 
-    function showVerdict(data) {
-        const banner = document.getElementById('verdict-banner');
-        const title = document.getElementById('verdict-title');
-        const text = document.getElementById('verdict-text');
-        const icon = document.getElementById('verdict-icon-i');
-        const actions = document.getElementById('timeline-actions');
+    function setActive(index, customText = null) {
+        const el = document.getElementById(steps[index].id);
+        if (!el) return;
 
-        banner.style.display = 'block';
-        actions.style.display = 'block';
-
-        if (data.is_safe) {
-            banner.className = 'verdict-banner success';
-            banner.style.background = 'rgba(16, 185, 129, 0.1)';
-            banner.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-            title.innerText = "Website is Safe";
-            title.style.color = '#10b981';
-            text.innerText = "No malicious threats detected across 5 layers.";
-            icon.className = 'bx bx-shield-check text-success-bold';
-        } else {
-            banner.className = 'verdict-banner danger';
-            banner.style.background = 'rgba(239, 68, 68, 0.1)';
-            banner.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-            title.innerText = "Phishing Detected";
-            title.style.color = '#ef4444';
-            text.innerText = "This URL exhibits malicious behavior. Do not visit.";
-            icon.className = 'bx bx-shield-x text-danger-bold';
-
-            // Highlight specific failing steps if possible? 
-            // For simplicity, we just show global verdict now.
+        el.classList.add('active');
+        el.querySelector('.step-icon').innerHTML = "<i class='bx bx-loader-alt'></i>";
+        if (customText) {
+            el.querySelector('.step-description').innerText = customText;
         }
     }
 
-    function showError() {
-        const banner = document.getElementById('verdict-banner');
-        banner.style.display = 'block';
-        banner.className = 'verdict-banner danger';
-        banner.innerHTML = "<h3>Error</h3><p>Could not complete scan. Please try again.</p>";
+    function markCompleted(index) {
+        const el = document.getElementById(steps[index].id);
+        if (!el) return;
+
+        el.classList.remove('active');
+        el.classList.add('completed');
+        el.querySelector('.step-icon').innerHTML = "<i class='bx bx-check'></i>";
     }
-*/ // END DISABLED CODE
+
+    // --- RESULT POPULATION ---
+    function populateResultCard(data) {
+        const card = document.getElementById('legacy-result-card');
+        if (!card) return;
+
+        // 1. Update Scanned URL
+        // Finding elements by class or structure since IDs might not exist in loop
+        // Best approach: Use the 'name' array logic from the backend
+
+        // Helper to update text safely
+        const setTxt = (sel, txt) => {
+            const el = card.querySelector(sel);
+            if (el) el.innerText = txt;
+        };
+
+        // URL Display
+        const urlSpan = card.querySelector('.url-text span');
+        if (urlSpan) urlSpan.innerText = data.url;
+
+        // 2. Logic for Safe vs Phishing
+        const isSafe = data.is_safe;
+        const isWarning = data.status === 'Warning';
+
+        // Icon Wrapper
+        const iconWrapper = card.querySelector('.security-icon');
+        iconWrapper.className = 'security-icon'; // Reset
+
+        // Icon I element
+        const iconI = iconWrapper.querySelector('i');
+
+        // Verdict Heading
+        const verdictHead = card.querySelector('.verdict-text');
+
+        if (isSafe) {
+            iconWrapper.classList.add('icon-safe');
+            iconI.className = 'bx bxs-shield-alt-2';
+            verdictHead.innerText = "This website appears safe";
+            verdictHead.className = "verdict-text text-success fw-bold mb-0";
+        } else if (isWarning) {
+            iconWrapper.classList.add('icon-warning');
+            iconI.className = 'bx bxs-error-alt';
+            verdictHead.innerText = "Suspicious patterns detected";
+            verdictHead.className = "verdict-text text-warning fw-bold mb-0";
+        } else {
+            iconWrapper.classList.add('icon-danger');
+            iconI.className = 'bx bxs-shield-x';
+            verdictHead.innerText = "High-risk phishing indicators found";
+            verdictHead.className = "verdict-text text-danger fw-bold mb-0";
+        }
+
+        // 3. CTA Buttons (Sandbox vs Proceed)
+        const sandboxLink = card.querySelector('.btn-sandbox-primary');
+        if (sandboxLink) {
+            if (data.details && data.details.layers.sandbox && data.details.layers.sandbox.success) {
+                sandboxLink.href = `/sandbox/${data.details.layers.sandbox.scan_id}`;
+            } else {
+                // Hide or disable if no sandbox
+            }
+        }
+
+        // Update Proceed Button
+        const btnProceeding = card.querySelector('button[onclick]'); // Naive selector
+        // Ideally we recreate the button or change its class/onclick
+        // For simplicity: Update the 'secondary-cta-wrapper'
+        const secondaryWrapper = card.querySelector('.secondary-cta-wrapper');
+        if (secondaryWrapper) {
+            if (isSafe) {
+                secondaryWrapper.innerHTML = `
+                    <button class="btn-proceed-secondary" onclick="window.open('${data.url}')" target="_blank">
+                      <i class='bx bx-check-circle me-1'></i> Proceed Safely
+                    </button>
+                `;
+            } else {
+                secondaryWrapper.innerHTML = `
+                    <button class="btn-proceed-danger" onclick="window.open('${data.url}')" target="_blank">
+                      <i class='bx bx-error-circle me-1'></i> View Anyway (Risk)
+                    </button>
+                `;
+            }
+        }
+
+        // 4. Update Analysis Details List (Optional but good)
+        // ... (We could iterate layers and update the list, but for now the verdict is key)
+    }
+});
+

@@ -1,6 +1,7 @@
 from .layers import Layer1_Blacklist, Layer2_Domain, Layer3_SSL, Layer4_ML_Model, Layer5_Behavioral, SAFE, WARNING, PHISHING
 from .sandbox import SandboxAnalyzer
 from .forensics import ForensicAnalyzer
+from datetime import datetime
 
 class PhishingDetectionPipeline:
     def __init__(self, enable_sandbox=True):
@@ -86,7 +87,11 @@ class PhishingDetectionPipeline:
                     })
                     
             except Exception as e:
-                print(f"Sandbox error: {e}")
+                import traceback
+                error_msg = f"Sandbox error: {str(e)}\n{traceback.format_exc()}"
+                print(error_msg)
+                with open("sandbox_error.log", "a") as f:
+                    f.write(f"[{datetime.now()}] {error_msg}\n")
                 results['sandbox'] = {'success': False, 'error': str(e), 'scan_id': None}
         
         return self._finalize(final_status, results, forensics_data)
