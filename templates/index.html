@@ -39,7 +39,7 @@
   <link href="static/css/footer-particles.css" rel="stylesheet">
   <link href="static/css/benefits.css" rel="stylesheet">
   <link href="static/css/how-it-works.css" rel="stylesheet">
-  <link href="static/css/phishing-education.css" rel="stylesheet">
+
 
   <link href="static/css/premium-hero.css" rel="stylesheet">
   <link href="static/css/global-warm-glow.css" rel="stylesheet">
@@ -48,6 +48,7 @@
   <link href="static/css/hero-dashboard.css" rel="stylesheet">
   <link href="static/css/scan-timeline.css" rel="stylesheet">
   <link href="static/css/modern-hero-bg.css" rel="stylesheet">
+  <link href="static/css/faq-scroll.css" rel="stylesheet">
 
   <style>
     html {
@@ -178,13 +179,23 @@
                 <form action="{{ url_for('predict')}}" method="post" class="scan-form p-1" id="url-scan-form">
                   <div class="input-group neon-box">
                     <div class="input-content-mask">
+                      <div class="input-icon">
+                        <i class='bx bx-link-alt'></i>
+                      </div>
                       <input type="url" id="url-input" name="name" class="form-control" autocomplete="url"
                         placeholder="Paste URL here (https://...)" required
                         aria-label="Enter URL to scan for phishing threats">
                       <div class="input-group-append">
-                        <button type="submit" class="btn btn-primary">Scan Website</button>
+                        <button type="submit" class="btn btn-primary">
+                          <span>Scan Website</span>
+                          <i class='bx bx-rocket'></i>
+                        </button>
                       </div>
                     </div>
+                  </div>
+                  <div class="privacy-message">
+                    <i class='bx bx-lock-alt'></i>
+                    <span>Your scan results are 100% private and encrypted.</span>
                   </div>
                 </form>
               </div>
@@ -515,58 +526,81 @@
   <section id="benefits" class="benefits">
     <div class="container" data-aos="fade-up">
 
-      <div class="section-title">
-        <h2>Why Use PhishDetector?</h2>
-        <p>Enterprise-grade security simplified for everyone.</p>
+      <div class="section-header-centered">
+        <div class="pill-badge">Next-Gen Intelligence</div>
+        <h2>Why Choose <span class="highlight-text">PhishDetector?</span></h2>
+        <p>Architected for speed, built for absolute privacy, and powered by the world's most advanced threat
+          intelligence.</p>
       </div>
 
-      <div class="benefits-grid">
+      <div class="benefits-grid-3-col">
 
-        <!-- Benefit 1 -->
-        <div class="benefit-card" data-aos="fade-up" data-aos-delay="100">
-          <div class="icon-container">
-            <i class="bx bx-rocket"></i>
+        <!-- Left Column -->
+        <div class="benefits-column left-col">
+          <!-- Benefit 1 -->
+          <div class="benefit-card neumorphic" data-aos="fade-right" data-aos-delay="100">
+            <div class="icon-container">
+              <i class="bx bxs-bolt"></i>
+            </div>
+            <div class="content">
+              <h3>Real-Time Analysis</h3>
+              <p>Millisecond URL scanning that intercepts threats instantly. Experience security at the speed of
+                thought.
+              </p>
+            </div>
           </div>
-          <div class="content">
-            <h3>Real-Time Analysis</h3>
-            <p>Instant URL scanning capabilities that detect malicious links in milliseconds before you click. Speed
-              meets security.</p>
+
+          <!-- Benefit 2 -->
+          <div class="benefit-card neumorphic" data-aos="fade-right" data-aos-delay="200">
+            <div class="icon-container">
+              <i class="bx bx-shield-quarter"></i>
+            </div>
+            <div class="content">
+              <h3>5-Layer Defense</h3>
+              <p>A proprietary stack of domain reputation, SSL validation, and behavioral heuristics working in perfect
+                harmony.</p>
+            </div>
           </div>
         </div>
 
-        <!-- Benefit 2 -->
-        <div class="benefit-card" data-aos="fade-up" data-aos-delay="200">
-          <div class="icon-container">
-            <i class="bx bx-brain"></i>
-          </div>
-          <div class="content">
-            <h3>AI-Powered Core</h3>
-            <p>Advanced machine learning models trained to recognize zero-day threats and evolving phishing patterns
-              that traditional tools miss.</p>
-          </div>
-        </div>
-
-        <!-- Benefit 3 -->
-        <div class="benefit-card" data-aos="fade-up" data-aos-delay="300">
-          <div class="icon-container">
-            <i class="bx bx-layer"></i>
-          </div>
-          <div class="content">
-            <h3>5-Layer Defense</h3>
-            <p>Comprehensive security stack including SSL checks, domain reputation, behavioral analysis, and blacklist
-              verification.</p>
+        <!-- Center Column (Visual) -->
+        <div class="benefits-column center-col" data-aos="zoom-in" data-aos-delay="100">
+          <div class="central-shield-visual">
+            <div class="shield-core">
+              <i class='bx bx-check-shield'></i>
+            </div>
+            <div class="shield-ring ring-1"></div>
+            <div class="shield-ring ring-2"></div>
+            <div class="shield-glow"></div>
+            <div class="orbit-dot dot-1"></div>
+            <div class="orbit-dot dot-2"></div>
           </div>
         </div>
 
-        <!-- Benefit 4 -->
-        <div class="benefit-card" data-aos="fade-up" data-aos-delay="400">
-          <div class="icon-container">
-            <i class="bx bx-shield-quarter"></i>
+        <!-- Right Column -->
+        <div class="benefits-column right-col">
+          <!-- Benefit 3 -->
+          <div class="benefit-card neumorphic" data-aos="fade-left" data-aos-delay="100">
+            <div class="icon-container">
+              <i class="bx bx-brain"></i>
+            </div>
+            <div class="content">
+              <h3>AI-Powered Core</h3>
+              <p>Custom neural networks trained on billions of data points to predict zero-day threats before they
+                propagate.</p>
+            </div>
           </div>
-          <div class="content">
-            <h3>Privacy First</h3>
-            <p>No account required. We scan URLs anonymously without storing your personal data or browsing history.
-              Your safety is our priority.</p>
+
+          <!-- Benefit 4 -->
+          <div class="benefit-card neumorphic" data-aos="fade-left" data-aos-delay="200">
+            <div class="icon-container">
+              <i class="bx bx-fingerprint"></i>
+            </div>
+            <div class="content">
+              <h3>Privacy First</h3>
+              <p>Zero logs. Zero tracking. Your identity remains yours. We secure your navigation without watching your
+                path.</p>
+            </div>
           </div>
         </div>
 
@@ -581,83 +615,93 @@
 
       <div class="section-title">
         <h2>How PhishDetector Protects You</h2>
-        <p class="section-intro">Our 5-layer security pipeline analyzes URLs through multiple detection methods to
+        <p class="section-intro">Our 6-phase security pipeline analyzes URLs through multiple detection methods to
           identify phishing threats with 97.4% accuracy.</p>
       </div>
 
       <div class="process-flow">
-        <!-- Layer 1 -->
+        <!-- Phase 1: Global Blacklist -->
         <div class="process-step" data-aos="fade-up" data-aos-delay="100">
-          <div class="step-number">1</div>
-          <div class="step-icon">
+          <div class="floating-icon">
             <i class='bx bx-list-check'></i>
           </div>
-          <h4>Blacklist Check</h4>
-          <p>Instantly blocks known malicious domains from PhishTank and Google Safe Browsing databases.</p>
+          <div class="phase-label">PHASE 01</div>
+          <h4>Global Blacklist</h4>
+          <p>Instant cross-referencing against 50M+ known malicious endpoints using low-latency edge nodes.</p>
+          <div class="status-badge active">
+            <i class='bx bx-radio-circle-marked'></i> ACTIVE MONITORING
+          </div>
         </div>
 
-        <!-- Layer 2 -->
+        <!-- Phase 2: Domain Heuristics -->
         <div class="process-step" data-aos="fade-up" data-aos-delay="200">
-          <div class="step-number">2</div>
-          <div class="step-icon">
-            <i class='bx bx-globe'></i>
+          <div class="floating-icon">
+            <i class='bx bx-network-chart'></i>
           </div>
-          <h4>Domain Analysis</h4>
-          <p>Detects typosquatting, suspicious TLDs, and brand impersonation attempts through heuristic analysis.</p>
+          <div class="phase-label">PHASE 02</div>
+          <h4>Domain Heuristics</h4>
+          <p>Algorithmic detection of typosquatting and brand impersonation using Levenshtein distance analysis.</p>
+          <div class="progress-indicator">
+            <div class="progress-bar"></div>
+          </div>
         </div>
 
-        <!-- Layer 3 -->
+        <!-- Phase 3: SSL Cryptography -->
         <div class="process-step" data-aos="fade-up" data-aos-delay="300">
-          <div class="step-number">3</div>
-          <div class="step-icon">
-            <i class='bx bx-lock-alt'></i>
+          <div class="floating-icon">
+            <i class='bx bx-shield-alt-2'></i>
           </div>
-          <h4>SSL Certificate</h4>
-          <p>Validates HTTPS certificates and secure connections to ensure encrypted communication.</p>
-
-          <!-- HTTPS Education Callout -->
-          <div class="education-callout warning">
-            <i class='bx bx-info-circle'></i>
-            <div>
-              <strong>Important:</strong> HTTPS encrypts your connection but doesn't guarantee the site is trustworthy.
-              Attackers can obtain valid certificates.
-            </div>
+          <div class="phase-label">PHASE 03</div>
+          <h4>SSL Cryptography</h4>
+          <p>Deep-dive validation of certificate chains and encryption protocols to ensure verified ownership.</p>
+          <div class="dot-indicators">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
           </div>
         </div>
 
-        <!-- Layer 4 -->
+        <!-- Phase 4: AI Neural Engine -->
         <div class="process-step" data-aos="fade-up" data-aos-delay="400">
-          <div class="step-number">4</div>
-          <div class="step-icon">
+          <div class="floating-icon">
             <i class='bx bx-brain'></i>
           </div>
-          <h4>AI/ML Model</h4>
-          <p>Gradient Boosting Classifier analyzes deep content features with 97.4% accuracy to detect zero-day threats.
-          </p>
+          <div class="phase-label">PHASE 04</div>
+          <h4>AI Neural Engine</h4>
+          <p>XGBoost models analyze 200+ features in real-time to uncover zero-day phishing architecture.</p>
+          <div class="status-badge confidence">
+            <i class='bx bx-check-circle'></i> 97.4% CONFIDENCE SCORE
+          </div>
         </div>
 
-        <!-- Layer 5 -->
+        <!-- Phase 5: Behavioral Audit -->
         <div class="process-step" data-aos="fade-up" data-aos-delay="500">
-          <div class="step-number">5</div>
-          <div class="step-icon">
-            <i class='bx bx-search-alt'></i>
+          <div class="floating-icon">
+            <i class='bx bx-show-alt'></i>
           </div>
-          <h4>Behavioral Analysis</h4>
-          <p>Checks for obfuscation techniques, IP-based URLs, and suspicious redirect patterns.</p>
+          <div class="phase-label">PHASE 05</div>
+          <h4>Behavioral Audit</h4>
+          <p>Scanning for obfuscated scripts, hidden redirects, and payload delivery patterns.</p>
+          <div class="status-footer">
+            <div class="toggle-indicators">
+              <span class="toggle on"></span>
+              <span class="toggle off"></span>
+              <span class="toggle on"></span>
+            </div>
+            <span class="status-text">REAL-TIME LOGGING</span>
+          </div>
         </div>
 
-        <!-- Layer 6 - Sandbox (Highlighted) -->
+        <!-- Phase 6: Cloud Sandbox -->
         <div class="process-step highlight" data-aos="fade-up" data-aos-delay="600">
-          <div class="step-number">6</div>
-          <div class="step-icon">
-            <i class='bx bx-desktop'></i>
+          <div class="floating-icon">
+            <i class='bx bx-cloud'></i>
           </div>
-          <h4>Sandbox Analysis</h4>
-          <p>Opens URLs in an isolated browser to capture screenshots and detect behavioral patterns—without exposing
-            you to risk.</p>
-          <div class="sandbox-badge">
-            <i class='bx bxs-lock-alt'></i>
-            <span>Secure • Isolated • Read-only</span>
+          <div class="phase-label final">FINAL DEFENSE</div>
+          <h4>Cloud Sandbox</h4>
+          <p>Execution in a fully isolated, ephemeral virtual container to verify final intent without risk.</p>
+          <div class="status-badge isolation">
+            <i class='bx bx-lock-alt'></i> TOTAL ISOLATION
           </div>
         </div>
       </div>
@@ -665,260 +709,89 @@
     </div>
   </section><!-- End How It Works Section -->
 
-  <!-- ======= Phishing Education Section ======= -->
-  <section id="phishing-education" class="phishing-education">
-    <div class="container" data-aos="fade-up">
 
-      <div class="section-title">
-        <h2>Recognize Phishing Attempts</h2>
-        <p class="section-intro">Learn to identify common phishing tactics used by attackers to steal your information.
-        </p>
-      </div>
-
-      <div class="trick-grid">
-        <!-- Trick 1: Typosquatting -->
-        <div class="trick-card" data-aos="fade-up" data-aos-delay="100">
-          <div class="trick-icon">🔗</div>
-          <h4>Typosquatting</h4>
-          <p>Attackers register domains with slight misspellings to trick users:</p>
-          <div class="example-box">
-            <div class="example-item bad">
-              <i class='bx bx-x-circle'></i>
-              <span>paypa<strong>1</strong>.com</span>
-            </div>
-            <div class="example-divider">instead of</div>
-            <div class="example-item good">
-              <i class='bx bx-check-circle'></i>
-              <span>paypal.com</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Trick 2: HTTPS Deception -->
-        <div class="trick-card" data-aos="fade-up" data-aos-delay="200">
-          <div class="trick-icon">🔒</div>
-          <h4>HTTPS Deception</h4>
-          <p>Phishing sites can have valid SSL certificates. HTTPS only encrypts data—it doesn't verify legitimacy.</p>
-          <div class="warning-badge">
-            <i class='bx bx-error-alt'></i>
-            <span>HTTPS ≠ Safe</span>
-          </div>
-        </div>
-
-        <!-- Trick 3: Urgency Tactics -->
-        <div class="trick-card" data-aos="fade-up" data-aos-delay="300">
-          <div class="trick-icon">⚡</div>
-          <h4>Urgency Tactics</h4>
-          <p>"Your account will be closed in 24 hours!" Legitimate companies don't create panic.</p>
-          <div class="tip-box">
-            <i class='bx bx-bulb'></i>
-            <span>Take your time. Verify independently.</span>
-          </div>
-        </div>
-
-        <!-- Trick 4: Email Spoofing -->
-        <div class="trick-card" data-aos="fade-up" data-aos-delay="400">
-          <div class="trick-icon">📧</div>
-          <h4>Email Spoofing</h4>
-          <p>Display names can be faked. Always check the actual sender email address, not just the name.</p>
-          <div class="example-box">
-            <div class="example-item bad">
-              <i class='bx bx-x-circle'></i>
-              <span>support@<strong>paypa1-secure</strong>.com</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Trick 5: Suspicious Links -->
-        <div class="trick-card" data-aos="fade-up" data-aos-delay="500">
-          <div class="trick-icon">🎣</div>
-          <h4>Suspicious Links</h4>
-          <p>Hover over links before clicking. The displayed text may not match the actual URL destination.</p>
-          <div class="tip-box">
-            <i class='bx bx-bulb'></i>
-            <span>Use PhishDetector to scan before clicking!</span>
-          </div>
-        </div>
-
-        <!-- Trick 6: Brand Impersonation -->
-        <div class="trick-card" data-aos="fade-up" data-aos-delay="600">
-          <div class="trick-icon">🎭</div>
-          <h4>Brand Impersonation</h4>
-          <p>Fake websites copy logos and designs from legitimate companies to appear trustworthy.</p>
-          <div class="warning-badge">
-            <i class='bx bx-error-alt'></i>
-            <span>Always verify the domain</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section><!-- End Phishing Education Section -->
 
   <!-- ======= Frequently Asked Questions Section ======= -->
   <section id="faq" class="faq">
     <div class="faq-glow-container">
       <div class="glow-orb orb-1"></div>
       <div class="glow-orb orb-2"></div>
-      <div class="glow-orb orb-3"></div>
     </div>
+
     <div class="container" data-aos="fade-up">
+      <div class="faq-container-grid">
 
-      <div class="faq-list">
-        <ul>
-          <li data-aos="fade-up" data-aos="fade-up" data-aos-delay="100">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" class="collapse"
-              href="#faq-list-1">What is phishing <i class="bx bx-chevron-down icon-show"></i><i
-                class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-1" class="collapse show" data-parent=".faq-list">
-              <p>
-                Phishing is a cybercrime in which a target or targets are contacted by email, telephone, or text message
-                by someone posing as a legitimate institution to lure individuals into providing sensitive data such as
-                personally identifiable information, banking and credit card details, and passwords.
-                <br>OR<br>
-                Phishing is a cyber attack where the attacker tricks the target into disclosing personal information,
-                revealing login credentials, or transferring money.
+        <!-- Left Column: Content -->
+        <div class="faq-header-sticky">
+          <span class="pill-badge">Support Center</span>
+          <h2>Frequently Asked Questions</h2>
+          <p>Everything you need to know about protecting your data and staying safe from phishing attacks.</p>
+
+          <!-- Scroll Progress Indicator -->
+          <div class="faq-progress-container">
+            <div class="faq-progress-bar"></div>
+            <div class="faq-progress-steps">
+              <!-- Steps will be generated or styled in CSS/JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Scrolling Cards -->
+        <div class="faq-scroll-list">
+
+          <!-- FAQ 1 -->
+          <div class="faq-card" data-index="1">
+            <h3><i class='bx bx-help-circle'></i> What is phishing?</h3>
+            <div class="faq-answer">
+              <p>Phishing is a cyber attack where the attacker tricks the target into disclosing personal information,
+                revealing login credentials, or transferring money. It involves someone posing as a legitimate
+                institution to lure individuals into providing sensitive data.</p>
+            </div>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div class="faq-card" data-index="2">
+            <h3><i class='bx bx-shield-quarter'></i> Why is phishing knowledge vital?</h3>
+            <div class="faq-answer">
+              <p>Phishing is the #1 vector for data breaches. Understanding it prevents financial loss, protects your
+                personal identity, and secures organizational networks from unauthorized access. A phisher's success is
+                contingent upon establishing false trust.</p>
+            </div>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div class="faq-card" data-index="3">
+            <h3><i class='bx bx-network-chart'></i> What are the major types?</h3>
+            <div class="faq-answer">
+              <p><strong>Deceptive Phishing:</strong> Fraudsters impersonate legitimate companies to steal data.
+                <br><strong>Spear Phishing:</strong> Targets specific individuals with customized research.
+                <br><strong>Whaling:</strong> Targets high-level executives with sophisticated social engineering.
               </p>
             </div>
-          </li>
+          </div>
 
-          <li data-aos="fade-up" data-aos-delay="200">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" href="#faq-list-2"
-              class="collapsed">Why should I bother Knowing what Phishing is all about <i
-                class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-2" class="collapse" data-parent=".faq-list">
-              <p>
-                The purpose of phishing is to collect sensitive information with the intention of using that information
-                to gain access to otherwise protected data, networks, etc. A phisher's success is contingent upon
-                establishing trust with its victims. <br><br>
-                Successful Phishing attacks can: <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Cause financial loss for victims <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Put their personal information at risk <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Put data and systems at risk
-              </p>
+          <!-- FAQ 4 -->
+          <div class="faq-card" data-index="4">
+            <h3><i class='bx bx-user-check'></i> How can individuals protect themselves?</h3>
+            <div class="faq-answer">
+              <p>Never give away information in unsolicited calls or emails. Inspect messages for typos, verify urgency
+                through official channels, and use multi-layer authentication. Always verify the actual URL before
+                clicking any link.</p>
             </div>
-          </li>
+          </div>
 
-          <li data-aos="fade-up" data-aos-delay="200">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" href="#faq-list-3"
-              class="collapsed">Two Major Types of Phishing Attack<i class="bx bx-chevron-down icon-show"></i><i
-                class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-3" class="collapse" data-parent=".faq-list">
-              <p>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> <b> Deceptive Phishing:</b> Deceptive phishing
-                is by far the most common type of phishing scam. In this ploy, fraudsters impersonate a legitimate
-                company to steal people’s personal data or login credentials. Those emails frequently use threats and a
-                sense of urgency to scare users into doing what the attackers want. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> <b>Spear Phishing:</b> Spear Phishing targets
-                specific individuals instead of a wide group of people. Attackers often research their victims on social
-                media and other sites. That way, they can customize their communications and appear more authentic.
-                <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> <b>Other phishing Technique</b> <i
-                  class='bx bxs-hand-down'></i><br><br>
-                <i class='bx bx-right-arrow-alt icon-arrrow'></i> <b>Angler Phishing:</b> This cyberattack comes by way
-                of social media. It may involve fake URLs, instant messages or profiles used to obtain sensitive data.
-                Attackers also peruse social profiles to glean any personal information they can use for social
-                engineering. <br><br>
-                <i class='bx bx-right-arrow-alt icon-arrrow'></i> <b>Clone Phishing:</b> Clone phishing involves exact
-                duplication of an email to make it appear as legitimate as possible.<br><br>
-                <i class='bx bx-right-arrow-alt icon-arrrow'></i> <b>Domain Spoofing:</b> In this category of phishing,
-                the attacker forges a company domain, which makes the email appear to be from that company.<br><br>
-                <i class='bx bx-right-arrow-alt icon-arrrow'></i> <b>Email Phishing:</b> Phishing emails are often the
-                first to come to mind when people hear the term phishing. Attackers send an illegitimate email asking
-                for personal information or login credentials.<br><br>
-                <i class='bx bx-right-arrow-alt icon-arrrow'></i> <b>Search Engine Phishing:</b> Rather than sending
-                correspondence to you to gain information, search engine fishing involves creating a website that mimics
-                a legitimate site. Site visitors are asked to download products that are infected with malware or
-                provide personal information in forms that go to the attacker.<br><br>
-                <i class='bx bx-right-arrow-alt icon-arrrow'></i> <b>Smishing:</b> Combine SMS with phishing and you
-                have the technique called smishing. With smishing, attackers send fraudulent text messages in an attempt
-                to gather information like credit card numbers or passwords.<br><br>
-                <i class='bx bx-right-arrow-alt icon-arrrow'></i> <b>Whaling:</b> A whaling attack targets the big fish,
-                or executive-level employees. An attack of this sort often involves more sophisticated social
-                engineering tactics and intelligence gathering to better sell the fake.<br><br>
-                <i class='bx bx-right-arrow-alt icon-arrrow'></i> <b>Vishing:</b> Combine VoIP with phishing and you get
-                vishing. This type of phishing involves calls from a fraudulent person attempting to obtain sensitive
-                information.<br><br>
-                <i class='bx bx-right-arrow-alt icon-arrrow'></i> <b>Malvertising:</b> Malvertising is malicious
-                advertising that contains active scripts designed to download malware or force unwanted content onto
-                your computer. Exploits in Adobe PDF and Flash are the most common methods used in
-                malvertisements<br><br>
-              </p>
+          <!-- FAQ 5 -->
+          <div class="faq-card" data-index="5">
+            <h3><i class='bx bx-buildings'></i> How do companies defend?</h3>
+            <div class="faq-answer">
+              <p>Invest in security awareness training to turn employees into human firewalls. Keep all
+                software/antivirus updated and research zero-day threats regularly to maintain a vigilant security
+                posture against evolving tactics.</p>
             </div>
-          </li>
+          </div>
 
-          <li data-aos="fade-up" data-aos-delay="200">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" href="#faq-list-4"
-              class="collapsed">How to Prevent and Protect Against Phishing As An End-user<i
-                class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-4" class="collapse" data-parent=".faq-list">
-              <p>
-                To help prevent phishing attacks, you should observe general best practices, similar to those you might
-                undertake to avoid viruses and other malware. First, make sure your systems are updated to help protect
-                against known vulnerabilities. Protect devices and systems with reputable security software and firewall
-                protection. You can also add software that watches for PII being sent over email or other insecure
-                methods.Since the weak link in phishing attacks is the end user, you should provide proper end-user
-                security awareness training and educate your team on how to recognize a phishing scam. The key to
-                protecting against phishing lies in the ability to recognize the cyberattack as illegitimate. Following
-                are some key concepts to include in end-user training: <br><br>
-
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Users are to choose strong passwords and be wary
-                of posting your personal details on social media. Information like birthdates, addresses and phone
-                numbers are valuable to an attacker. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> If there are any suspicions about an email or
-                social post, contact the IT team to have them examine the situation. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Only open attachments from a trusted source.
-                When in doubt, check with the alleged sender directly. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Note any language differences in messaging or
-                emails that vary from legitimate organizational communications. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Never give away personal information in an email
-                or unsolicited call. For instance, financial institutions will never call and ask for login credentials
-                or account info because they already have it. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Inspect emails for typos and inaccurate grammar.
-                This is usually a dead giveaway of less-sophisticated phishing scams. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Don’t supply personal information via email or
-                text. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Beware of urgent or time-sensitive warnings.
-                Phishing attacks often prompt action by pretending to be urgent. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Verify emails and other correspondence by
-                contacting the organization directly. If you think something is fishy (okay, bad pun), a phone call can
-                quickly identify a legitimate call from a fake one. <br><br>
-
-              </p>
-            </div>
-          </li>
-
-          <li data-aos="fade-up" data-aos-delay="200">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" href="#faq-list-5"
-              class="collapsed">How to Prevent and Protect Against Phishing As A Company<i
-                class="bx bx-chevron-down icon-show"></i><i class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-5" class="collapse" data-parent=".faq-list">
-              <p>
-                Since we can’t control the criminals, let’s take a look at how you can prevent phishing attacks. <br>
-
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> <b>Train Your Employees</b> - Unsuspecting
-                employees who are not trained to identify phishing emails are easily tricked. If they click on a link,
-                open an attachment, or respond to the email, they could be giving the attacker exactly what they need to
-                break into your system. Training is by far the most crucial action you can take to avoid phishing
-                attacks. By investing in your employees’ security education, you empower them to take ownership of
-                security best practices. With training, your employees can identify a phishing email and report
-                suspicious activity before any information is compromised. <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> <b>Update Your Antivirus Software</b>- Keeping
-                your antivirus software updated adds a layer of security. The software will scan files coming into your
-                computer, preventing possible damage. Ensure that your anti-spyware and firewall settings are active.
-                <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> <b>Stay Up-to-Date</b> - By staying in-the-know,
-                you remain vigilant to phishing attempts. Research common phishing scams so that you’re aware of what
-                security professionals see as the main threats. The more aware you are of what’s out there, the more
-                likely you are to identify a possible attack. <br><br>
-
-              </p>
-            </div>
-          </li>
-
-        </ul>
+        </div>
       </div>
-
     </div>
   </section><!-- End Frequently Asked Questions Section -->
 
@@ -929,44 +802,71 @@
       <div class="container" data-aos="fade-up">
 
         <div class="section-title">
-          <h2>About PhishDetector</h2>
+          <h2>About <span style="color: #3b4ef8;">PhishDetector</span></h2>
+          <p class="about-subtitle">Strengthening digital defenses through advanced URL validation and
+            machine learning.</p>
         </div>
 
-        <div class="row">
-          <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
+        <div class="row justify-content-center">
+          <!-- Left Card: The Project -->
+          <div class="col-lg-5 col-md-6 d-flex align-items-stretch" data-aos="fade-right" data-aos-delay="100">
             <div class="about-card">
-              <div class="icon-box">
+              <div class="icon-circle">
                 <i class="bx bx-info-circle"></i>
-                <h3>The Project</h3>
               </div>
-              <p>Phishing is an internet scam in which an attacker sends out fake messages that look to come from a
-                trusted source. A URL or file will be included in the mail, which when clicked will steal personal
-                information or infect a computer with a virus. Phish Detector is a project which aims to help reduce
-                phishing attack by helping internet users authenticate URL link by testing if it is phishing or
-                legitimate. The progress of validating a Website URL for phishing or legitimate has gone through several
-                Machine learning models.</p>
+              <h3>The Project</h3>
+
+              <p class="about-text">
+                Phishing is a deceptive internet scam where attackers dispatch fraudulent messages that masquerade as
+                trusted sources. These often contain malicious URLs designed to harvest sensitive personal information
+                or
+                deploy malware.
+              </p>
+              <br>
+              <p class="about-text">
+                <span style="color: #3b4ef8; font-weight: 600;">Phish Detector</span> is a proactive initiative aimed at
+                mitigating these threats. By enabling users to authenticate URLs through rigorous testing, we
+                distinguish
+                between legitimate sites and phishing attempts. Our system leverages multiple <strong>Machine Learning
+                  models</strong> to achieve high-accuracy validation.
+              </p>
+
+              <div class="about-badges mt-4">
+                <span class="badge-pill ai-powered"><i class='bx bxs-magic-wand'></i> AI POWERED</span>
+                <span class="badge-pill secure"><i class='bx bx-shield-quarter'></i> SECURE</span>
+              </div>
             </div>
           </div>
 
-          <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+          <!-- Right Card: About Us -->
+          <div class="col-lg-5 col-md-6 d-flex align-items-stretch" data-aos="fade-left" data-aos-delay="200">
             <div class="about-card">
-              <div class="icon-box">
-                <i class="bx bx-group"></i>
-                <h3>About Us</h3>
+              <div class="icon-circle">
+                <i class="bx bxs-group"></i>
               </div>
-              <p>This project is developed by final-year Computer Engineering students from Sandip University, Nashik
+              <h3>About Us</h3>
+
+              <p class="about-text">
+                This project is conceptualized and developed by final-year Computer Engineering students from
+                <strong>Sandip University, Nashik</strong>, dedicated to enhancing web safety.
               </p>
 
-              <div class="team-info mt-4">
-                <div class="students">
-                  <span class="badge-item">VAIBHAV INGLE</span>
-                  <span class="badge-item">SAKSHI PHATAKE</span>
-                  <span class="badge-item">RUSHI JAGTAP</span>
+              <div class="team-section mt-4">
+                <h6 class="team-label">DEVELOPMENT TEAM</h6>
+                <div class="team-badges">
+                  <span class="team-badge">VAIBHAV INGLE</span>
+                  <span class="team-badge">SAKSHI PHATAKE</span>
+                  <span class="team-badge">RUSHI JAGTAP</span>
                 </div>
+              </div>
 
-                <div class="guide mt-4">
-                  <h6 class="guide-title">Guided By</h6>
-                  <h5 class="guide-names">DR. PAWAN BHALADHARE, MR. AVINASH TASKAR</h5>
+              <div class="guide-section mt-4">
+                <h6 class="team-label">GUIDED BY</h6>
+                <div class="guide-item">
+                  <i class='bx bxs-graduation'></i> <span>DR. PAWAN BHALADHARE</span>
+                </div>
+                <div class="guide-item">
+                  <i class='bx bxs-graduation'></i> <span>MR. AVINASH TASKAR</span>
                 </div>
               </div>
             </div>
@@ -1004,20 +904,51 @@
       <div class="footer-particle"></div>
       <div class="footer-particle"></div>
     </div>
-    <div class="container d-md-flex py-4">
-
-      <div class="text-center text-md-center">
-        <div class="copyright">
-          <img src="static/assets/img/google.png" alt="" loading="lazy" decoding="async" width="24" height="24">
-          <a href="https://phishingquiz.withgoogle.com/" target="_blank" class="get-started-btn scrollto">Take a
-            Phishing Test by GOOGLE</a> <br>
-          <hr />
-          <p style="padding-top: 8px; font-weight: 600;"><a style="text-decoration:none; color:inherit;"
-              href="https://github.com/Vaibhav01-bit">Final Year Project &copy; 2026.All Rights Reserved</a></p><a
-            href="https://github.com/Vaibhav01-bit/PhishDetector" target="_blank" rel="noopener noreferrer"><button
-              style="font-size:15px" class="button3">Source
-              Code <i class="fa fa-github"></i></button></a>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="brand-logo">
+          <i class='bx bxs-shield-alt-2'></i>
+          <span>PhishDetector</span>
         </div>
+        <p class="brand-tagline">Empowering users with the tools and knowledge to defend against modern digital threats
+          through interactive testing and research.</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-column">
+          <h4>PROJECT</h4>
+          <ul>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>RESOURCES</h4>
+          <ul>
+            <li><a href="https://github.com/Vaibhav01-bit/PhishDetector" target="_blank">Source Code</a></li>
+            <li><a href="#how-it-works">Documentation</a></li>
+            <li><a href="#security">Security Tips</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>LEGAL</h4>
+          <ul>
+            <li><a href="#privacy">Privacy Policy</a></li>
+            <li><a href="#terms">Terms of Service</a></li>
+            <li><a href="#cookies">Cookie Policy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-cta">
+        <div class="cta-label">INTERACTIVE</div>
+        <a href="https://phishingquiz.withgoogle.com/" target="_blank" class="cta-button">
+          <i class='bx bxs-shield-alt-2'></i>
+          <span>Take a Phishing Test</span>
+        </a>
       </div>
     </div>
 
@@ -1050,6 +981,11 @@
 
   <script src="static/js/theme-toggle.js"></script>
   <script src="static/js/scan-timeline.js"></script>
+
+  <!-- GSAP & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="static/js/faq-scroll.js" defer></script>
 </body>
 
 </html>

@@ -256,3 +256,230 @@ body.dark-mode .footer-particle {
 body.dark-mode .footer-particle:nth-child(even) {
     box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
 }
+
+/* ========================================
+   FOOTER CONTENT STYLING
+   ======================================== */
+
+/* Footer Base Styling */
+#footer {
+    background: #0F172A;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 60px 0 40px 0;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Light Mode Footer */
+body:not(.dark-mode) #footer {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: rgba(15, 23, 42, 0.8);
+}
+
+body.dark-mode #footer {
+    background: #0F172A;
+}
+
+/* Footer Content Layout */
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 3fr 1.5fr;
+    gap: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Brand Section */
+.footer-brand {
+    max-width: 300px;
+}
+
+.brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.brand-logo i {
+    font-size: 1.8rem;
+    color: #f97316;
+}
+
+.brand-logo span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+body:not(.dark-mode) .brand-logo span {
+    color: #0f172a;
+}
+
+.brand-tagline {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+body:not(.dark-mode) .brand-tagline {
+    color: rgba(15, 23, 42, 0.7);
+}
+
+/* Footer Links Grid */
+.footer-links {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.footer-column h4 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    transition: color 0.3s ease;
+}
+
+body:not(.dark-mode) .footer-column h4 {
+    color: rgba(15, 23, 42, 0.5);
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column ul li {
+    margin-bottom: 12px;
+}
+
+.footer-column ul li a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+body:not(.dark-mode) .footer-column ul li a {
+    color: rgba(15, 23, 42, 0.7);
+}
+
+.footer-column ul li a:hover {
+    color: #ffffff;
+}
+
+body:not(.dark-mode) .footer-column ul li a:hover {
+    color: #0f172a;
+}
+
+/* CTA Section */
+.footer-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.cta-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 12px;
+    transition: color 0.3s ease;
+}
+
+body:not(.dark-mode) .cta-label {
+    color: rgba(15, 23, 42, 0.5);
+}
+
+.cta-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: rgba(249, 115, 34, 0.1);
+    border: 1px solid rgba(249, 115, 34, 0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+body:not(.dark-mode) .cta-button {
+    background: rgba(249, 115, 34, 0.15);
+    border: 1px solid rgba(249, 115, 34, 0.4);
+    color: #0f172a;
+}
+
+.cta-button:hover {
+    background: rgba(249, 115, 34, 0.2);
+    border-color: rgba(249, 115, 34, 0.5);
+    transform: translateY(-2px);
+}
+
+body:not(.dark-mode) .cta-button:hover {
+    background: rgba(249, 115, 34, 0.25);
+    border-color: rgba(249, 115, 34, 0.6);
+}
+
+.cta-button i {
+    font-size: 1.3rem;
+    color: #f97316;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .footer-brand {
+        max-width: 100%;
+    }
+
+    .footer-links {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .footer-cta {
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 768px) {
+    #footer {
+        padding: 40px 0 30px 0;
+    }
+
+    .footer-content {
+        gap: 30px;
+    }
+
+    .footer-links {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .brand-logo span {
+        font-size: 1.3rem;
+    }
+
+    .brand-tagline {
+        font-size: 0.8rem;
+    }
+}

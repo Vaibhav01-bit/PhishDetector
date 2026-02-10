@@ -1,0 +1,218 @@
+/* FAQ Scroll-Driven Animation Styles - Ultra Premium Refinements */
+
+/* Default: Light Mode */
+.faq {
+    position: relative;
+    padding: 120px 0;
+    overflow: visible;
+    background: radial-gradient(circle at center, #f8fafc 0%, #f1f5f9 100%);
+    transition: background 0.8s ease;
+}
+
+body.dark-mode .faq {
+    background: radial-gradient(circle at center, #051937 0%, #000c1d 100%);
+}
+
+.faq-container-grid {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 100px;
+    align-items: start;
+}
+
+/* Left Column - Sticky Content */
+.faq-header-sticky {
+    position: sticky;
+    top: 150px;
+}
+
+.faq-header-sticky h2 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    letter-spacing: -1px;
+}
+
+body.dark-mode .faq-header-sticky h2 {
+    color: #ffffff;
+}
+
+.faq-header-sticky p {
+    color: #475569;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    max-width: 380px;
+    margin-bottom: 40px;
+}
+
+body.dark-mode .faq-header-sticky p {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Progress Indicator */
+.faq-progress-container {
+    width: 2px;
+    height: 150px;
+    background: rgba(0, 0, 0, 0.05);
+    position: relative;
+    border-radius: 4px;
+}
+
+body.dark-mode .faq-progress-container {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.faq-progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background: #3b82f6;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    transition: background 0.4s ease;
+}
+
+body.dark-mode .faq-progress-bar {
+    background: #00f2ff;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.6);
+}
+
+/* Right Column - FAQ Cards */
+.faq-scroll-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding-bottom: 300px;
+    perspective: 2000px;
+    /* Enhanced depth */
+}
+
+.faq-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 24px;
+    padding: 35px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    /* Initial state for GSAP */
+    opacity: 0.1;
+    transform: scale(0.9) translateY(60px) translateZ(-100px) rotateX(5deg);
+    filter: blur(12px);
+
+    transition: background 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+        border-color 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+        box-shadow 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+body.dark-mode .faq-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.faq-card h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0;
+}
+
+body.dark-mode .faq-card h3 {
+    color: #ffffff;
+}
+
+.faq-card h3 i {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.2rem;
+}
+
+body.dark-mode .faq-card h3 i {
+    color: #00f2ff;
+    background: rgba(0, 242, 255, 0.1);
+}
+
+.faq-card .faq-answer {
+    color: #64748b;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin: 0;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+}
+
+body.dark-mode .faq-card .faq-answer {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Glow Accent (Top-only) */
+.faq-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+body.dark-mode .faq-card::after {
+    background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.5), transparent);
+}
+
+.faq-card.is-active::after {
+    opacity: 1;
+}
+
+/* Response for Mobile */
+@media (max-width: 1200px) {
+    .faq-container-grid {
+        gap: 50px;
+    }
+
+    .faq-header-sticky h2 {
+        font-size: 2.8rem;
+    }
+}
+
+@media (max-width: 991px) {
+    .faq-container-grid {
+        grid-template-columns: 1fr;
+        gap: 60px;
+    }
+
+    .faq-header-sticky {
+        position: relative;
+        top: 0;
+        text-align: center;
+    }
+
+    .faq-header-sticky p {
+        max-width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .faq-progress-container {
+        display: none;
+    }
+}

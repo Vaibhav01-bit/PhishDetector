@@ -37,6 +37,7 @@
   <link href="static/css/global-warm-glow.css" rel="stylesheet">
   <link href="static/css/threat-landscape.css" rel="stylesheet">
   <link href="static/css/footer-particles.css" rel="stylesheet">
+  <link href="static/css/phishing-education.css" rel="stylesheet">
 
   <style>
     html {
@@ -395,6 +396,109 @@
       </div>
     </section><!-- End Testimonials Section -->
 
+    <!-- ======= Phishing Education Section (Relocated) ======= -->
+    <section id="phishing-education" class="phishing-education" style="background: var(--color-bg-light);">
+      <div class="container" data-aos="fade-up">
+
+        <div class="section-title">
+          <h2>Understanding Modern Phishing Tactics</h2>
+          <p class="section-intro">This section explains how real phishing attacks deceive users, using techniques shown
+            in the examples above.</p>
+        </div>
+
+        <div class="trick-grid">
+          <!-- Trick 1: Typosquatting -->
+          <div class="trick-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="trick-icon">🔗</div>
+            <h4>Typosquatting</h4>
+            <p>Attackers register domains with slight misspellings to trick users:</p>
+            <div class="example-box">
+              <div class="example-item bad">
+                <i class='bx bx-x-circle'></i>
+                <span>paypa<strong>1</strong>.com</span>
+              </div>
+              <div class="example-divider">instead of</div>
+              <div class="example-item good">
+                <i class='bx bx-check-circle'></i>
+                <span>paypal.com</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trick 2: HTTPS Deception -->
+          <div class="trick-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="trick-icon">🔒</div>
+            <h4>HTTPS Deception</h4>
+            <p>Phishing sites can have valid SSL certificates. HTTPS only encrypts data—it doesn't verify legitimacy.
+            </p>
+            <div class="warning-badge">
+              <i class='bx bx-error-alt'></i>
+              <span>HTTPS ≠ Safe</span>
+            </div>
+          </div>
+
+          <!-- Trick 3: Urgency Tactics -->
+          <div class="trick-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="trick-icon">⚡</div>
+            <h4>Urgency Tactics</h4>
+            <p>"Your account will be closed in 24 hours!" Legitimate companies don't create panic.</p>
+            <div class="tip-box">
+              <i class='bx bx-bulb'></i>
+              <span>Take your time. Verify independently.</span>
+            </div>
+          </div>
+
+          <!-- Trick 4: Email Spoofing -->
+          <div class="trick-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="trick-icon">📧</div>
+            <h4>Email Spoofing</h4>
+            <p>Display names can be faked. Always check the actual sender email address, not just the name.</p>
+            <div class="example-box">
+              <div class="example-item bad">
+                <i class='bx bx-x-circle'></i>
+                <span>support@<strong>paypa1-secure</strong>.com</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trick 5: Suspicious Links -->
+          <div class="trick-card" data-aos="fade-up" data-aos-delay="500">
+            <div class="trick-icon">🎣</div>
+            <h4>Suspicious Links</h4>
+            <p>Hover over links before clicking. The displayed text may not match the actual URL destination.</p>
+            <div class="tip-box">
+              <i class='bx bx-bulb'></i>
+              <span>Use PhishDetector to scan before clicking!</span>
+            </div>
+          </div>
+
+          <!-- Trick 6: Brand Impersonation -->
+          <div class="trick-card" data-aos="fade-up" data-aos-delay="600">
+            <div class="trick-icon">🎭</div>
+            <h4>Brand Impersonation</h4>
+            <p>Fake websites copy logos and designs from legitimate companies to appear trustworthy.</p>
+            <div class="warning-badge">
+              <i class='bx bx-error-alt'></i>
+              <span>Always verify the domain</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Education Contextual CTA -->
+        <div class="education-cta text-center mt-5" data-aos="fade-up" data-aos-delay="200"
+          style="padding-top: 40px; border-top: 1px solid var(--color-border, #e2e8f0);">
+          <h4 class="mb-3" style="color: var(--text-heading-primary); font-weight: 600;">Ready to apply this knowledge?
+          </h4>
+          <a href="{{ url_for('home') }}#hero" class="btn btn-primary btn-lg"
+            style="border-radius: 50px; padding: 12px 30px; font-weight: 600; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);">
+            Test these techniques using our URL Scanner <i class='bx bx-right-arrow-alt'
+              style="position: relative; top: 1px;"></i>
+          </a>
+        </div>
+
+      </div>
+    </section><!-- End Phishing Education Section -->
+
 
 
   </main><!-- End #main -->
@@ -423,20 +527,51 @@
       <div class="footer-particle"></div>
       <div class="footer-particle"></div>
     </div>
-    <div class="container d-md-flex py-4">
-
-      <div class="text-center text-md-center">
-        <div class="copyright">
-          <img src="static/assets/img/google.png" alt="" loading="lazy" decoding="async" width="24" height="24">
-          <a href="https://phishingquiz.withgoogle.com/" target="_blank" class="get-started-btn scrollto">Take a
-            Phishing Test by GOOGLE</a> <br>
-          <hr />
-          <p style="padding-top: 8px; font-weight: 600;"><a style="text-decoration:none; color:inherit;"
-              href="https://github.com/Vaibhav01-bit">Final Year Project &copy; 2026.All Rights Reserved</a></p><a
-            href="https://github.com/Vaibhav01-bit/PhishDetector" target="_blank" rel="noopener noreferrer"><button
-              style="font-size:15px" class="button3">Source
-              Code <i class="fa fa-github"></i></button></a>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="brand-logo">
+          <i class='bx bxs-shield-alt-2'></i>
+          <span>PhishDetector</span>
         </div>
+        <p class="brand-tagline">Empowering users with the tools and knowledge to defend against modern digital
+          threats through interactive testing and research.</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-column">
+          <h4>PROJECT</h4>
+          <ul>
+            <li><a href="{{ url_for('home') }}#about">About Us</a></li>
+            <li><a href="{{ url_for('home') }}#features">Features</a></li>
+            <li><a href="{{ url_for('home') }}#faq">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>RESOURCES</h4>
+          <ul>
+            <li><a href="https://github.com/Vaibhav01-bit/PhishDetector" target="_blank">Source Code</a></li>
+            <li><a href="{{ url_for('home') }}#how-it-works">Documentation</a></li>
+            <li><a href="{{ url_for('usecases') }}">Security Tips</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h4>LEGAL</h4>
+          <ul>
+            <li><a href="#privacy">Privacy Policy</a></li>
+            <li><a href="#terms">Terms of Service</a></li>
+            <li><a href="#cookies">Cookie Policy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-cta">
+        <div class="cta-label">INTERACTIVE</div>
+        <a href="https://phishingquiz.withgoogle.com/" target="_blank" class="cta-button">
+          <i class='bx bxs-shield-alt-2'></i>
+          <span>Take a Phishing Test</span>
+        </a>
       </div>
     </div>
 

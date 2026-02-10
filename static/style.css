@@ -1228,7 +1228,7 @@ section {
 # about
 --------------------------------------------------------------*/
 .about {
-  background: #F8FAFC;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf4 100%);
   padding: 100px 0;
   position: relative;
   overflow: hidden;
@@ -1248,106 +1248,233 @@ section {
 
 .about .section-title h2 {
   color: #2d405f;
-  margin-bottom: 40px;
+  margin-bottom: 15px;
+  font-size: 36px;
+  font-weight: 700;
 }
 
 .about .section-title h2::after {
-  background: rgba(59, 78, 248, 0.3);
+  display: none;
+}
+
+.about-subtitle {
+  color: #64748B;
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 60px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .about-card {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 40px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 32px 28px;
   border-radius: 20px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid rgba(226, 232, 240, 0.6);
   height: 100%;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  backdrop-filter: blur(5px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(59, 78, 248, 0.08);
+  display: flex;
+  flex-direction: column;
 }
 
 .about-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-8px);
   background: rgba(255, 255, 255, 1);
-  border-color: rgba(59, 78, 248, 0.3);
-  box-shadow: 0 20px 40px rgba(59, 78, 248, 0.15);
+  border-color: rgba(59, 78, 248, 0.25);
+  box-shadow: 0 20px 50px rgba(59, 78, 248, 0.15);
 }
 
-.about-card .icon-box {
+.about-card .icon-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
-  margin-bottom: 25px;
-}
-
-.about-card .icon-box i {
-  font-size: 32px;
-  color: #3b4ef8;
-  margin-right: 15px;
-  background: rgba(59, 78, 248, 0.1);
-  padding: 10px;
-  border-radius: 12px;
+  justify-content: center;
+  margin-bottom: 20px;
   transition: 0.3s;
 }
 
-.about-card:hover .icon-box i {
-  background: #3b4ef8;
+.about-card:hover .icon-circle {
+  transform: scale(1.1) rotate(10deg);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.about-card .icon-circle i {
+  font-size: 28px;
   color: #fff;
-  transform: rotate(-10deg) scale(1.1);
 }
 
 .about-card h3 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: #2d405f;
-  margin: 0;
+  margin-bottom: 16px;
 }
 
-.about-card p {
+.about-card .about-text {
   color: #64748B;
-  font-size: 16px;
-  line-height: 1.8;
+  font-size: 13px;
+  line-height: 1.65;
   margin-bottom: 0;
 }
 
-.badge-item {
-  display: inline-block;
-  background: rgba(59, 78, 248, 0.1);
-  color: #2d405f;
-  padding: 8px 16px;
+/* Badges */
+.about-badges {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
   border-radius: 50px;
-  font-size: 13px;
-  font-weight: 600;
-  margin: 0 8px 12px 0;
-  border: 1px solid rgba(59, 78, 248, 0.2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
   transition: 0.3s;
 }
 
-.badge-item:hover {
-  background: #3b4ef8;
+.badge-pill.ai-powered {
+  background: rgba(124, 58, 237, 0.12);
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.badge-pill.ai-powered:hover {
+  background: #7c3aed;
   color: #fff;
-  border-color: #3b4ef8;
   transform: scale(1.05);
 }
 
-.guide-title {
-  color: #64748B;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: 12px;
-  font-weight: 700;
-  margin-bottom: 10px;
+.badge-pill.secure {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.guide-names {
-  color: #2d405f;
-  font-size: 18px;
+.badge-pill.secure:hover {
+  background: #10b981;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Team Section */
+.team-section,
+.guide-section {
+  margin-top: 20px;
+}
+
+.team-label {
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.team-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.team-badge {
+  display: inline-block;
+  background: #f1f5f9;
+  color: #334155;
+  padding: 9px 16px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1.4;
+  border: 1px solid #e2e8f0;
+  transition: 0.3s;
+}
+
+.team-badge:hover {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.guide-item i {
+  color: #7c3aed;
+  font-size: 18px;
+}
+
+/* Dark Mode Support */
+body.dark-mode .about {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+body.dark-mode .about .section-title h2 {
+  color: #f1f5f9;
+}
+
+body.dark-mode .about-subtitle {
+  color: #94a3b8;
+}
+
+body.dark-mode .about-card {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(71, 85, 105, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .about-card:hover {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(102, 126, 234, 0.4);
+  box-shadow: 0 20px 50px rgba(102, 126, 234, 0.2);
+}
+
+body.dark-mode .about-card h3 {
+  color: #f1f5f9;
+}
+
+body.dark-mode .about-card .about-text {
+  color: #cbd5e1;
+}
+
+body.dark-mode .team-badge {
+  background: rgba(71, 85, 105, 0.3);
+  color: #e2e8f0;
+  border-color: rgba(71, 85, 105, 0.5);
+}
+
+body.dark-mode .team-badge:hover {
+  background: rgba(71, 85, 105, 0.5);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
+body.dark-mode .guide-item {
+  color: #e2e8f0;
 }
 
 @media (max-width: 991px) {
   .about-card {
     margin-bottom: 30px;
+  }
+
+  .about .section-title h2 {
+    font-size: 32px;
   }
 }
 
