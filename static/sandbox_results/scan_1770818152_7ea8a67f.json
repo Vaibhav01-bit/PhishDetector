@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "scan_id": "scan_1770818152_7ea8a67f",
+  "source_url": "https://paypal.com",
+  "final_url": "https://www.paypal.com/auth/validatecaptcha",
+  "redirect_count": 2,
+  "ip_address": "162.159.141.96",
+  "domain": "paypal.com",
+  "page_title": "No Title",
+  "load_time": 20523,
+  "total_time": 25142,
+  "screenshot_path": "scan_1770818152_7ea8a67f.jpg",
+  "sandbox_message": "Rendered in an isolated sandbox. No user interaction.",
+  "has_login_form": false,
+  "has_password_field": false,
+  "has_email_field": false,
+  "suspicious_keywords": [],
+  "timestamp": "2026-02-11 19:26:17"
+}

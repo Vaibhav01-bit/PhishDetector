@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "scan_id": "scan_1770818210_72694c11",
+  "source_url": "https://google.com",
+  "final_url": "https://www.google.com/",
+  "redirect_count": 1,
+  "ip_address": "142.250.76.78",
+  "domain": "google.com",
+  "page_title": "Google",
+  "load_time": 29002,
+  "total_time": 54885,
+  "screenshot_path": "scan_1770818210_72694c11.jpg",
+  "sandbox_message": "Rendered in an isolated sandbox. No user interaction.",
+  "has_login_form": false,
+  "has_password_field": false,
+  "has_email_field": false,
+  "suspicious_keywords": [],
+  "timestamp": "2026-02-11 19:27:45"
+}
