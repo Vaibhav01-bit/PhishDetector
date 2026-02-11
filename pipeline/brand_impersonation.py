@@ -11,6 +11,7 @@ import json
 import os
 import re
 from urllib.parse import urlparse
+from functools import lru_cache
 
 
 class BrandImpersonationDetector:
@@ -41,6 +42,7 @@ class BrandImpersonationDetector:
         '8': 'b'
     }
     
+    
     def __init__(self, registry_path=None):
         """
         Initialize the brand impersonation detector.
@@ -55,6 +57,10 @@ class BrandImpersonationDetector:
         
         self.registry_path = registry_path
         self.brands = self._load_brand_registry()
+        # Optimization: Create a set of brand keys for O(1) lookup
+        self.brand_keys_set = set(self.brands.keys())
+        # Optimization: Create a list of brand keys sorted by length (descending) for robust substring matching
+        self.brand_keys_list = sorted(self.brands.keys(), key=len, reverse=True)
     
     def _load_brand_registry(self):
         """Load brand registry from JSON file."""
@@ -157,20 +163,25 @@ class BrandImpersonationDetector:
         details['brand_in_domain'] = True
         
         # Step 5: Check for typosquatting (spelling similarity)
-        typo_score, typo_details = self._calculate_typosquatting_score(
-            domain_without_www, matched_brand
-        )
-        if typo_score > 0:
-            risk_score += typo_score
-            reasons.append(f"Typosquatting detected: {typo_details}")
-            details['typosquatting_detected'] = True
+        # Optimized: Only run if the domain is not just the brand name (which would be an exact match check)
+        if domain_without_www != matched_brand: 
+            typo_score, typo_details = self._calculate_typosquatting_score(
+                domain_without_www, matched_brand
+            )
+            if typo_score > 0:
+                risk_score += typo_score
+                reasons.append(f"Typosquatting detected: {typo_details}")
+                details['typosquatting_detected'] = True
         
         # Step 6: Check for homoglyphs and numeric substitutions
-        homoglyph_detected = self._detect_homoglyphs(domain_without_www, matched_brand)
-        if homoglyph_detected:
-            risk_score += 15
-            reasons.append("Homoglyph or numeric substitution detected")
-            details['homoglyphs_detected'] = True
+        # Optimized: Only check if risk score is already elevated OR if domain contains numbers/suspicious patterns
+        # We need to be careful not to skip this if the ONLY sign is the homoglyph itself
+        if risk_score >= 15 or any(char.isdigit() for char in domain_without_www) or self._has_repeated_chars_heuristic(domain_without_www):
+            homoglyph_detected = self._detect_homoglyphs(domain_without_www, matched_brand)
+            if homoglyph_detected:
+                risk_score += 30 # Increased score because homoglyphs are strong indicators
+                reasons.append("Homoglyph or numeric substitution detected")
+                details['homoglyphs_detected'] = True
         
         # Step 7: Check for intent keywords
         intent_keywords = self._check_intent_keywords(domain_tokens, path_tokens)
@@ -209,6 +220,8 @@ class BrandImpersonationDetector:
         Check if domain exactly matches an official brand domain.
         This includes subdomain checks (e.g., accounts.google.com is valid).
         """
+        # Optimization opportunity: map official domains to brands for O(1) in future
+        # For now, iterating is acceptable as official_domains lists are short
         for brand_key, brand_data in self.brands.items():
             for official_domain in brand_data['official_domains']:
                 # Exact match
@@ -254,26 +267,60 @@ class BrandImpersonationDetector:
         Check if any brand keyword appears in domain tokens, subdomain, or path.
         Returns dict with brand key and location if found, None otherwise.
         """
-        all_tokens = domain_tokens + path_tokens
+        # Optimization: Fast check against set for exact token matches
+        for token in domain_tokens:
+            if token in self.brand_keys_set:
+                return {'brand': token, 'location': 'domain'}
         
-        for brand_key in self.brands.keys():
-            # Check in domain tokens
-            if brand_key in domain_tokens:
-                return {'brand': brand_key, 'location': 'domain'}
+        if subdomain:
+             # Check if subdomain is exactly a brand
+             if subdomain in self.brand_keys_set:
+                 return {'brand': subdomain, 'location': 'subdomain'}
+             
+             # Check tokens within subdomain
+             sub_tokens = re.split(r'[.\-]', subdomain)
+             for token in sub_tokens:
+                 if token in self.brand_keys_set:
+                     return {'brand': token, 'location': 'subdomain'}
+
+        for token in path_tokens:
+            if token in self.brand_keys_set:
+                return {'brand': token, 'location': 'path'}
+        
+        # Optimization: Search for substrings only if no exact match found
+        # Use sorted list to match longest brands first (e.g., "facebook" before "face")
+        all_tokens = domain_tokens + path_tokens
+        if subdomain:
+            all_tokens.append(subdomain)
             
-            # Check in subdomain
-            if brand_key in subdomain:
-                return {'brand': brand_key, 'location': 'subdomain'}
+        for brand_key in self.brand_keys_list:
+            if len(brand_key) < 4: continue # Skip very short brands for substring check to reduce FPs
             
-            # Check in path tokens
-            if brand_key in path_tokens:
-                return {'brand': brand_key, 'location': 'path'}
-            
-            # Check for brand keyword as substring in any token
             for token in all_tokens:
-                if brand_key in token and len(token) - len(brand_key) <= 2:
-                    # Allow small variations (e.g., 'paypal' in 'paypals')
-                    return {'brand': brand_key, 'location': 'domain (substring)'}
+                if brand_key in token:
+                     # Verify it's a significant match (not just a small part of a larger word)
+                     # e.g. "face" in "interface" is filtered out by length check usually, but here we want
+                     # to catch "paypal" in "paypalservice"
+                     if len(token) - len(brand_key) <= 4:
+                        return {'brand': brand_key, 'location': 'domain (substring)'}
+                
+                # Check for repeated characters (e.g. gooogle)
+                if self._has_repeated_chars_heuristic(token):
+                    # If token has repeated chars, check if it simplifies to brand_key
+                    # This is expensive so we only do it if heuristic passes
+                    if self._has_repeated_chars(token, brand_key):
+                        return {'brand': brand_key, 'location': 'domain (repeated chars)'}
+                
+                # Check for homoglyphs in token (e.g. g00gle)
+                # Only if token length is similar to brand length
+                if abs(len(token) - len(brand_key)) <= 1 and any(c.isdigit() for c in token):
+                     # Quick check: replace numbers with likely chars
+                     # This is a mini-version of _detect_homoglyphs just for detection
+                     for number, letters in self.HOMOGLYPH_PATTERNS.items():
+                        if number in token:
+                            for letter in letters:
+                                if token.replace(number, letter) == brand_key:
+                                    return {'brand': brand_key, 'location': 'domain (homoglyph)'}
         
         return None
     
@@ -289,6 +336,10 @@ class BrandImpersonationDetector:
         closest_domain = None
         
         for official_domain in official_domains:
+            # Optimization: Skip if length difference is already too large
+            if abs(len(domain) - len(official_domain)) > 3:
+                continue
+                
             distance = self._levenshtein_distance(domain, official_domain)
             if distance < min_distance:
                 min_distance = distance
@@ -303,10 +354,12 @@ class BrandImpersonationDetector:
         
         return 0, ""
     
+    @lru_cache(maxsize=1024)
     def _levenshtein_distance(self, s1, s2):
         """
         Calculate Levenshtein distance between two strings.
         This is a lightweight implementation without external dependencies.
+        Cached for performance.
         """
         if len(s1) < len(s2):
             return self._levenshtein_distance(s2, s1)
@@ -335,8 +388,11 @@ class BrandImpersonationDetector:
         # Check if domain contains numbers
         if not any(char.isdigit() for char in domain):
             return False
-        
+            
+        # Optimization: Limit patterns check
         # Check for common substitution patterns
+        if len(domain) > 50: return False # Skip long domains for expensive checks
+        
         for number, letters in self.HOMOGLYPH_PATTERNS.items():
             if number in domain:
                 # Check if replacing the number with possible letters creates brand name
@@ -358,6 +414,13 @@ class BrandImpersonationDetector:
         
         return False
     
+    def _has_repeated_chars_heuristic(self, domain):
+        """Quick check if domain has repeated characters (3+ same chars in a row)."""
+        for i in range(len(domain) - 2):
+            if domain[i] == domain[i+1] == domain[i+2]:
+                return True
+        return False
+
     def _has_repeated_chars(self, test_str, reference_str):
         """Check if test_str has repeated characters compared to reference."""
         # Simple check: if test_str is longer and contains reference as substring
@@ -366,7 +429,37 @@ class BrandImpersonationDetector:
             extra_chars = len(test_str) - len(reference_str)
             if extra_chars <= 2:  # Allow up to 2 extra characters
                 return True
-        return False
+        
+        # Enhanced greedy check for interleaved repetitions (e.g. gooogle vs google)
+        # This handles cases where the substring check fails (like gooogle vs google where google is NOT a substring of gooogle exactly if we just look for "google")
+        # Actually "google" IS a substring of "gooogle" -> NO it is not. "goo" + "ogle".
+        
+        if len(test_str) <= len(reference_str): return False
+        
+        i = 0 # test_str index
+        j = 0 # reference_str index
+        repeats = 0
+        
+        while i < len(test_str) and j < len(reference_str):
+            if test_str[i] == reference_str[j]:
+                i += 1
+                j += 1
+            elif j > 0 and test_str[i] == reference_str[j-1]:
+                # Repeated character detected
+                i += 1
+                repeats += 1
+            else:
+                return False # Mismatch that isn't a repetition
+        
+        # Check remaining characters in test_str
+        while i < len(test_str):
+            if j > 0 and test_str[i] == reference_str[j-1]:
+                 i += 1
+                 repeats += 1
+            else:
+                return False
+                
+        return repeats <= 2 and repeats > 0
     
     def _check_intent_keywords(self, domain_tokens, path_tokens):
         """
@@ -376,6 +469,7 @@ class BrandImpersonationDetector:
         all_tokens = domain_tokens + path_tokens
         detected = []
         
+        # Optimization: Set lookup intersection would be faster but keywords list is small
         for keyword in self.INTENT_KEYWORDS:
             if keyword in all_tokens:
                 detected.append(keyword)

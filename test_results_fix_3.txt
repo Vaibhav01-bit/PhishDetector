@@ -1,0 +1,236 @@
+﻿====================================================================================================
+BRAND IMPERSONATION DETECTION - COMPREHENSIVE TEST SUITE
+====================================================================================================
+
+TEST CATEGORY 1: LEGITIMATE BRAND URLS (Should NOT trigger)
+----------------------------------------------------------------------------------------------------
+
+TEST CATEGORY 2: PHISHING URLS WITH BRAND IMPERSONATION (Should trigger)
+----------------------------------------------------------------------------------------------------
+
+TEST CATEGORY 3: EDGE CASES
+----------------------------------------------------------------------------------------------------
+
+TEST CATEGORY 4: ADVANCED PHISHING TECHNIQUES
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+DETAILED TEST RESULTS
+====================================================================================================
+
+[PASS] YouTube Official
+   URL: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Official YouTube video URL
+   Message: Official brand domain
+
+[PASS] Google Accounts
+   URL: https://accounts.google.com/signin/v2/identifier
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Official Google sign-in page
+   Message: Official brand domain
+
+[PASS] PayPal Official
+   URL: https://www.paypal.com/myaccount/home
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Official PayPal account page
+   Message: Official brand domain
+
+[PASS] Amazon Official
+   URL: https://www.amazon.com/gp/product/B08N5WRWNW
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Official Amazon product page
+   Message: Official brand domain
+
+[PASS] Facebook Official
+   URL: https://www.facebook.com/login
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Official Facebook login (login in path is OK for official domain)
+   Message: Official brand domain
+
+[PASS] Netflix Official
+   URL: https://www.netflix.com/browse
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Official Netflix browse page
+   Message: Official brand domain
+
+[PASS] Microsoft Login
+   URL: https://login.microsoftonline.com/common/oauth2/authorize
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Official Microsoft OAuth login
+   Message: Official brand domain
+
+[PASS] Apple iCloud
+   URL: https://www.icloud.com/mail
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Official Apple iCloud mail
+   Message: Official brand domain
+
+[PASS] YouTube Typosquatting
+   URL: https://youtubee-login.com/verify
+   Expected: True | Actual: True | Risk Score: 50
+   Description: Extra 'e' in youtube + login keyword
+   Message: Possible YouTube impersonation detected (Risk Score: 50)
+   Reasons: Brand keyword 'youtube' detected in domain (substring), Phishing intent keywords detected: login, verify
+
+[PASS] PayPal Numeric Substitution
+   URL: https://paypa1-secure.com/reset
+   Expected: True | Actual: True | Risk Score: 80
+   Description: Number '1' instead of 'l' + secure keyword
+   Message: Possible PayPal impersonation detected (Risk Score: 80)
+   Reasons: Brand keyword 'paypal' detected in domain (homoglyph), Homoglyph or numeric substitution detected
+
+[PASS] Google Homoglyph
+   URL: https://g00gle-accounts.com/signin
+   Expected: True | Actual: True | Risk Score: 80
+   Description: Zeros instead of 'o' + accounts keyword
+   Message: Possible Google impersonation detected (Risk Score: 80)
+   Reasons: Brand keyword 'google' detected in domain (homoglyph), Homoglyph or numeric substitution detected
+
+[PASS] PayPal Login Phishing
+   URL: https://paypal-login-secure.com/update
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Hyphens + multiple intent keywords
+   Message: Possible PayPal impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'paypal' detected in domain, Phishing intent keywords detected: login, update, secure
+
+[PASS] YouTube Verify Phishing
+   URL: https://youtube-verify.com/account
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Hyphen + verify keyword
+   Message: Possible YouTube impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'youtube' detected in domain, Phishing intent keywords detected: verify, account
+
+[PASS] Amazon Security Alert
+   URL: https://amazon-security-alert.com/suspended
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Multiple hyphens + security + suspended keywords
+   Message: Possible Amazon impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'amazon' detected in domain, Phishing intent keywords detected: security, suspended, alert
+
+[PASS] Facebook Confirm
+   URL: https://facebook-confirm-identity.com/verify
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Multiple hyphens + confirm + verify keywords
+   Message: Possible Facebook impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'facebook' detected in domain, Phishing intent keywords detected: verify, confirm
+
+[PASS] Netflix Account Update
+   URL: https://netflix-account-update.com/billing
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Multiple hyphens + account + update + billing keywords
+   Message: Possible Netflix impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'netflix' detected in domain, Phishing intent keywords detected: update, account, billing
+
+[PASS] Apple ID Locked
+   URL: https://apple-id-locked.com/unlock
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Hyphens + locked keyword (urgency)
+   Message: Possible Apple impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'apple' detected in domain, Phishing intent keywords detected: locked
+
+[PASS] Microsoft Verify
+   URL: https://microsoft-verify-account.com/login
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Multiple hyphens + verify + account + login
+   Message: Possible Microsoft impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'microsoft' detected in domain, Phishing intent keywords detected: login, verify, account
+
+[PASS] Brand in Path Only
+   URL: https://example.com/youtube/video
+   Expected: False | Actual: False | Risk Score: 30
+   Description: Brand keyword in path of non-brand domain (low risk)
+   Message: Low risk brand reference detected (Score: 30)
+   Reasons: Brand keyword 'youtube' detected in path
+
+[PASS] User Channel Name
+   URL: https://myyoutubechannel.com
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Contains 'youtube' but clearly a user channel (low risk)
+   Message: No brand impersonation detected
+
+[PASS] News Article About Brand
+   URL: https://technews.com/google-announces-new-feature
+   Expected: False | Actual: False | Risk Score: 30
+   Description: Brand in URL path as news topic
+   Message: Low risk brand reference detected (Score: 30)
+   Reasons: Brand keyword 'google' detected in path
+
+[PASS] Subdomain Impersonation
+   URL: https://paypal.phishing-site.com/login
+   Expected: True | Actual: True | Risk Score: 50
+   Description: Brand as subdomain of different domain
+   Message: Possible PayPal impersonation detected (Risk Score: 50)
+   Reasons: Brand keyword 'paypal' detected in domain, Phishing intent keywords detected: login
+
+[PASS] Similar Brand Name
+   URL: https://paypals.com/login
+   Expected: True | Actual: True | Risk Score: 75
+   Description: Plural form of brand + login keyword
+   Message: Possible PayPal impersonation detected (Risk Score: 75)
+   Reasons: Brand keyword 'paypal' detected in domain (substring), Typosquatting detected: Very similar to paypal.com (distance: 1)
+
+[PASS] Brand with TLD Trick
+   URL: https://youtube.xyz/verify
+   Expected: True | Actual: True | Risk Score: 65
+   Description: Official-looking but suspicious TLD + verify
+   Message: Possible YouTube impersonation detected (Risk Score: 65)
+   Reasons: Brand keyword 'youtube' detected in domain, Typosquatting detected: Similar to youtube.com (distance: 3)
+
+[PASS] Legitimate Subdomain
+   URL: https://developer.google.com/apis
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Legitimate Google subdomain
+   Message: Official brand domain
+
+[PASS] CDN Domain
+   URL: https://fbcdn.net/images/photo.jpg
+   Expected: False | Actual: False | Risk Score: 0
+   Description: Official Facebook CDN domain
+   Message: Official brand domain
+
+[PASS] Repeated Characters
+   URL: https://gooogle.com/signin
+   Expected: True | Actual: True | Risk Score: 75
+   Description: Repeated 'o' in google
+   Message: Possible Google impersonation detected (Risk Score: 75)
+   Reasons: Brand keyword 'google' detected in domain (repeated chars), Typosquatting detected: Very similar to google.com (distance: 1)
+
+[PASS] Mixed Case Trick
+   URL: https://PayPal-Secure.com/verify
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Mixed case with hyphen (normalized to lowercase)
+   Message: Possible PayPal impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'paypal' detected in domain, Phishing intent keywords detected: verify, secure
+
+[PASS] Multiple Brands
+   URL: https://google-paypal-verify.com/login
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Multiple brand names in one domain
+   Message: Possible Google impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'google' detected in domain, Phishing intent keywords detected: login, verify
+
+[PASS] Urgent Action Required
+   URL: https://netflix-urgent-action.com/expired
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Urgency keywords + expired
+   Message: Possible Netflix impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'netflix' detected in domain, Phishing intent keywords detected: expired, urgent, action
+
+[PASS] Suspended Account
+   URL: https://amazon-account-suspended.com/restore
+   Expected: True | Actual: True | Risk Score: 60
+   Description: Account suspended urgency tactic
+   Message: Possible Amazon impersonation detected (Risk Score: 60)
+   Reasons: Brand keyword 'amazon' detected in domain, Phishing intent keywords detected: account, suspended
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+Total Tests: 31
+Passed: 31
+Failed: 0
+Pass Rate: 100.0%
+
+ALL TESTS PASSED!
+====================================================================================================

@@ -1,0 +1,13 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.6, pytest-8.4.2, pluggy-1.6.0
+rootdir: D:\Phishing Website\Phishing Website Detector
+plugins: anyio-3.7.1
+collected 0 items
+
+============================== warnings summary ===============================
+pipeline\test_brand_impersonation.py:15
+  D:\Phishing Website\Phishing Website Detector\pipeline\test_brand_impersonation.py:15: PytestCollectionWarning: cannot collect test class 'TestBrandImpersonation' because it has a __init__ constructor (from: pipeline/test_brand_impersonation.py)
+    class TestBrandImpersonation:
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= 1 warning in 0.04s ==============================

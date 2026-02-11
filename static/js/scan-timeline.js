@@ -10,12 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Steps Configuration (Must match HTML)
     const steps = [
-        { id: 'step-1', delay: 600 },  // URL Validation
-        { id: 'step-2', delay: 800 },  // Domain Parsing
-        { id: 'step-3', delay: 1000 }, // Redirect Resolution
-        { id: 'step-4', delay: 800 },  // Brand Impersonation
-        { id: 'step-5', delay: 900 },  // AI Evaluation
-        { id: 'step-6', delay: 600 }   // Sandbox
+        { id: 'step-1', delay: 300 },  // URL Validation
+        { id: 'step-2', delay: 400 },  // Domain Parsing
+        { id: 'step-3', delay: 500 }, // Redirect Resolution
+        { id: 'step-4', delay: 400 },  // Brand Impersonation
+        { id: 'step-5', delay: 500 },  // AI Evaluation
+        { id: 'step-6', delay: 300 }   // Sandbox
     ];
 
     if (form) {
@@ -68,7 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 await runStep(5); // Sandbox
 
                 // 5. CRITICAL TRANSITION PHASE
-                await new Promise(r => setTimeout(r, 400)); // Pause for impact
+                // Faster transition
+                await new Promise(r => setTimeout(r, 200));
 
                 // Mark timeline as finished visually
                 timeline.classList.remove('active-scan');
@@ -76,14 +77,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Fade out timeline
                 timeline.classList.add('scan-complete');
 
-                // Wait for fade out
-                await new Promise(r => setTimeout(r, 500));
+                // Wait for fade out (slightly shorter than CSS transition for overlap)
+                await new Promise(r => setTimeout(r, 300));
 
                 // 6. REVEAL VERDICT
                 timeline.style.display = 'none';
                 populateResultCard(result);
                 legacyCard.style.display = 'block';
                 legacyCard.classList.add('slide-up-entrance');
+
+                // Smooth scroll to result
+                legacyCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
             } catch (error) {
                 console.error("Scan Error:", error);

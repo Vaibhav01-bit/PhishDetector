@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "scan_id": "scan_1770802649_1abfefc4",
+  "source_url": "https://labs.google/fx/tools/whisk",
+  "final_url": "https://accounts.google.com/v3/signin/identifier?opparams=%253F&dsh=S-332375185%3A1770802647314272&client_id=365941595420-v51i7q8ik0crmaoltkhuo5ogb1kekl6f.apps.googleusercontent.com&code_challenge=riiZ9a8LStRQUJ9YJe6B7N4IMivY8NF59pORFXNeJnE&code_challenge_method=S256&o2v=2&redirect_uri=https%3A%2F%2Flabs.google%2Ffx%2Fapi%2Fauth%2Fcallback%2Fgoogle&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Faisandbox+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&service=lso&state=Nvje4LuA1lSDJzs9iwsBqqUlPe2ycvWkJ6mH4M8qO9c&flowName=GeneralOAuthLite&continue=https%3A%2F%2Faccounts.google.com%2Fsignin%2Foauth%2Flegacy%2Fconsent%3Fauthuser%3Dunknown%26part%3DAJi8hAN7GLdYcEMukrJNo_Izyc2NObPPFQ0onK4rCoenfiJ0g-DooWrmx3A8Fn71UXyGe8dDwSo3t_fW_b99S5hVXXVIDuCgtkuhTP1EtxjoP8g2owQrLzWIICEM-iB2pN_G_XJSuTMDCejOhiCVozACrwCRCl212ssp_bVYHj4TMEtb-ApyNg3ZM1snrtou1cOVP-y--mhT9218_Js0xf65xGPxV_J_lLn3V4hfdtTXYsLsw76qlJJZ3F5F51vd4reKyZG9uuQDbi9OBCYQhoZDXlg6BJ0JX3q8x4zUSNLL6bVzUCqexeujOXA5z5vCYOcCCjo12jg4C9uDPCuzSmsoTg2Pq0Kw3U9rBXhTi5LaUva--AFM-SIh8s_rgniIYYvy5aoxQZnIEZHpBqK3ettDkB13Cc7dPnFsFauJEPUfJ4-9xalLglIVdD-jq09EPrSdqZwBB_tMnStVg76DSXi31DlAEo18Ug%26flowName%3DGeneralOAuthFlow%26as%3DS-332375185%253A1770802647314272%26client_id%3D365941595420-v51i7q8ik0crmaoltkhuo5ogb1kekl6f.apps.googleusercontent.com%23&app_domain=https%3A%2F%2Flabs.google&rart=ANgoxcfGkKkZyYBe_LjzTzkUSr9GIFC0Va2Fu0PKwJl4iU0WqIcWDgCteuPhjCphVQaFLMYK2cZKXfkCpYjhF1c_Ss9FfkzyWnjSGPYuURU8DOGV1ZrUnb4",
+  "redirect_count": 0,
+  "ip_address": "142.250.192.209",
+  "domain": "accounts.google.com",
+  "page_title": "Sign in - Google Accounts",
+  "load_time": 9291,
+  "total_time": 13245,
+  "screenshot_path": "scan_1770802649_1abfefc4.jpg",
+  "sandbox_message": "Rendered in an isolated sandbox. No user interaction.",
+  "has_login_form": true,
+  "has_password_field": true,
+  "has_email_field": true,
+  "suspicious_keywords": [],
+  "timestamp": "2026-02-11 15:07:42"
+}

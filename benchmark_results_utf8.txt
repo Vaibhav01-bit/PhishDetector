@@ -1,0 +1,9 @@
+﻿Running Verification Benchmarks...
+URL Type                       | Time (ms) 
+---------------------------------------------
+https://www.google.com         | 0.00
+https://example.com/some/rando | 1.19
+https://secure-paypal-login-at | 0.00
+https://very-long-domain-name- | 0.63
+https://amazon-security-alert- | 0.00
+https://apple-id-verification- | 0.66

@@ -6,10 +6,16 @@ Tests legitimate URLs, phishing URLs, and edge cases
 import sys
 import os
 
+
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Force UTF-8 encoding for stdout to prevent UnicodeEncodeError on Windows
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 from pipeline.brand_impersonation import BrandImpersonationDetector
+
 
 
 class TestBrandImpersonation:
@@ -37,10 +43,10 @@ class TestBrandImpersonation:
         
         if passed:
             self.passed += 1
-            status = "✓ PASS"
+            status = "[PASS]"
         else:
             self.failed += 1
-            status = "✗ FAIL"
+            status = "[FAIL]"
         
         self.test_results.append({
             'name': name,
@@ -64,7 +70,7 @@ class TestBrandImpersonation:
         print()
         
         # ===== LEGITIMATE URLS (Should NOT trigger - False Positives Check) =====
-        print("📋 TEST CATEGORY 1: LEGITIMATE BRAND URLS (Should NOT trigger)")
+        print("TEST CATEGORY 1: LEGITIMATE BRAND URLS (Should NOT trigger)")
         print("-" * 100)
         
         self.test(
@@ -126,7 +132,7 @@ class TestBrandImpersonation:
         print()
         
         # ===== PHISHING URLS (Should trigger - Detection Rate Check) =====
-        print("📋 TEST CATEGORY 2: PHISHING URLS WITH BRAND IMPERSONATION (Should trigger)")
+        print("TEST CATEGORY 2: PHISHING URLS WITH BRAND IMPERSONATION (Should trigger)")
         print("-" * 100)
         
         self.test(
@@ -202,7 +208,7 @@ class TestBrandImpersonation:
         print()
         
         # ===== EDGE CASES (Mixed scenarios) =====
-        print("📋 TEST CATEGORY 3: EDGE CASES")
+        print("TEST CATEGORY 3: EDGE CASES")
         print("-" * 100)
         
         self.test(
@@ -264,7 +270,7 @@ class TestBrandImpersonation:
         print()
         
         # ===== ADVANCED PHISHING TECHNIQUES =====
-        print("📋 TEST CATEGORY 4: ADVANCED PHISHING TECHNIQUES")
+        print("TEST CATEGORY 4: ADVANCED PHISHING TECHNIQUES")
         print("-" * 100)
         
         self.test(
@@ -333,15 +339,15 @@ class TestBrandImpersonation:
         pass_rate = (self.passed / total * 100) if total > 0 else 0
         
         print(f"Total Tests: {total}")
-        print(f"Passed: {self.passed} ✓")
-        print(f"Failed: {self.failed} ✗")
+        print(f"Passed: {self.passed}")
+        print(f"Failed: {self.failed}")
         print(f"Pass Rate: {pass_rate:.1f}%")
         print()
         
         if self.failed == 0:
-            print("🎉 ALL TESTS PASSED! 🎉")
+            print("ALL TESTS PASSED!")
         else:
-            print("⚠️  Some tests failed. Review the results above.")
+            print("Some tests failed. Review the results above.")
         
         print("=" * 100)
 
