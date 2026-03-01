@@ -2,7 +2,7 @@
 
 A state-of-the-art, enterprise-grade phishing detection system that combines **Machine Learning**, **Heuristic Analysis**, and **Sandboxed Browser Automation** to identify malicious websites with 97.4% accuracy.
 
-![image2](https://github.com/asrith-reddy/Phishing-detector/assets/76733972/da226de9-dfe6-4f0c-a8bc-b92d4cc08e53)
+![PhishDetector Dashboard](static/assets/img/Screenshot%202026-02-10%20130011.png)
 
 ## 🚀 Key Features
 
