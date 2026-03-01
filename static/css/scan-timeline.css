@@ -1,27 +1,46 @@
-/* PROGRESSIVE SCAN TIMELINE - PREMIUM SAAS STYLE */
+/* ─────────────────────────────────────────────────────────────────────────────
+   ULTRA-FAST PROGRESSIVE SCAN TIMELINE — Premium SaaS Style
+   ──────────────────────────────────────────────────────────────────────────── */
 
-/* Container - Glassmorphism & Depth */
+/* ── Timeline Container ───────────────────────────────────────────────────── */
 .scan-timeline-container {
     display: none;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(185%);
+    -webkit-backdrop-filter: blur(20px) saturate(185%);
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 24px;
-    padding: 2.5rem;
+    padding: 2.25rem 2.5rem;
     box-shadow:
         0 20px 50px rgba(0, 0, 0, 0.05),
         0 1px 0 rgba(255, 255, 255, 0.8) inset;
     margin: 2rem auto;
-    max-width: 550px;
+    max-width: 560px;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    transform-style: preserve-3d;
-    perspective: 1000px;
+    /* Smooth entrance */
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+    animation: tlEnter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* Floating Animation */
+@keyframes tlEnter {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Active scan: gentle floating */
+.scan-timeline-container.active-scan {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow:
+        0 20px 50px rgba(59, 130, 246, 0.08),
+        0 0 0 1px rgba(59, 130, 246, 0.08) inset;
+    animation: tlEnter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+        floatTimeline 7s ease-in-out 0.25s infinite;
+}
+
 @keyframes floatTimeline {
 
     0%,
@@ -30,19 +49,11 @@
     }
 
     50% {
-        transform: translateY(-8px);
+        transform: translateY(-6px);
     }
 }
 
-.scan-timeline-container.active-scan {
-    animation: floatTimeline 6s ease-in-out infinite;
-    border-color: rgba(59, 130, 246, 0.3);
-    box-shadow:
-        0 20px 50px rgba(59, 130, 246, 0.1),
-        0 0 0 1px rgba(59, 130, 246, 0.1) inset;
-}
-
-/* Cyber Gradient Edges (Subtle) */
+/* Cyber gradient top edge */
 .scan-timeline-container::before {
     content: '';
     position: absolute;
@@ -50,152 +61,141 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
-    opacity: 0.5;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.55), transparent);
 }
 
+/* ── Dark Mode ────────────────────────────────────────────────────────────── */
 body.dark-mode .scan-timeline-container {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
 }
 
 body.dark-mode .scan-timeline-container.active-scan {
-    box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.5),
-        0 0 30px rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(59, 130, 246, 0.09);
+    border-color: rgba(59, 130, 246, 0.22);
 }
 
-/* Timeline Layout */
+/* ── Exit Animation ───────────────────────────────────────────────────────── */
+.scan-timeline-container.tl-exit {
+    animation: tlExit 0.38s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+}
+
+@keyframes tlExit {
+    to {
+        opacity: 0;
+        transform: scale(0.97) translateY(5px);
+        filter: blur(2px);
+    }
+}
+
+/* ── Steps Layout ─────────────────────────────────────────────────────────── */
 .timeline-steps {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.35rem;
     position: relative;
     padding-left: 12px;
 }
 
-/* Connecting Line */
+/* Connecting line */
 .timeline-steps::before {
     content: '';
     position: absolute;
-    top: 20px;
-    bottom: 30px;
-    left: 24px;
-    /* Center of icon */
+    top: 22px;
+    bottom: 28px;
+    left: 26px;
     width: 2px;
-    background: linear-gradient(180deg,
-            rgba(59, 130, 246, 0.8) 0%,
-            rgba(59, 130, 246, 0.1) 100%);
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.8) 0%, rgba(59, 130, 246, 0.05) 100%);
+    opacity: 0.25;
     z-index: 0;
-    opacity: 0.3;
 }
 
-/* Individual Step */
+/* ── Individual Step ──────────────────────────────────────────────────────── */
 .scan-step {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1.15rem;
     position: relative;
     z-index: 1;
-    opacity: 0.4;
-    transition: all 0.4s ease;
-    padding: 4px 0;
+    opacity: 0.35;
+    transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.34, 1.3, 0.64, 1);
+    padding: 3px 0;
 }
 
 .scan-step.active,
 .scan-step.completed {
     opacity: 1;
-    transform: translateX(4px);
+    transform: translateX(3px);
 }
 
-/* Step Icon */
+/* ── Step Icon ────────────────────────────────────────────────────────────── */
 .step-icon {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    background: var(--bg-card);
-    /* Theme aware */
-    border: 2px solid var(--border-color);
+    background: var(--bg-card, #fff);
+    border: 2px solid var(--border-color, #e2e8f0);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     font-size: 14px;
-    color: var(--text-muted);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    color: var(--text-muted, #94a3b8);
+    transition: all 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
-/* Active State - Pulse */
+/* Active: blue pulse ring */
 .scan-step.active .step-icon {
     border-color: #3b82f6;
     color: #3b82f6;
-    background: rgba(59, 130, 246, 0.05);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    background: rgba(59, 130, 246, 0.06);
+    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.12);
 }
 
-.scan-step.active .step-icon i {
-    animation: rotateIcon 2s linear infinite;
-}
-
-@keyframes rotateIcon {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Completed State - Checkmark */
+/* Completed: green checkmark */
 .scan-step.completed .step-icon {
     background: #10b981;
     border-color: #10b981;
     color: white;
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transform: scale(1.12);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
 }
 
-/* Text Styling */
+/* Error state */
+.scan-step.step-error .step-icon {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: white;
+}
+
+/* ── Step Text ────────────────────────────────────────────────────────────── */
 .step-content {
     display: flex;
     flex-direction: column;
 }
 
 .step-title {
-    font-size: 0.95rem;
+    font-size: 0.93rem;
     font-weight: 600;
-    color: var(--text-heading-primary);
-    margin-bottom: 2px;
+    color: var(--text-heading-primary, #1e293b);
+    margin-bottom: 1px;
     letter-spacing: -0.01em;
 }
 
 .step-description {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.79rem;
+    color: var(--text-muted, #94a3b8);
     font-weight: 400;
 }
 
-/* Active Text Highlight */
 .scan-step.active .step-title {
     color: #3b82f6;
-    text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    text-shadow: 0 0 18px rgba(59, 130, 246, 0.28);
 }
 
-/* Timeline Exit Animation */
-.scan-timeline-container.scan-complete {
-    transform: scale(0.98) translateY(5px);
-    opacity: 0;
-    pointer-events: none;
-    filter: blur(2px);
-}
-
-/* Dark Mode Specifics */
+/* ── Dark mode step icons ─────────────────────────────────────────────────── */
 body.dark-mode .step-icon {
     background: #0f172a;
     border-color: #334155;
@@ -203,10 +203,10 @@ body.dark-mode .step-icon {
 
 body.dark-mode .scan-step.active .step-icon {
     background: rgba(59, 130, 246, 0.1);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.18);
 }
 
-/* Header Text */
+/* Timeline header */
 .timeline-header h5 {
     color: #3b82f6;
     letter-spacing: -0.02em;
@@ -214,5 +214,267 @@ body.dark-mode .scan-step.active .step-icon {
 
 body.dark-mode .timeline-header h5 {
     color: #60a5fa;
-    text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.38);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESULT CARD ENTRANCE
+   ──────────────────────────────────────────────────────────────────────────── */
+.result-card-enter {
+    animation: cardEnter 0.22s cubic-bezier(0.34, 1.3, 0.64, 1) forwards;
+}
+
+@keyframes cardEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.98) translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SANDBOX PROGRESS BADGE
+   ──────────────────────────────────────────────────────────────────────────── */
+.sandbox-progress-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 100px;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #3b82f6;
+    margin: 0.75rem auto 0.5rem;
+    max-width: fit-content;
+    animation: badgePulse 2.5s ease-in-out infinite;
+}
+
+body.dark-mode .sandbox-progress-badge {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #93c5fd;
+}
+
+@keyframes badgePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.badge-fadeout {
+    animation: badgeFadeOut 0.35s ease forwards;
+}
+
+@keyframes badgeFadeOut {
+    to {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+/* ── Primary CTA wrapper: centered sandbox button ────────────────────────── */
+.primary-cta-wrapper {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ── CTA fade-in ─────────────────────────────────────────────────────────── */
+.cta-fade-in {
+    animation: ctaFadeIn 0.3s ease forwards;
+}
+
+@keyframes ctaFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCREENSHOT FRAME
+   ──────────────────────────────────────────────────────────────────────────── */
+.screenshot-frame {
+    margin: 1rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+/* Placeholder shimmer state */
+.screenshot-placeholder {
+    background: var(--bg-card, #f1f5f9);
+    border: 1px dashed rgba(99, 116, 155, 0.25);
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+body.dark-mode .screenshot-placeholder {
+    background: rgba(30, 41, 59, 0.5);
+}
+
+/* Shimmer sweep */
+.screenshot-placeholder::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+}
+
+body.dark-mode .screenshot-placeholder::after {
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.06) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s linear infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.screenshot-shimmer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.5;
+    z-index: 1;
+    position: relative;
+}
+
+.screenshot-icon {
+    font-size: 2rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+.screenshot-label {
+    font-size: 0.75rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+/* Loaded real screenshot */
+.screenshot-loaded {
+    border: 1px solid rgba(99, 116, 155, 0.18);
+    animation: screenshotReveal 0.4s ease forwards;
+}
+
+.screenshot-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+}
+
+@keyframes screenshotReveal {
+    from {
+        opacity: 0;
+        filter: blur(4px);
+    }
+
+    to {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+
+.frame-fadeout {
+    animation: frameFadeOut 0.28s ease forwards;
+}
+
+@keyframes frameFadeOut {
+    to {
+        opacity: 0;
+        height: 0;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SKELETON LOADERS (for deferred content)
+   ──────────────────────────────────────────────────────────────────────────── */
+.skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+    margin-bottom: 8px;
+}
+
+body.dark-mode .skeleton-line {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+}
+
+.skeleton-line.short {
+    width: 55%;
+}
+
+.skeleton-line.med {
+    width: 80%;
+}
+
+.skeleton-line.full {
+    width: 100%;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MOBILE OPTIMIZATION  (@media ≤768px)
+   On mobile: kill the floating animation, reduce glow, keep only opacity/transform
+   ──────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .scan-timeline-container.active-scan {
+        animation: tlEnter 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+        /* No float animation on mobile */
+    }
+
+    .scan-timeline-container {
+        padding: 1.6rem 1.4rem;
+        border-radius: 18px;
+    }
+
+    .scan-step.active .step-icon {
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .screenshot-placeholder {
+        height: 110px;
+    }
 }

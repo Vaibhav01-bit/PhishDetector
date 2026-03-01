@@ -220,20 +220,20 @@
             </div>
 
             <div class="scan-result mt-4">
-              <!-- PROGRESSIVE SCAN TIMELINE -->
+              <!-- ░░░ PROGRESSIVE SCAN TIMELINE ░░░ -->
               <div id="scan-timeline" class="scan-timeline-container" style="display: none;">
                 <div class="timeline-header text-center mb-4">
                   <h5 class="text-primary font-weight-bold">Security Analysis in Progress</h5>
-                  <p class="text-muted small">Analyzing URL across 5 security layers...</p>
+                  <p class="text-muted small">Analyzing URL across 5 security layers + sandbox…</p>
                 </div>
 
                 <div class="timeline-steps">
-                  <!-- Step 1: URL Validation -->
+                  <!-- Step 1: URL Normalization -->
                   <div class="scan-step" id="step-1">
                     <div class="step-icon"><i class='bx bx-circle'></i></div>
                     <div class="step-content">
-                      <div class="step-title">URL Validation</div>
-                      <div class="step-description">Checking format and reachability...</div>
+                      <div class="step-title">URL Normalization</div>
+                      <div class="step-description">Resolving and normalizing URL structure...</div>
                     </div>
                   </div>
 
@@ -241,17 +241,17 @@
                   <div class="scan-step" id="step-2">
                     <div class="step-icon"><i class='bx bx-circle'></i></div>
                     <div class="step-content">
-                      <div class="step-title">Domain & Structure Parsing</div>
-                      <div class="step-description">Analyzing TLD and subdomains...</div>
+                      <div class="step-title">Domain Parsing</div>
+                      <div class="step-description">Analyzing TLD, subdomains and registrar...</div>
                     </div>
                   </div>
 
-                  <!-- Step 3: Redirects -->
+                  <!-- Step 3: SSL + Redirect Check -->
                   <div class="scan-step" id="step-3">
                     <div class="step-icon"><i class='bx bx-circle'></i></div>
                     <div class="step-content">
-                      <div class="step-title">Redirect Resolution</div>
-                      <div class="step-description">Tracing detailed redirect path...</div>
+                      <div class="step-title">SSL &amp; Redirect Check</div>
+                      <div class="step-description">Tracing redirect chain and validating HTTPS...</div>
                     </div>
                   </div>
 
@@ -264,109 +264,98 @@
                     </div>
                   </div>
 
-                  <!-- Step 5: AI Evaluation -->
+                  <!-- Step 5: AI/ML Risk Evaluation -->
                   <div class="scan-step" id="step-5">
                     <div class="step-icon"><i class='bx bx-circle'></i></div>
                     <div class="step-content">
                       <div class="step-title">AI / ML Risk Evaluation</div>
-                      <div class="step-description">Running behavioral model...</div>
+                      <div class="step-description">Running behavioral neural model...</div>
                     </div>
                   </div>
 
-                  <!-- Step 6: Sandbox -->
+                  <!-- Step 6: Async Sandbox (stays active while result card is shown) -->
                   <div class="scan-step" id="step-6">
                     <div class="step-icon"><i class='bx bx-circle'></i></div>
                     <div class="step-content">
                       <div class="step-title">Secure Sandbox Execution</div>
-                      <div class="step-description">Isolating environment...</div>
+                      <div class="step-description">Executing in isolated environment...</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- Result Card (Hidden by default) -->
+              <!--
+                ░░ RESULT CARD ░░
+                JS-driven: scan-timeline.js populates all content dynamically.
+                Fallback Jinja template content shown below for server-side renders.
+              -->
               <div id="legacy-result-card" class="result-card enterprise-card p-5 rounded-4 shadow-lg" {% if not name
                 %}style="display: none;" {% endif %}>
-                <!-- Scanning URL (Small, Muted) -->
-                {% if name %}
+
+                <!-- URL display (JS sets .url-text span; Jinja fallback below) -->
                 <p class="url-text mb-3 text-muted">
                   <i class='bx bx-link-alt me-1'></i>
-                  Scanning: <span class="fw-medium">{{name[0]}}</span>
+                  Scanning: <span class="fw-medium">{% if name %}{{name[0]}}{% endif %}</span>
                 </p>
-                {% endif %}
 
-                {% if name %}
-                <!-- Security Icon + Verdict -->
+                <!-- ── Verdict Section ─────────────────────────────────────── -->
                 <div class="verdict-section mb-3">
                   <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
-                    <!-- Security Icon with Pulse -->
+
+                    <!-- Security icon (JS sets class + inner icon) -->
                     <div
-                      class="security-icon {% if name[3] %}icon-safe{% elif name[2] == 'Warning' %}icon-warning{% else %}icon-danger{% endif %}">
-                      {% if name[3] %}
-                      <i class='bx bxs-shield-alt-2'></i>
-                      {% elif name[2] == 'Warning' %}
-                      <i class='bx bxs-error-alt'></i>
-                      {% else %}
-                      <i class='bx bxs-shield-x'></i>
-                      {% endif %}
+                      class="security-icon {% if name %}{% if name[3] %}icon-safe{% elif name[2] == 'Warning' %}icon-warning{% else %}icon-danger{% endif %}{% endif %}">
+                      {% if name %}
+                      {% if name[3] %}<i class='bx bxs-shield-alt-2'></i>
+                      {% elif name[2] == 'Warning' %}<i class='bx bxs-error-alt'></i>
+                      {% else %}<i class='bx bxs-shield-x'></i>{% endif %}
+                      {% else %}<i class='bx bx-shield'></i>{% endif %}
                     </div>
 
-                    <!-- Verdict Text (Honest Language) -->
+                    <!-- Verdict heading (JS sets text + class) -->
                     <h3
-                      class="verdict-text {% if name[3] %}text-success{% elif name[2] == 'Warning' %}text-warning{% else %}text-danger{% endif %} fw-bold mb-0">
-                      {% if name[3] %}
-                      This website appears safe
-                      {% elif name[2] == 'Warning' %}
-                      Suspicious patterns detected
-                      {% else %}
-                      High-risk phishing indicators found
+                      class="verdict-text {% if name %}{% if name[3] %}text-success{% elif name[2] == 'Warning' %}text-warning{% else %}text-danger{% endif %}{% endif %} fw-bold mb-0">
+                      {% if name %}
+                      {% if name[3] %}This website appears safe
+                      {% elif name[2] == 'Warning' %}Suspicious patterns detected
+                      {% else %}High-risk phishing indicators found{% endif %}
                       {% endif %}
                     </h3>
                   </div>
 
-                  <!-- Subtext Disclaimer (Anti-Overconfidence) -->
                   <p class="verdict-subtext text-muted mb-4">
-                    Based on automated 5-layer analysis. HTTPS encryption alone does not guarantee legitimacy. Always
-                    verify URLs manually.
+                    Based on automated 5-layer analysis. HTTPS encryption alone does not guarantee legitimacy.
+                    Always verify URLs manually.
                   </p>
 
-                  <!-- Detailed Risk Analysis (Feature 6) -->
+                  <!-- ── Analysis Details ────────────────────────────────── -->
                   <div class="risk-analysis text-left mb-4 p-3 rounded">
-                    <h5 class="section-header mb-3" style="font-size: 1rem;"><i class='bx bx-analyse'></i> Security
-                      Analysis Details</h5>
-
-                    <ul class="list-unstyled mb-0" style="font-size: 0.9rem;">
-                      <!-- Forensics -->
+                    <h5 class="section-header mb-3" style="font-size:1rem">
+                      <i class='bx bx-analyse'></i> Security Analysis Details
+                    </h5>
+                    <!-- JS populates this list; Jinja fills it on server-side renders -->
+                    <ul class="list-unstyled mb-0" style="font-size:0.9rem">
+                      {% if name and details %}
                       {% if details.layers.forensics_check.status != 'Safe' %}
-                      <li class="mb-2 text-warning"><i class='bx bx-search-alt'></i> <strong>Forensics:</strong> {{
-                        details.layers.forensics_check.message }}</li>
+                      <li class="mb-2 text-warning"><i class='bx bx-search-alt'></i> <strong>Forensics:</strong>
+                        {{details.layers.forensics_check.message}}</li>
                       {% endif %}
-
-                      <!-- Domain Layer -->
                       {% if details.layers.layer2.status != 'Safe' %}
-                      <li class="mb-2 text-warning"><i class='bx bx-globe'></i> <strong>Domain:</strong> {{
-                        details.layers.layer2.message }}</li>
+                      <li class="mb-2 text-warning"><i class='bx bx-globe'></i> <strong>Domain:</strong>
+                        {{details.layers.layer2.message}}</li>
                       {% endif %}
-
-                      <!-- SSL Layer -->
                       {% if details.layers.layer3.status != 'Safe' %}
-                      <li class="mb-2 text-warning"><i class='bx bx-lock-open-alt'></i> <strong>SSL:</strong> {{
-                        details.layers.layer3.message }}</li>
+                      <li class="mb-2 text-warning"><i class='bx bx-lock-open-alt'></i> <strong>SSL:</strong>
+                        {{details.layers.layer3.message}}</li>
                       {% endif %}
-
-                      <!-- Behavioral Layer -->
                       {% if details.layers.layer5.status != 'Safe' %}
-                      <li class="mb-2 text-warning"><i class='bx bx-radar'></i> <strong>Behavior:</strong> {{
-                        details.layers.layer5.message }}</li>
+                      <li class="mb-2 text-warning"><i class='bx bx-radar'></i> <strong>Behavior:</strong>
+                        {{details.layers.layer5.message}}</li>
                       {% endif %}
-
-                      <!-- ML Layer -->
                       {% if details.layers.layer4.status == 'Phishing' %}
                       <li class="mb-2 text-danger"><i class='bx bx-brain'></i> <strong>AI Detection:</strong> High
                         confidence phishing pattern detected.</li>
                       {% endif %}
-
-                      <!-- Trust Signals (If Safe) -->
                       {% if name[3] %}
                       <li class="mb-2 text-success"><i class='bx bx-check-shield'></i> <strong>Domain:</strong> No
                         obvious brand impersonation detected.</li>
@@ -375,22 +364,22 @@
                       <li class="mb-2 text-success"><i class='bx bx-data'></i> <strong>Reputation:</strong> Not found in
                         active blacklists.</li>
                       {% endif %}
+                      {% endif %}
                     </ul>
 
-                    <!-- Redirect Chain Visualization (Feature 2) -->
-                    {% if details.forensics.redirect_chain and details.forensics.redirect_chain|length > 1 %}
+                    {% if name and details and details.forensics.redirect_chain and
+                    details.forensics.redirect_chain|length > 1 %}
                     <div class="redirect-chain mt-3 pt-3 border-top border-secondary">
-                      <h6 class="section-header mb-2" style="font-size: 0.85rem;"><i class='bx bx-git-branch'></i>
-                        Redirect Path:</h6>
-                      <div class="chain-visual pl-2" style="border-left: 2px solid rgba(59, 130, 246, 0.3);">
+                      <h6 class="section-header mb-2" style="font-size:.85rem"><i class='bx bx-git-branch'></i> Redirect
+                        Path:</h6>
+                      <div class="chain-visual pl-2" style="border-left:2px solid rgba(59,130,246,.3)">
                         {% for hop in details.forensics.redirect_chain %}
-                        <div class="chain-node py-1" style="font-size: 0.85rem;">
-                          <span class="{{ 'text-success font-weight-bold' if loop.last else 'text-muted' }}">
-                            {{ hop.url[:50] }}{{ '...' if hop.url|length > 50 else '' }}
+                        <div class="chain-node py-1" style="font-size:.85rem">
+                          <span class="{{  'text-success font-weight-bold' if loop.last else 'text-muted' }}">
+                            {{hop.url[:50]}}{{ '...' if hop.url|length > 50 else '' }}
                           </span>
-                          {% if not loop.last %}
-                          <div class="text-muted small ml-1"><i class='bx bx-down-arrow-alt'></i></div>
-                          {% endif %}
+                          {% if not loop.last %}<div class="text-muted small ml-1"><i class='bx bx-down-arrow-alt'></i>
+                          </div>{% endif %}
                         </div>
                         {% endfor %}
                       </div>
@@ -398,53 +387,39 @@
                     {% endif %}
                   </div>
                 </div>
-                <!-- CTA Section: Sandbox Primary, Proceed Secondary -->
+
+                <!-- ── CTA Section ─────────────────────────────────────────── -->
                 <div class="cta-section mt-4">
-
-                  {% if details and details.layers.get('sandbox') and details.layers.sandbox.success %}
-
-                  <!-- PRIMARY CTA: Sandbox Analysis -->
-                  <div class="primary-cta-wrapper mb-3">
+                  <!-- Sandbox CTA: hidden by default; JS or Jinja reveals it -->
+                  <div class="primary-cta-wrapper mb-3" {% if not (name and details and details.layers.get('sandbox')
+                    and details.layers.sandbox.success) %}style="display:none" {% endif %}>
+                    {% if name and details and details.layers.get('sandbox') and details.layers.sandbox.success %}
                     <a href="{{ url_for('sandbox_results', scan_id=details.layers.sandbox.scan_id) }}"
                       class="btn-sandbox-primary">
                       <span>View Sandbox Analysis</span>
                       <i class='bx bx-right-arrow-alt'></i>
                     </a>
-
-                    <!-- Trust Caption -->
                     <p class="sandbox-caption mt-2 mb-0 text-center">
-                      <i class='bx bxs-lock-alt'></i>
-                      Secure sandbox environment • No user interaction performed
+                      <i class='bx bxs-lock-alt'></i> Secure sandbox environment • No user interaction performed
                     </p>
+                    {% endif %}
                   </div>
-                  {% elif details and details.layers.get('sandbox') and not details.layers.sandbox.success %}
-                  <!-- Sandbox Error (Brief) -->
-                  <div class="sandbox-error-brief mb-3">
-                    <p class="mb-0 text-center">
-                      <i class='bx bx-info-circle'></i>
-                      Sandbox analysis unavailable: {{ details.layers.sandbox.error if details.layers.sandbox.error else
-                      "Unknown error" }}
-                    </p>
-                  </div>
-                  {% endif %}
 
-                  <!-- SECONDARY CTA: Proceed/View Anyway -->
+                  <!-- Secondary CTA: JS or Jinja -->
                   <div class="secondary-cta-wrapper text-center">
+                    {% if name %}
                     {% if name[3] %}
-                    <button class="btn-proceed-secondary" onclick="window.open('{{name[0]}}')" target="_blank">
-                      <i class='bx bx-check-circle me-1'></i>
-                      Proceed Safely
+                    <button class="btn-proceed-secondary" onclick="window.open('{{name[0]}}', '_blank')">
+                      <i class='bx bx-check-circle me-1'></i> Proceed Safely
                     </button>
                     {% else %}
-                    <button class="btn-proceed-danger" onclick="window.open('{{name[0]}}')" target="_blank">
-                      <i class='bx bx-error-circle me-1'></i>
-                      View Anyway (Risk)
+                    <button class="btn-proceed-danger" onclick="window.open('{{name[0]}}', '_blank')">
+                      <i class='bx bx-error-circle me-1'></i> View Anyway (Risk)
                     </button>
+                    {% endif %}
                     {% endif %}
                   </div>
                 </div>
-                {% endif %}
-
 
               </div>
 

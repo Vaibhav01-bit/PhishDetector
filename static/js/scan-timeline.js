@@ -1,234 +1,497 @@
 /**
- * PROGRESSIVE SCAN TIMELINE LOGIC
- * Cinematic security analysis with step-by-step visualization
+ * ULTRA-FAST PROGRESSIVE SCAN TIMELINE
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Architecture:
+ *   1. All 6 steps rendered in "pending" state INSTANTLY (t=0)
+ *   2. POST /scan/fast  →  layers 1-5 run server-side (no sandbox)
+ *   3. Preliminary result card rendered at verdict receipt (~1-2s)
+ *   4. Sandbox step stays "active" (spinner); result card visible simultaneously
+ *   5. Poll /scan/status/<id> every 1.5s  →  screenshot fades in when ready
+ *
+ * ZERO artificial sequential delays.
+ * ZERO dead time between timeline and result card.
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('url-scan-form');
-    const timeline = document.getElementById('scan-timeline');
-    const legacyCard = document.getElementById('legacy-result-card');
+(function () {
+    'use strict';
 
-    // Steps Configuration (Must match HTML)
-    const steps = [
-        { id: 'step-1', delay: 300 },  // URL Validation
-        { id: 'step-2', delay: 400 },  // Domain Parsing
-        { id: 'step-3', delay: 500 }, // Redirect Resolution
-        { id: 'step-4', delay: 400 },  // Brand Impersonation
-        { id: 'step-5', delay: 500 },  // AI Evaluation
-        { id: 'step-6', delay: 300 }   // Sandbox
+    // ─── DOM refs ─────────────────────────────────────────────────────────────
+    const form = document.getElementById('url-scan-form');
+    const timelineEl = document.getElementById('scan-timeline');
+    const resultCard = document.getElementById('legacy-result-card');
+
+    if (!form || !timelineEl || !resultCard) return;
+
+    // ─── Step metadata ────────────────────────────────────────────────────────
+    // "fast" steps update together when /scan/fast resolves.
+    // "sandbox" step (index 5) updates independently when polling completes.
+    const STEPS = [
+        { id: 'step-1', label: 'URL Normalization', desc: 'Resolving and normalizing URL structure...', group: 'fast' },
+        { id: 'step-2', label: 'Domain Parsing', desc: 'Analyzing TLD, subdomains and registrar...', group: 'fast' },
+        { id: 'step-3', label: 'SSL & Redirect Check', desc: 'Tracing redirect chain and validating HTTPS...', group: 'fast' },
+        { id: 'step-4', label: 'Brand Impersonation', desc: 'Detecting fake brand signatures...', group: 'fast' },
+        { id: 'step-5', label: 'AI / ML Risk Evaluation', desc: 'Running behavioral neural model...', group: 'fast' },
+        { id: 'step-6', label: 'Secure Sandbox Execution', desc: 'Executing in isolated environment...', group: 'sandbox' },
     ];
 
-    if (form) {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    // ─── State ────────────────────────────────────────────────────────────────
+    let pollingTimer = null;
+    let currentScanId = null;
+    let pollingAttempts = 0;
+    const MAX_POLL = 50; // 50 × 1.5s = 75s max
 
-            // 1. UI INITIALIZATION
-            if (legacyCard) {
-                legacyCard.style.display = 'none';
-                legacyCard.classList.remove('slide-up-entrance');
-            }
-            timeline.style.display = 'block';
-            timeline.classList.remove('scan-complete'); // Reset exit animation
-            timeline.classList.add('active-scan');
+    // ─── Main Event ───────────────────────────────────────────────────────────
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearPolling();
 
-            // Reset all steps
-            resetTimeline();
+        const formData = new FormData(form);
+        const url = formData.get('name');
+        if (!url) return;
 
-            // Get URL
-            const formData = new FormData(form);
-            const url = formData.get('name');
+        // t=0: show timeline, all steps pending
+        initTimeline();
 
-            try {
-                // 2. START PROGRESSIVE ANIMATION (Steps 1-3: "Fast" checks)
-                // We show these running immediately to provide instant feedback
-                await runStep(0);
-                await runStep(1);
+        // t=100ms: kick off the fast scan (visually feels instant)
+        await sleep(100);
 
-                // Start backend request in parallel with Step 3
-                // This makes it feel faster but maintains the illusion of sequential work
-                const scanPromise = fetch('/result', {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
+        // Mark all fast steps as "active" together – zero sequential fake delay
+        STEPS.filter(s => s.group === 'fast').forEach(s => setActive(s.id));
 
-                await runStep(2); // Redirects
+        // ── Fetch fast verdict ────────────────────────────────────────────────
+        let result;
+        try {
+            const scanFormData = new FormData();
+            scanFormData.append('name', url);
 
-                // 3. WAIT FOR BACKEND (Simulate "Deep Analysis")
-                // Activate Step 4 (Brand Check) to show we are working
-                setActive(3, "Deep scanning...");
+            const resp = await fetch('/scan/fast', {
+                method: 'POST',
+                body: scanFormData
+            });
 
-                const response = await scanPromise;
-                if (!response.ok) throw new Error("Scan failed");
-                const result = await response.json();
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            result = await resp.json();
+        } catch (err) {
+            console.error('[Scanner] /scan/fast failed:', err);
+            // Graceful fallback: submit the form the old way
+            form.submit();
+            return;
+        }
 
-                // 4. COMPLETE REMAINING STEPS
-                markCompleted(3); // Finish Brand Check
-                await runStep(4); // AI
-                await runStep(5); // Sandbox
+        // ── Fast layers done: complete steps 1-5 simultaneously ───────────────
+        STEPS.filter(s => s.group === 'fast').forEach(s => setCompleted(s.id));
 
-                // 5. CRITICAL TRANSITION PHASE
-                // Faster transition
-                await new Promise(r => setTimeout(r, 200));
+        // Step 6 stays active (sandbox still running)
+        setActive('step-6', 'Executing secure isolated environment…');
 
-                // Mark timeline as finished visually
-                timeline.classList.remove('active-scan');
+        // ── Render preliminary result card (INSTANT — no wait) ───────────────
+        currentScanId = result.scan_id;
+        pollingAttempts = 0;
 
-                // Fade out timeline
-                timeline.classList.add('scan-complete');
+        await sleep(120); // just enough for CSS transition to fire on steps
+        renderResultCard(result, { preliminary: true });
+        showResultCard();
 
-                // Wait for fade out (slightly shorter than CSS transition for overlap)
-                await new Promise(r => setTimeout(r, 300));
+        // ── Begin polling for sandbox ─────────────────────────────────────────
+        if (currentScanId) {
+            startPolling(currentScanId);
+        }
+    });
 
-                // 6. REVEAL VERDICT
-                timeline.style.display = 'none';
-                populateResultCard(result);
-                legacyCard.style.display = 'block';
-                legacyCard.classList.add('slide-up-entrance');
 
-                // Smooth scroll to result
-                legacyCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // ═══════════════════════════════════════════════════════════════════════════
+    // TIMELINE HELPERS
+    // ═══════════════════════════════════════════════════════════════════════════
 
-            } catch (error) {
-                console.error("Scan Error:", error);
-                // In case of error, just fallback to standard submit or show error
-                // For now, we'll reload the page with standard submit if JS fails
-                form.submit();
-            }
-        });
-    }
+    function initTimeline() {
+        // Reset result card
+        resultCard.style.display = 'none';
+        resultCard.classList.remove('result-card-enter');
 
-    // --- ANIMATION HELPERS ---
-
-    function resetTimeline() {
-        steps.forEach(s => {
+        // Reset all steps to pending
+        STEPS.forEach(s => {
             const el = document.getElementById(s.id);
-            if (el) {
-                el.className = 'scan-step';
-                el.querySelector('.step-icon').innerHTML = "<i class='bx bx-circle'></i>";
-                // Reset text if we changed it
-                if (s.id === 'step-4') el.querySelector('.step-description').innerText = "Detecting fake brand signatures...";
-            }
+            if (!el) return;
+            el.className = 'scan-step';
+            const icon = el.querySelector('.step-icon');
+            if (icon) icon.innerHTML = "<i class='bx bx-circle'></i>";
+            const desc = el.querySelector('.step-description');
+            if (desc) desc.textContent = s.desc;
         });
+
+        // Show timeline
+        timelineEl.style.display = 'block';
+        timelineEl.style.opacity = '1';
+        timelineEl.style.transform = '';
+        timelineEl.classList.remove('scan-complete', 'tl-exit');
+        timelineEl.classList.add('active-scan');
     }
 
-    async function runStep(index) {
-        if (index >= steps.length) return;
-        const s = steps[index];
-
-        // Active Phase
-        setActive(index);
-
-        // Wait
-        await new Promise(r => setTimeout(r, s.delay));
-
-        // Complete Phase
-        markCompleted(index);
-    }
-
-    function setActive(index, customText = null) {
-        const el = document.getElementById(steps[index].id);
+    function setActive(stepId, customDesc = null) {
+        const el = document.getElementById(stepId);
         if (!el) return;
-
         el.classList.add('active');
-        el.querySelector('.step-icon').innerHTML = "<i class='bx bx-loader-alt'></i>";
-        if (customText) {
-            el.querySelector('.step-description').innerText = customText;
+        el.classList.remove('completed');
+        el.querySelector('.step-icon').innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>";
+        if (customDesc) {
+            const d = el.querySelector('.step-description');
+            if (d) d.textContent = customDesc;
         }
     }
 
-    function markCompleted(index) {
-        const el = document.getElementById(steps[index].id);
+    function setCompleted(stepId, customDesc = null) {
+        const el = document.getElementById(stepId);
         if (!el) return;
-
         el.classList.remove('active');
         el.classList.add('completed');
         el.querySelector('.step-icon').innerHTML = "<i class='bx bx-check'></i>";
+        if (customDesc) {
+            const d = el.querySelector('.step-description');
+            if (d) d.textContent = customDesc;
+        }
     }
 
-    // --- RESULT POPULATION ---
-    function populateResultCard(data) {
-        const card = document.getElementById('legacy-result-card');
-        if (!card) return;
+    function collapseTimeline() {
+        timelineEl.classList.remove('active-scan');
+        timelineEl.classList.add('tl-exit');
+        setTimeout(() => { timelineEl.style.display = 'none'; }, 400);
+    }
 
-        // 1. Update Scanned URL
-        // Finding elements by class or structure since IDs might not exist in loop
-        // Best approach: Use the 'name' array logic from the backend
 
-        // Helper to update text safely
-        const setTxt = (sel, txt) => {
-            const el = card.querySelector(sel);
-            if (el) el.innerText = txt;
-        };
+    // ═══════════════════════════════════════════════════════════════════════════
+    // RESULT CARD RENDERING
+    // ═══════════════════════════════════════════════════════════════════════════
 
-        // URL Display
-        const urlSpan = card.querySelector('.url-text span');
-        if (urlSpan) urlSpan.innerText = data.url;
+    function renderResultCard(data, opts = {}) {
+        const { preliminary = false } = opts;
 
-        // 2. Logic for Safe vs Phishing
-        const isSafe = data.is_safe;
-        const isWarning = data.status === 'Warning';
+        const status = data.status || 'Safe';
+        const isSafe = data.is_safe || (status === 'Safe');
+        const isWarning = data.is_warning || (status === 'Warning');
+        const url = data.url || '';
 
-        // Icon Wrapper
-        const iconWrapper = card.querySelector('.security-icon');
-        iconWrapper.className = 'security-icon'; // Reset
-
-        // Icon I element
-        const iconI = iconWrapper.querySelector('i');
-
-        // Verdict Heading
-        const verdictHead = card.querySelector('.verdict-text');
-
-        if (isSafe) {
-            iconWrapper.classList.add('icon-safe');
-            iconI.className = 'bx bxs-shield-alt-2';
-            verdictHead.innerText = "This website appears safe";
-            verdictHead.className = "verdict-text text-success fw-bold mb-0";
-        } else if (isWarning) {
-            iconWrapper.classList.add('icon-warning');
-            iconI.className = 'bx bxs-error-alt';
-            verdictHead.innerText = "Suspicious patterns detected";
-            verdictHead.className = "verdict-text text-warning fw-bold mb-0";
-        } else {
-            iconWrapper.classList.add('icon-danger');
-            iconI.className = 'bx bxs-shield-x';
-            verdictHead.innerText = "High-risk phishing indicators found";
-            verdictHead.className = "verdict-text text-danger fw-bold mb-0";
+        // ── URL display ─────────────────────────────────────────────────────
+        const urlSpan = resultCard.querySelector('.url-text span');
+        if (urlSpan) urlSpan.textContent = url;
+        else {
+            const urlP = resultCard.querySelector('.url-text');
+            if (urlP) urlP.innerHTML = `<i class='bx bx-link-alt me-1'></i>Scanning: <span class="fw-medium">${escHtml(url)}</span>`;
         }
 
-        // 3. CTA Buttons (Sandbox vs Proceed)
-        const sandboxLink = card.querySelector('.btn-sandbox-primary');
-        if (sandboxLink) {
-            if (data.details && data.details.layers.sandbox && data.details.layers.sandbox.success) {
-                sandboxLink.href = `/sandbox/${data.details.layers.sandbox.scan_id}`;
+        // ── Verdict icon + heading ────────────────────────────────────────────
+        const iconWrapper = resultCard.querySelector('.security-icon');
+        const iconI = iconWrapper && iconWrapper.querySelector('i');
+        const verdictHead = resultCard.querySelector('.verdict-text');
+
+        if (iconWrapper) {
+            iconWrapper.className = 'security-icon';
+            if (isSafe) {
+                iconWrapper.classList.add('icon-safe');
+                if (iconI) iconI.className = 'bx bxs-shield-alt-2';
+                if (verdictHead) {
+                    verdictHead.textContent = 'This website appears safe';
+                    verdictHead.className = 'verdict-text text-success fw-bold mb-0';
+                }
+            } else if (isWarning) {
+                iconWrapper.classList.add('icon-warning');
+                if (iconI) iconI.className = 'bx bxs-error-alt';
+                if (verdictHead) {
+                    verdictHead.textContent = 'Suspicious patterns detected';
+                    verdictHead.className = 'verdict-text text-warning fw-bold mb-0';
+                }
             } else {
-                // Hide or disable if no sandbox
+                iconWrapper.classList.add('icon-danger');
+                if (iconI) iconI.className = 'bx bxs-shield-x';
+                if (verdictHead) {
+                    verdictHead.textContent = 'High-risk phishing indicators found';
+                    verdictHead.className = 'verdict-text text-danger fw-bold mb-0';
+                }
             }
         }
 
-        // Update Proceed Button
-        const btnProceeding = card.querySelector('button[onclick]'); // Naive selector
-        // Ideally we recreate the button or change its class/onclick
-        // For simplicity: Update the 'secondary-cta-wrapper'
-        const secondaryWrapper = card.querySelector('.secondary-cta-wrapper');
+        // ── Sandbox badge (visible during preliminary) ────────────────────────
+        injectSandboxBadge(preliminary);
+
+        // ── Screenshot placeholder ─────────────────────────────────────────────
+        injectScreenshotFrame();
+
+        // ── Analysis detail list ─────────────────────────────────────────────
+        renderAnalysisDetails(data, isSafe);
+
+        // ── CTA buttons ──────────────────────────────────────────────────────
+        const secondaryWrapper = resultCard.querySelector('.secondary-cta-wrapper');
         if (secondaryWrapper) {
             if (isSafe) {
                 secondaryWrapper.innerHTML = `
-                    <button class="btn-proceed-secondary" onclick="window.open('${data.url}')" target="_blank">
+                    <button class="btn-proceed-secondary" onclick="window.open('${escHtml(url)}', '_blank')">
                       <i class='bx bx-check-circle me-1'></i> Proceed Safely
-                    </button>
-                `;
+                    </button>`;
             } else {
                 secondaryWrapper.innerHTML = `
-                    <button class="btn-proceed-danger" onclick="window.open('${data.url}')" target="_blank">
+                    <button class="btn-proceed-danger" onclick="window.open('${escHtml(url)}', '_blank')">
                       <i class='bx bx-error-circle me-1'></i> View Anyway (Risk)
-                    </button>
-                `;
+                    </button>`;
             }
         }
 
-        // 4. Update Analysis Details List (Optional but good)
-        // ... (We could iterate layers and update the list, but for now the verdict is key)
+        // ── Sandbox primary CTA: hide until sandbox is done ──────────────────
+        const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
+        if (sandboxCTA) sandboxCTA.style.display = 'none';
     }
-});
 
+    function injectSandboxBadge(visible) {
+        let badge = resultCard.querySelector('#sandbox-progress-badge');
+        if (!badge) {
+            badge = document.createElement('div');
+            badge.id = 'sandbox-progress-badge';
+            badge.className = 'sandbox-progress-badge';
+            badge.innerHTML = "<i class='bx bx-loader-alt bx-spin me-1'></i>Sandbox analysis in progress…";
+
+            // Insert before CTA section
+            const cta = resultCard.querySelector('.cta-section');
+            if (cta) cta.insertAdjacentElement('beforebegin', badge);
+            else resultCard.appendChild(badge);
+        }
+        badge.style.display = visible ? 'flex' : 'none';
+    }
+
+    function injectScreenshotFrame() {
+        if (resultCard.querySelector('#screenshot-frame')) return;
+        const frame = document.createElement('div');
+        frame.id = 'screenshot-frame';
+        frame.className = 'screenshot-frame screenshot-placeholder';
+        frame.innerHTML = `
+            <div class="screenshot-shimmer">
+                <i class='bx bx-image-alt screenshot-icon'></i>
+                <span class="screenshot-label">Screenshot loading…</span>
+            </div>`;
+
+        const cta = resultCard.querySelector('.cta-section');
+        if (cta) cta.insertAdjacentElement('beforebegin', frame);
+    }
+
+    function renderAnalysisDetails(data, isSafe) {
+        const list = resultCard.querySelector('.risk-analysis ul');
+        if (!list) return;
+        list.innerHTML = '';
+
+        const layers = data.layers || {};
+        const forensics = data.forensics || {};
+
+        const addItem = (cls, icon, label, msg) => {
+            const li = document.createElement('li');
+            li.className = `mb-2 ${cls}`;
+            li.innerHTML = `<i class='bx ${icon}'></i> <strong>${label}:</strong> ${escHtml(msg)}`;
+            list.appendChild(li);
+        };
+
+        // Forensics
+        if (layers.forensics_check && layers.forensics_check.status !== 'Safe') {
+            addItem('text-warning', 'bx-search-alt', 'Redirects', layers.forensics_check.message);
+        }
+        // Domain
+        if (layers.layer2 && layers.layer2.status !== 'Safe') {
+            addItem('text-warning', 'bx-globe', 'Domain', layers.layer2.message);
+        }
+        // SSL
+        if (layers.layer3 && layers.layer3.status !== 'Safe') {
+            addItem('text-warning', 'bx-lock-open-alt', 'SSL', layers.layer3.message);
+        }
+        // Behavioral
+        if (layers.layer5 && layers.layer5.status !== 'Safe') {
+            addItem('text-warning', 'bx-radar', 'Behavior', layers.layer5.message);
+        }
+        // AI
+        if (layers.layer4 && layers.layer4.status === 'Phishing') {
+            addItem('text-danger', 'bx-brain', 'AI Detection', 'High confidence phishing pattern detected.');
+        }
+
+        // Trust signals if safe
+        if (isSafe) {
+            addItem('text-success', 'bx-check-shield', 'Domain', 'No obvious brand impersonation detected.');
+            addItem('text-success', 'bx-lock-alt', 'SSL', 'Valid HTTPS connection.');
+            addItem('text-success', 'bx-data', 'Reputation', 'Not found in active blacklists.');
+        }
+
+        // Redirect chain
+        const chain = forensics.redirect_chain;
+        const chainContainer = resultCard.querySelector('.redirect-chain');
+        if (chain && chain.length > 1) {
+            if (!chainContainer) {
+                const div = document.createElement('div');
+                div.className = 'redirect-chain mt-3 pt-3 border-top border-secondary';
+                const inner = chain.map((h, i) => `
+                    <div class="chain-node py-1" style="font-size:.85rem">
+                      <span class="${i === chain.length - 1 ? 'text-success font-weight-bold' : 'text-muted'}">
+                        ${escHtml((h.url || '').substring(0, 50))}${(h.url || '').length > 50 ? '…' : ''}
+                      </span>
+                      ${i < chain.length - 1 ? "<div class='text-muted small'><i class='bx bx-down-arrow-alt'></i></div>" : ''}
+                    </div>`).join('');
+                div.innerHTML = `<h6 class="section-header mb-2" style="font-size:.85rem"><i class='bx bx-git-branch'></i> Redirect Path:</h6>
+                    <div class="chain-visual pl-2" style="border-left:2px solid rgba(59,130,246,.3)">${inner}</div>`;
+                list.closest('.risk-analysis').appendChild(div);
+            }
+        }
+    }
+
+    function showResultCard() {
+        resultCard.style.display = 'block';
+        resultCard.classList.add('result-card-enter');
+        // Smooth scroll
+        setTimeout(() => resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+    }
+
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SANDBOX POLLING
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function startPolling(scanId) {
+        pollingTimer = setInterval(async () => {
+            pollingAttempts++;
+
+            if (pollingAttempts > MAX_POLL) {
+                clearPolling();
+                finalizeSandboxTimeout();
+                return;
+            }
+
+            try {
+                const resp = await fetch(`/scan/status/${scanId}`);
+                if (!resp.ok) return;
+                const status = await resp.json();
+
+                if (status.done) {
+                    clearPolling();
+                    onSandboxComplete(status);
+                }
+            } catch (err) {
+                console.warn('[Scanner] polling error:', err);
+            }
+        }, 1500);
+    }
+
+    function clearPolling() {
+        if (pollingTimer) {
+            clearInterval(pollingTimer);
+            pollingTimer = null;
+        }
+    }
+
+    function onSandboxComplete(status) {
+        console.log('[Scanner] Sandbox complete:', status);
+
+        // Update step 6
+        if (status.success) {
+            setCompleted('step-6', 'Sandbox execution complete ✓');
+        } else {
+            const el = document.getElementById('step-6');
+            if (el) {
+                el.classList.remove('active');
+                el.classList.add('step-error');
+                el.querySelector('.step-icon').innerHTML = "<i class='bx bx-x'></i>";
+                const d = el.querySelector('.step-description');
+                if (d) d.textContent = status.error ? 'Sandbox unavailable: ' + status.error.substring(0, 60) : 'Sandbox unavailable for this URL.';
+            }
+        }
+
+        // Collapse timeline after sandbox completes
+        setTimeout(collapseTimeline, 600);
+
+        // Hide sandbox badge
+        const badge = resultCard.querySelector('#sandbox-progress-badge');
+        if (badge) {
+            badge.classList.add('badge-fadeout');
+            setTimeout(() => badge.remove(), 400);
+        }
+
+        // Reveal screenshot
+        if (status.screenshot_url) {
+            revealScreenshot(status.screenshot_url);
+        } else {
+            removeScreenshotFrame();
+        }
+
+        // ── Show sandbox CTA button ─────────────────────────────────────────
+        // Use sandbox_page_url from server; fall back to /sandbox/<scan_id> if
+        // we know the scan_id and sandbox ran (success may be true but URL null
+        // due to a serialisation mismatch).
+        const sandboxPageUrl = status.sandbox_page_url
+            || (status.success && currentScanId ? `/sandbox/${currentScanId}` : null);
+
+        if (sandboxPageUrl) {
+            const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
+            if (sandboxCTA) {
+                sandboxCTA.innerHTML = `
+                    <a href="${escHtml(sandboxPageUrl)}" class="btn-sandbox-primary">
+                        <span>View Sandbox Analysis</span>
+                        <i class='bx bx-right-arrow-alt'></i>
+                    </a>
+                    <p class="sandbox-caption mt-2 mb-0 text-center">
+                        <i class='bx bxs-lock-alt'></i>
+                        Secure sandbox environment &bull; No user interaction performed
+                    </p>`;
+                sandboxCTA.style.display = 'block';
+                sandboxCTA.classList.add('cta-fade-in');
+            }
+        } else if (!status.success && status.error) {
+            // Sandbox failed: show brief inline error instead of CTA
+            const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
+            if (sandboxCTA) {
+                sandboxCTA.innerHTML = `
+                    <p class="text-center mb-0" style="font-size:.82rem;opacity:.7">
+                        <i class='bx bx-info-circle'></i>
+                        Sandbox analysis unavailable for this URL.
+                    </p>`;
+                sandboxCTA.style.display = 'block';
+            }
+        }
+    }
+
+    function revealScreenshot(url) {
+        const frame = resultCard.querySelector('#screenshot-frame');
+        if (!frame) return;
+
+        const img = new Image();
+        img.onload = () => {
+            frame.className = 'screenshot-frame screenshot-loaded';
+            frame.innerHTML = '';
+            img.className = 'screenshot-img';
+            frame.appendChild(img);
+        };
+        img.onerror = () => removeScreenshotFrame();
+        img.src = url;
+    }
+
+    function removeScreenshotFrame() {
+        const frame = resultCard.querySelector('#screenshot-frame');
+        if (frame) {
+            frame.classList.add('frame-fadeout');
+            setTimeout(() => frame.remove(), 300);
+        }
+    }
+
+    function finalizeSandboxTimeout() {
+        setCompleted('step-6', 'Sandbox analysis timed out.');
+        collapseTimeline();
+        const badge = resultCard.querySelector('#sandbox-progress-badge');
+        if (badge) badge.remove();
+        removeScreenshotFrame();
+    }
+
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // UTILS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    function sleep(ms) {
+        return new Promise(r => setTimeout(r, ms));
+    }
+
+    function escHtml(str) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(str || ''));
+        return div.innerHTML;
+    }
+
+})();
