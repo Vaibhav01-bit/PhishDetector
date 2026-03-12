@@ -413,31 +413,55 @@
             setTimeout(() => badge.remove(), 400);
         }
 
-        // Reveal screenshot
-        if (status.screenshot_url) {
-            revealScreenshot(status.screenshot_url);
+        // Reveal screenshot (now Base64 data instead of file URL)
+        if (status.screenshot) {
+            revealScreenshot(status.screenshot);
         } else {
             removeScreenshotFrame();
         }
 
         // ── Show sandbox CTA button ─────────────────────────────────────────
-        // Always show the button when sandbox succeeds - construct URL from scan_id
+        // Button now opens the sandbox details page
         const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
         
-        // Get scan_id from either status or currentScanId
+        // Get scan_id - use either from status or from the initial scan
         const scanId = status.scan_id || currentScanId;
+        
+        // Store all sandbox data
+        window.latestSandboxData = {
+            screenshot: status.screenshot,
+            sourceUrl: status.source_url,
+            finalUrl: status.final_url,
+            ipAddress: status.ip_address,
+            domain: status.domain,
+            pageTitle: status.page_title,
+            redirectCount: status.redirect_count,
+            loadTime: status.load_time,
+            timestamp: status.timestamp,
+            hasLoginForm: status.has_login_form,
+            hasPasswordField: status.has_password_field,
+            hasEmailField: status.has_email_field,
+            suspiciousKeywords: status.suspicious_keywords || [],
+            sandboxMessage: status.sandbox_message,
+            scanId: scanId,
+            layers: status.layers,
+            forensics: status.forensics,
+            finalStatus: status.final_status
+        };
         
         console.log('[Scanner] sandboxCTA found:', !!sandboxCTA);
         console.log('[Scanner] status.success:', status.success);
         console.log('[Scanner] scanId:', scanId);
+        console.log('[Scanner] status.screenshot exists:', !!status.screenshot);
         
-        if (sandboxCTA && status.success && scanId) {
-            // Sandbox succeeded - show the View Sandbox button
-            const sandboxUrl = `/sandbox/${scanId}`;
-            console.log('[Scanner] Showing sandbox button with URL:', sandboxUrl);
-            
+        // Show button when screenshot exists (sandbox completed)
+        // OR when success is true and we have a scanId
+        const shouldShowButton = (status.screenshot && scanId) || (status.success && scanId);
+        
+        if (sandboxCTA && shouldShowButton) {
+            // Sandbox succeeded - show button to view sandbox details page
             sandboxCTA.innerHTML = `
-                <a href="${escHtml(sandboxUrl)}" class="btn-sandbox-primary">
+                <a href="/sandbox/${scanId}" class="btn-sandbox-primary">
                     <span>View Sandbox Analysis</span>
                     <i class='bx bx-right-arrow-alt'></i>
                 </a>
@@ -447,6 +471,7 @@
                 </p>`;
             sandboxCTA.style.display = 'block';
             sandboxCTA.classList.add('cta-fade-in');
+            console.log('[Scanner] Button HTML set for success case');
         } else if (sandboxCTA && !status.success) {
             // Sandbox failed - show error message
             console.log('[Scanner] Sandbox failed, showing error');
@@ -456,6 +481,8 @@
                     Sandbox analysis unavailable for this URL.
                 </p>`;
             sandboxCTA.style.display = 'block';
+        } else if (sandboxCTA && !scanId) {
+            console.log('[Scanner] WARNING: No scanId available');
         }
     }
 
@@ -504,5 +531,203 @@
         div.appendChild(document.createTextNode(str || ''));
         return div.innerHTML;
     }
+
+    // Global function to show sandbox modal
+    window.showSandboxModal = function() {
+        const data = window.latestSandboxData;
+        if (!data || !data.screenshot) {
+            alert('Sandbox data not available');
+            return;
+        }
+        
+        const d = document;
+        
+        const modal = d.createElement('div');
+        modal.className = 'sandbox-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        `;
+        
+        const getStatusColor = (status) => {
+            if (status === 'Safe') return '#4caf50';
+            if (status === 'Warning') return '#ffa500';
+            return '#f44336';
+        };
+        
+        const getStatusIcon = (status) => {
+            if (status === 'Safe') return 'bxs-shield-check';
+            if (status === 'Warning') return 'bx-error';
+            return 'bxs-shield-x';
+        };
+        
+        const statusColor = getStatusColor(data.finalStatus || 'Safe');
+        const statusIcon = getStatusIcon(data.finalStatus || 'Safe');
+        
+        // Build layers HTML
+        let layersHtml = '';
+        if (data.layers) {
+            const layerNames = ['layer1', 'layer2', 'layer3', 'layer4', 'layer5'];
+            const layerTitles = ['Blacklist Check', 'Domain Analysis', 'SSL Certificate', 'ML Model', 'Behavioral Analysis'];
+            
+            layerNames.forEach((layer, idx) => {
+                if (data.layers[layer]) {
+                    const layerStatus = data.layers[layer].status || 'Safe';
+                    const layerColor = getStatusColor(layerStatus);
+                    const layerIcon = getStatusIcon(layerStatus);
+                    layersHtml += `
+                        <div style="padding: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; border-left: 3px solid ${layerColor};">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 600; color: #fff;">${idx + 1}. ${layerTitles[idx]}</span>
+                                <span style="color: ${layerColor}; font-size: 12px;">
+                                    <i class='bx ${layerIcon}'></i> ${layerStatus}
+                                </span>
+                            </div>
+                            <p style="color: #888; font-size: 12px; margin: 4px 0 0 0;">${data.layers[layer].message || 'No issues detected'}</p>
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        // Build behavioral signals HTML
+        const signals = [];
+        if (data.hasLoginForm) signals.push('Login Form Detected');
+        if (data.hasPasswordField) signals.push('Password Field Detected');
+        if (data.hasEmailField) signals.push('Email Input Detected');
+        if (data.suspiciousKeywords && data.suspiciousKeywords.length > 0) {
+            signals.push('Suspicious Keywords: ' + data.suspiciousKeywords.join(', '));
+        }
+        
+        const signalsHtml = signals.length > 0 ? 
+            signals.map(s => `<div style="background: #3a2a1a; padding: 10px; margin-bottom: 6px; border-radius: 6px; color: #ffa500; font-size: 13px;"><i class='bx bx-warning' style="margin-right: 6px;"></i>${s}</div>`).join('') :
+            `<div style="background: #1a3a1a; padding: 10px; border-radius: 6px; color: #4caf50; font-size: 13px;"><i class='bx bx-check-circle' style="margin-right: 6px;"></i>No Security Issues Detected</div>`;
+        
+        modal.innerHTML = `
+            <div style="background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%); border-radius: 16px; max-width: 1000px; width: 100%; max-height: 95vh; overflow-y: auto; padding: 0; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+                <!-- Header -->
+                <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); padding: 20px 24px; border-radius: 16px 16px 0 0;">
+                    <button onclick="this.closest('.sandbox-modal').remove()" style="position: absolute; top: 12px; right: 16px; background: rgba(255,255,255,0.2); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center;">&times;</button>
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 48px; height: 48px; background: ${statusColor}; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                            <i class='bx ${statusIcon}' style="color: #fff;"></i>
+                        </div>
+                        <div>
+                            <h2 style="color: #fff; margin: 0; font-size: 22px; font-weight: 600;">Sandbox Analysis Report</h2>
+                            <p style="color: rgba(255,255,255,0.8); margin: 4px 0 0 0; font-size: 14px;">${data.sourceUrl || 'N/A'}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trust Banner -->
+                <div style="background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); margin: 20px; padding: 16px; border-radius: 12px; display: flex; align-items: center; gap: 12px;">
+                    <i class='bx bxs-lock-alt' style="font-size: 24px; color: #4caf50;"></i>
+                    <div>
+                        <strong style="color: #4caf50;">Secure Sandbox Environment</strong>
+                        <p style="color: #888; margin: 4px 0 0 0; font-size: 12px;">This URL was opened in an isolated, read-only browser. No data was submitted.</p>
+                    </div>
+                </div>
+                
+                <!-- Content Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 20px 20px 20px;">
+                    <!-- Left Column - Screenshot -->
+                    <div>
+                        <h3 style="color: #fff; margin: 0 0 12px 0; font-size: 16px;">🖼️ Website Screenshot</h3>
+                        <div style="background: #0a0a15; border-radius: 12px; overflow: hidden; border: 1px solid #333;">
+                            <div style="background: #1a1a2e; padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #333;">
+                                <div style="display: flex; gap: 6px;">
+                                    <span style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f57;"></span>
+                                    <span style="width: 12px; height: 12px; border-radius: 50%; background: #febc2e;"></span>
+                                    <span style="width: 12px; height: 12px; border-radius: 50%; background: #28c840;"></span>
+                                </div>
+                                <div style="flex: 1; background: #0a0a15; border-radius: 6px; padding: 6px 12px; margin-left: 12px; font-size: 12px; color: #888; display: flex; align-items: center; gap: 6px;">
+                                    <i class='bx bx-lock-alt' style="font-size: 10px;"></i>
+                                    ${data.finalUrl || 'N/A'}
+                                </div>
+                            </div>
+                            <img src="${data.screenshot}" style="width: 100%; display: block;" alt="Website Screenshot">
+                        </div>
+                        <p style="color: #666; font-size: 11px; margin: 8px 0 0 0; text-align: center;">
+                            <i class='bx bx-time'></i> Captured: ${data.timestamp || 'N/A'}
+                        </p>
+                    </div>
+                    
+                    <!-- Right Column - Details -->
+                    <div>
+                        <h3 style="color: #fff; margin: 0 0 12px 0; font-size: 16px;">📊 Technical Metadata</h3>
+                        <div style="background: #0a0a15; border-radius: 12px; padding: 16px; border: 1px solid #333; margin-bottom: 20px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div>
+                                    <p style="color: #666; font-size: 11px; margin: 0;">Final URL</p>
+                                    <p style="color: #ccc; font-size: 12px; margin: 4px 0 0 0; word-break: break-all;">${data.finalUrl || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p style="color: #666; font-size: 11px; margin: 0;">Domain</p>
+                                    <p style="color: #ccc; font-size: 12px; margin: 4px 0 0 0;">${data.domain || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p style="color: #666; font-size: 11px; margin: 0;">IP Address</p>
+                                    <p style="color: #ccc; font-size: 12px; margin: 4px 0 0 0;">${data.ipAddress || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p style="color: #666; font-size: 11px; margin: 0;">Page Title</p>
+                                    <p style="color: #ccc; font-size: 12px; margin: 4px 0 0 0;">${data.pageTitle || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p style="color: #666; font-size: 11px; margin: 0;">Redirects</p>
+                                    <p style="color: #ccc; font-size: 12px; margin: 4px 0 0 0;">${data.redirectCount || 0}</p>
+                                </div>
+                                <div>
+                                    <p style="color: #666; font-size: 11px; margin: 0;">Load Time</p>
+                                    <p style="color: #ccc; font-size: 12px; margin: 4px 0 0 0;">${data.loadTime || 0}ms</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3 style="color: #fff; margin: 0 0 12px 0; font-size: 16px;">🔍 Behavioral Signals</h3>
+                        <div style="background: #0a0a15; border-radius: 12px; padding: 16px; border: 1px solid #333;">
+                            ${signalsHtml}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 5-Layer Analysis -->
+                <div style="padding: 0 20px 20px 20px;">
+                    <h3 style="color: #fff; margin: 0 0 12px 0; font-size: 16px;">🛡️ 5-Layer Security Analysis</h3>
+                    <div style="background: #0a0a15; border-radius: 12px; padding: 16px; border: 1px solid #333;">
+                        ${layersHtml || '<p style="color: #666; text-align: center;">No layer data available</p>'}
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div style="background: rgba(255,255,255,0.03); padding: 16px 20px; border-radius: 0 0 16px 16px; text-align: center;">
+                    <p style="color: #666; font-size: 12px; margin: 0;">
+                        <i class='bx bx-info-circle'></i> 
+                        This analysis reflects the website state at scan time. No personal data was accessed.
+                    </p>
+                    <p style="color: #444; font-size: 11px; margin: 8px 0 0 0;">
+                        Scan ID: ${data.scanId || 'N/A'}
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.remove();
+        };
+    };
 
 })();

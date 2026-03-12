@@ -361,15 +361,21 @@ class FeatureExtraction:
     # 10. Favicon
     def Favicon(self):
         try:
+            if not self.soup:
+                return -1
             for head in self.soup.find_all("head"):
+                if not head:
+                    continue
                 for head.link in self.soup.find_all("link", href=True):
-                    dots = [x.start(0) for x in re.finditer("\.", head.link["href"])]
-                    if (
-                        self.url in head.link["href"]
-                        or len(dots) == 1
-                        or self.domain in head.link["href"]
-                    ):
-                        return 1
+                    if not head.link or not head.link.get("href"):
+                        continue
+                    href = str(head.link["href"])
+                    try:
+                        dots = [x.start(0) for x in re.finditer("\.", href)]
+                        if self.url in href or len(dots) == 1 or self.domain in href:
+                            return 1
+                    except:
+                        continue
             return -1
         except:
             return -1
