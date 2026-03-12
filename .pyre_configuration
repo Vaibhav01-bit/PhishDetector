@@ -1,0 +1,18 @@
+{
+  "source_directories": [
+    {
+      "root": "."
+    }
+  ],
+  "search_path": [
+    ".",
+    "venv/Lib/site-packages"
+  ],
+  "exclude": [
+    ".*/\\.git",
+    ".*/venv/.*"
+  ],
+  "python_version": "3.11",
+  "strict": false,
+  "ignore_all_errors": false
+}

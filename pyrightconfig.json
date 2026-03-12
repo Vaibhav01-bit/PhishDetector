@@ -1,0 +1,24 @@
+{
+  "venvPath": "d:\\Phishing Website\\Phishing Website Detector",
+  "venv": "venv",
+  "pythonPath": "d:\\Phishing Website\\Phishing Website Detector\\venv\\Scripts\\python.exe",
+  "extraPaths": [
+    "d:\\Phishing Website\\Phishing Website Detector",
+    "d:\\Phishing Website\\Phishing Website Detector\\venv\\Lib\\site-packages"
+  ],
+  "include": [
+    "app",
+    "tests",
+    "run.py",
+    "test_api.py",
+    "test_flask.py",
+    "test_pipeline.py"
+  ],
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "none",
+  "reportMissingModuleSource": "none",
+  "reportOperatorIssue": "none",
+  "reportIndexIssue": "none",
+  "reportCallIssue": "none",
+  "reportArgumentType": "none"
+}
