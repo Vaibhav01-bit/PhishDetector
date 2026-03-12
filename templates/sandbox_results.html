@@ -121,8 +121,8 @@
                         </div>
                     </div>
                     <div class="browser-viewport">
-                        {% if sandbox.screenshot_path %}
-                        <img src="{{ url_for('serve_screenshot', filename=sandbox.screenshot_path) }}"
+                        {% if sandbox.screenshot_base64 %}
+                        <img src="{{ sandbox.screenshot_base64 }}"
                             alt="Website Screenshot" loading="lazy">
                         {% else %}
                         <div class="no-screenshot">

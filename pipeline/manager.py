@@ -1,21 +1,66 @@
-from .layers import Layer1_Blacklist, Layer2_Domain, Layer3_SSL, Layer4_ML_Model, Layer5_Behavioral, SAFE, WARNING, PHISHING
+from .layers import (
+    Layer0_Validation,
+    Layer1_Blacklist,
+    Layer2_Domain,
+    Layer3_SSL,
+    Layer4_ML_Model,
+    Layer5_Behavioral,
+    SAFE,
+    WARNING,
+    PHISHING,
+    INVALID,
+)
 from .sandbox import SandboxAnalyzer
 from .forensics import ForensicAnalyzer
 from .sandbox_utils import generate_scan_id
 from datetime import datetime
 import threading
-import os
+from typing import Optional
 import json
 
+
+class InMemoryStatusStore:
+    """
+    Thread-safe in-memory storage for scan status.
+    NO DATA IS STORED - All data exists only during scanning.
+    """
+
+    def __init__(self):
+        self._store = {}
+        self._lock = threading.Lock()
+
+    def set(self, scan_id, data):
+        with self._lock:
+            self._store[scan_id] = data
+
+    def get(self, scan_id):
+        with self._lock:
+            return self._store.get(scan_id)
+
+    def clear(self, scan_id):
+        with self._lock:
+            self._store.pop(scan_id, None)
+
+    def get_all(self):
+        with self._lock:
+            return dict(self._store)
+
+
 class PhishingDetectionPipeline:
+    sandbox: Optional[SandboxAnalyzer]
+
     def __init__(self, enable_sandbox=True):
         self.forensics = ForensicAnalyzer()
+        self.l0 = Layer0_Validation()
         self.l1 = Layer1_Blacklist()
         self.l2 = Layer2_Domain()
         self.l3 = Layer3_SSL()
         self.l4 = Layer4_ML_Model()
         self.l5 = Layer5_Behavioral()
         self.sandbox = SandboxAnalyzer() if enable_sandbox else None
+
+        self._fast_results = InMemoryStatusStore()
+        self._sandbox_status = InMemoryStatusStore()
 
     def analyze_fast(self, url):
         """
@@ -26,227 +71,251 @@ class PhishingDetectionPipeline:
         scan_id = generate_scan_id()
         results = {}
 
-        # 0. Forensic / redirect analysis
-        forensics_data = self.forensics.analyze(url)
-        target_url = forensics_data['final_url']
+        url = self.l0.sanitize(url)
 
-        redirect_count = forensics_data.get('redirect_count', 0)
-        is_shortener  = forensics_data.get('is_shortener', False)
+        status, message = self.l0.check(url)
+        if status == INVALID:
+            return self._finalize_fast(
+                INVALID,
+                {"validation": {"status": status, "message": message}},
+                {},
+                scan_id,
+            )
+
+        forensics_data = self.forensics.analyze(url)
+        target_url = forensics_data["final_url"]
+
+        redirect_count = forensics_data.get("redirect_count", 0)
+        is_shortener = forensics_data.get("is_shortener", False)
 
         if redirect_count > 3:
-            results['forensics_check'] = {'status': WARNING, 'message': f'Excessive redirects ({redirect_count}). Risk of obfuscation.'}
+            results["forensics_check"] = {
+                "status": WARNING,
+                "message": f"Excessive redirects ({redirect_count}). Risk of obfuscation.",
+            }
         elif is_shortener:
-            results['forensics_check'] = {'status': SAFE, 'message': 'Shortened URL detected. Final destination analyzed.'}
+            results["forensics_check"] = {
+                "status": SAFE,
+                "message": "Shortened URL detected. Final destination analyzed.",
+            }
         elif redirect_count > 0:
-            results['forensics_check'] = {'status': SAFE, 'message': f'Redirects followed ({redirect_count}). Final destination analyzed.'}
+            results["forensics_check"] = {
+                "status": SAFE,
+                "message": f"Redirects followed ({redirect_count}). Final destination analyzed.",
+            }
         else:
-            results['forensics_check'] = {'status': SAFE, 'message': 'Direct link. No redirects.'}
+            results["forensics_check"] = {
+                "status": SAFE,
+                "message": "Direct link. No redirects.",
+            }
 
-        # Layers 1-5 (no sandbox)
         status, message = self.l1.check(target_url)
-        results['layer1'] = {'status': status, 'message': message}
+        results["layer1"] = {"status": status, "message": message}
         if status == PHISHING:
             return self._finalize_fast(PHISHING, results, forensics_data, scan_id)
 
         status, message = self.l2.check(target_url)
-        results['layer2'] = {'status': status, 'message': message}
+        results["layer2"] = {"status": status, "message": message}
 
         status, message = self.l3.check(target_url)
-        results['layer3'] = {'status': status, 'message': message}
+        results["layer3"] = {"status": status, "message": message}
         if status == PHISHING:
             return self._finalize_fast(PHISHING, results, forensics_data, scan_id)
 
         status, message = self.l4.check(target_url)
-        results['layer4'] = {'status': status, 'message': message}
+        results["layer4"] = {"status": status, "message": message}
         if status == PHISHING:
             return self._finalize_fast(PHISHING, results, forensics_data, scan_id)
 
         status, message = self.l5.check(target_url)
-        results['layer5'] = {'status': status, 'message': message}
+        results["layer5"] = {"status": status, "message": message}
 
-        warnings = [r for r in results.values() if r.get('status') == WARNING]
+        warnings = [r for r in results.values() if r.get("status") == WARNING]
         final_status = WARNING if warnings else SAFE
 
         return self._finalize_fast(final_status, results, forensics_data, scan_id)
 
     def _finalize_fast(self, final_status, results, forensics_data, scan_id):
-        """Package the fast result and persist it so polling can find it."""
+        """Package the fast result in memory for polling."""
         data = {
-            'status': final_status,
-            'layers': results,
-            'forensics': forensics_data,
-            'scan_id': scan_id,
-            'preliminary': True  # flag: sandbox not yet run
+            "status": final_status,
+            "layers": results,
+            "forensics": forensics_data,
+            "scan_id": scan_id,
+            "preliminary": True,
         }
-        # Persist fast result so /scan/status can enrich it later
-        try:
-            path = os.path.join('static', 'sandbox_results', f'{scan_id}_fast.json')
-            os.makedirs(os.path.dirname(path), exist_ok=True)
-            with open(path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2)
-        except Exception as e:
-            print(f'Warning: could not save fast result: {e}')
+
+        self._fast_results.set(scan_id, data)
+
         return data
 
     def run_sandbox_background(self, url, scan_id):
         """
         Launch sandbox analysis in a background daemon thread.
         ALL work happens in the thread — never blocks the HTTP response.
+        NO DATA IS STORED - all data is in-memory only.
         """
-        # Load the fast result snapshot now (file already written)
-        fast_path = os.path.join('static', 'sandbox_results', f'{scan_id}_fast.json')
-        try:
-            with open(fast_path, 'r', encoding='utf-8') as f:
-                fast_data = json.load(f)
-            layers_snapshot = fast_data.get('layers', {})
-            final_status   = fast_data.get('status', SAFE)
-            forensics_snap = fast_data.get('forensics', {})
-        except Exception:
+        fast_data = self._fast_results.get(scan_id)
+        if fast_data:
+            layers_snapshot = fast_data.get("layers", {})
+            final_status = fast_data.get("status", SAFE)
+            forensics_snap = fast_data.get("forensics", {})
+        else:
             layers_snapshot = {}
-            final_status   = SAFE
+            final_status = SAFE
             forensics_snap = {}
 
         def _run():
-            # Default to failure so status file is always written
-            status_data = {'done': True, 'success': False, 'scan_id': scan_id}
+            status_data = {"done": True, "success": False, "scan_id": scan_id}
             try:
-                sandbox_result = self.sandbox.analyze(url, scan_id=scan_id)
+                sandbox_result = {"success": False, "error": "Sandbox uninitialized"}
+                if self.sandbox:
+                    sandbox_result = self.sandbox.analyze(url, scan_id=scan_id)
 
                 combined = dict(layers_snapshot)
-                combined['sandbox'] = sandbox_result
-
-                if sandbox_result.get('success') and sandbox_result.get('scan_id'):
-                    self.sandbox.save_full_results(scan_id, {
-                        'status': final_status,
-                        'layers': combined,
-                        'forensics': forensics_snap
-                    })
+                combined["sandbox"] = sandbox_result
 
                 status_data = {
-                    'done': True,
-                    'success': sandbox_result.get('success', False),
-                    'screenshot_path': sandbox_result.get('screenshot_path'),
-                    'scan_id': scan_id,
-                    'has_login_form': sandbox_result.get('has_login_form', False),
-                    'has_password_field': sandbox_result.get('has_password_field', False),
-                    'error': sandbox_result.get('error')
+                    "done": True,
+                    "success": sandbox_result.get("success", False),
+                    "screenshot_base64": sandbox_result.get("screenshot_base64"),
+                    "scan_id": scan_id,
+                    "source_url": sandbox_result.get("source_url"),
+                    "final_url": sandbox_result.get("final_url"),
+                    "ip_address": sandbox_result.get("ip_address"),
+                    "domain": sandbox_result.get("domain"),
+                    "page_title": sandbox_result.get("page_title"),
+                    "redirect_count": sandbox_result.get("redirect_count", 0),
+                    "load_time": sandbox_result.get("load_time", 0),
+                    "timestamp": sandbox_result.get("timestamp"),
+                    "has_login_form": sandbox_result.get("has_login_form", False),
+                    "has_password_field": sandbox_result.get(
+                        "has_password_field", False
+                    ),
+                    "has_email_field": sandbox_result.get("has_email_field", False),
+                    "suspicious_keywords": sandbox_result.get(
+                        "suspicious_keywords", []
+                    ),
+                    "sandbox_message": sandbox_result.get("sandbox_message"),
+                    "error": sandbox_result.get("error"),
+                    "layers": layers_snapshot,
+                    "forensics": forensics_snap,
+                    "final_status": final_status,
                 }
             except Exception as e:
                 import traceback
-                print(f'[Sandbox BG error] {traceback.format_exc()}')
-                status_data = {'done': True, 'success': False, 'error': str(e), 'scan_id': scan_id}
 
-            try:
-                status_path = os.path.join('static', 'sandbox_results', f'{scan_id}_status.json')
-                with open(status_path, 'w', encoding='utf-8') as f:
-                    json.dump(status_data, f, indent=2)
-                print(f'[Sandbox] status written: success={status_data["success"]}')
-            except Exception as ex:
-                print(f'Warning: could not save sandbox status: {ex}')
+                print(f"[Sandbox BG error] {traceback.format_exc()}")
+                status_data = {
+                    "done": True,
+                    "success": False,
+                    "error": str(e),
+                    "scan_id": scan_id,
+                    "layers": layers_snapshot,
+                    "forensics": forensics_snap,
+                    "final_status": final_status,
+                }
+
+            self._sandbox_status.set(scan_id, status_data)
+            print(
+                f"[Sandbox] status stored in memory: success={status_data['success']}"
+            )
 
         t = threading.Thread(target=_run, daemon=True)
         t.start()
 
     def get_sandbox_status(self, scan_id):
         """
-        Read the status sentinel written by run_sandbox_background.
+        Read the status from in-memory store.
         Returns None if not yet done.
         """
-        status_path = os.path.join('static', 'sandbox_results', f'{scan_id}_status.json')
-        if not os.path.exists(status_path):
-            return None
-        try:
-            with open(status_path, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except Exception:
-            return None
+        return self._sandbox_status.get(scan_id)
 
     def analyze(self, url):
         results = {}
-        
-        # 0. Forensic Analysis (Pre-scan)
-        # We analyze redirects first to scan the FINAL destination, which is safer and more accurate.
+
+        url = self.l0.sanitize(url)
+
+        status, message = self.l0.check(url)
+        if status == INVALID:
+            return self._finalize(
+                INVALID, {"validation": {"status": status, "message": message}}, {}
+            )
+
         forensics_data = self.forensics.analyze(url)
-        target_url = forensics_data['final_url']
-        
-        # Feature 2: URL Shortener & Redirects
-        redirect_count = forensics_data.get('redirect_count', 0)
-        is_shortener = forensics_data.get('is_shortener', False)
-        
+        target_url = forensics_data["final_url"]
+
+        redirect_count = forensics_data.get("redirect_count", 0)
+        is_shortener = forensics_data.get("is_shortener", False)
+
         if redirect_count > 3:
-             results['forensics_check'] = {'status': WARNING, 'message': f'Excessive redirects detected ({redirect_count}). Risk of obfuscation.'}
+            results["forensics_check"] = {
+                "status": WARNING,
+                "message": f"Excessive redirects detected ({redirect_count}). Risk of obfuscation.",
+            }
         elif is_shortener:
-             # We mark as SAFE because we successfully resolved it, but we inform the user.
-             results['forensics_check'] = {'status': SAFE, 'message': 'Shortened URL detected. Final destination analyzed.'}
+            results["forensics_check"] = {
+                "status": SAFE,
+                "message": "Shortened URL detected. Final destination analyzed.",
+            }
         elif redirect_count > 0:
-             results['forensics_check'] = {'status': SAFE, 'message': f'Redirects followed ({redirect_count}). Final destination analyzed.'}
+            results["forensics_check"] = {
+                "status": SAFE,
+                "message": f"Redirects followed ({redirect_count}). Final destination analyzed.",
+            }
         else:
-             results['forensics_check'] = {'status': SAFE, 'message': 'Direct link. No redirects.'}
-        
-        # Layer 1: Blacklist
+            results["forensics_check"] = {
+                "status": SAFE,
+                "message": "Direct link. No redirects.",
+            }
+
         status, message = self.l1.check(target_url)
-        results['layer1'] = {'status': status, 'message': message}
+        results["layer1"] = {"status": status, "message": message}
         if status == PHISHING:
             return self._finalize(PHISHING, results, forensics_data)
 
-        # Layer 2: Domain Analysis
         status, message = self.l2.check(target_url)
-        results['layer2'] = {'status': status, 'message': message}
-        
-        # Layer 3: SSL Check
-        status, message = self.l3.check(target_url)
-        results['layer3'] = {'status': status, 'message': message}
-        
-        # Layer 4: ML Model
-        status, message = self.l4.check(target_url)
-        results['layer4'] = {'status': status, 'message': message}
-        
-        # Layer 5: Behavioral Analysis
-        status, message = self.l5.check(target_url)
-        results['layer5'] = {'status': status, 'message': message}
+        results["layer2"] = {"status": status, "message": message}
 
-        # Aggregation Logic
+        status, message = self.l3.check(target_url)
+        results["layer3"] = {"status": status, "message": message}
+
+        status, message = self.l4.check(target_url)
+        results["layer4"] = {"status": status, "message": message}
+
+        status, message = self.l5.check(target_url)
+        results["layer5"] = {"status": status, "message": message}
+
         final_status = SAFE
-        
-        if results['layer4']['status'] == PHISHING:
-             return self._finalize(PHISHING, results, forensics_data)
-             
-        if results['layer3']['status'] == PHISHING:
+
+        if results["layer4"]["status"] == PHISHING:
             return self._finalize(PHISHING, results, forensics_data)
-            
-        warnings = [r for r in results.values() if r['status'] == WARNING]
+
+        if results["layer3"]["status"] == PHISHING:
+            return self._finalize(PHISHING, results, forensics_data)
+
+        warnings = [r for r in results.values() if r["status"] == WARNING]
         if len(warnings) > 0:
             final_status = WARNING
         else:
             final_status = SAFE
-            
-        # Sandbox Analysis
+
         if self.sandbox:
             try:
                 sandbox_result = self.sandbox.analyze(url)
-                results['sandbox'] = sandbox_result
-                
-                # Update full results with forensics
-                if sandbox_result.get('success') and sandbox_result.get('scan_id'):
-                    self.sandbox.save_full_results(sandbox_result['scan_id'], {
-                        'status': final_status,
-                        'layers': results,
-                        'forensics': forensics_data
-                    })
-                    
+                results["sandbox"] = sandbox_result
             except Exception as e:
                 import traceback
+
                 error_msg = f"Sandbox error: {str(e)}\n{traceback.format_exc()}"
                 print(error_msg)
-                with open("sandbox_error.log", "a") as f:
-                    f.write(f"[{datetime.now()}] {error_msg}\n")
-                results['sandbox'] = {'success': False, 'error': str(e), 'scan_id': None}
-        
+                results["sandbox"] = {
+                    "success": False,
+                    "error": str(e),
+                    "scan_id": None,
+                }
+
         return self._finalize(final_status, results, forensics_data)
 
     def _finalize(self, final_status, results, forensics_data):
-        return {
-            'status': final_status,
-            'layers': results,
-            'forensics': forensics_data
-        }
+        return {"status": final_status, "layers": results, "forensics": forensics_data}

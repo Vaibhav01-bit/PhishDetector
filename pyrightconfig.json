@@ -1,0 +1,23 @@
+{
+  "venvPath": "d:\\Phishing Website\\Phishing Website Detector",
+  "venv": "venv",
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/venv",
+    "**/static"
+  ],
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": [
+        "d:\\Phishing Website\\Phishing Website Detector\\venv\\Lib\\site-packages"
+      ]
+    }
+  ],
+  "reportMissingImports": true,
+  "typeCheckingMode": "basic"
+}

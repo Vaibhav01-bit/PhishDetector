@@ -1,6 +1,6 @@
- #importing required libraries
+# importing required libraries
 
-from flask import Flask, request, render_template, send_from_directory, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for
 import numpy as np
 import pandas as pd
 from sklearn import metrics
@@ -8,7 +8,8 @@ import warnings
 import pickle
 import os
 from convert import convertion
-warnings.filterwarnings('ignore')
+
+warnings.filterwarnings("ignore")
 
 # Import the new pipeline
 from pipeline.manager import PhishingDetectionPipeline, SAFE, WARNING, PHISHING
@@ -18,257 +19,287 @@ pipeline = PhishingDetectionPipeline()
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def home():
     return render_template("index.html")
 
-@app.route('/result',methods=['POST','GET'])
+
+@app.route("/result", methods=["POST", "GET"])
 def predict():
     if request.method == "POST":
         url = request.form["name"]
-        
+
         # Analyze using the 5-layer pipeline (+ sandbox)
         result = pipeline.analyze(url)
-        
+
         # Determine Verdict Flags
-        status = result['status']
-        is_safe = (status == SAFE)
-        
+        status = result["status"]
+        is_safe = status == SAFE
+
         # AJAX Response (For Progressive Timeline)
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             from flask import jsonify
-            return jsonify({
-                "status": status,
-                "is_safe": is_safe,
-                "url": url,
-                "details": result # Pass full details if needed later
-            })
+
+            return jsonify(
+                {"status": status, "is_safe": is_safe, "url": url, "details": result}
+            )
 
         # Fallback: Legacy Template Rendering
         if status == SAFE:
             name = [url, "Safe", "Continue", 1]
         elif status == WARNING:
-            name = [url, "Suspicious", "View Anyway (Risk)", 0] # 0 is falsy
+            name = [url, "Suspicious", "View Anyway (Risk)", 0]
         else:
             name = [url, "Phishing", "Back to Safety", 0]
 
         return render_template("index.html", name=name, details=result)
-        
+
     return render_template("index.html")
 
-@app.route('/usecases', methods=['GET', 'POST'])
+
+@app.route("/usecases", methods=["GET", "POST"])
 def usecases():
-    return render_template('usecases.html')
+    return render_template("usecases.html")
 
-@app.route('/sandbox_screenshot/<filename>')
-def serve_screenshot(filename):
-    """Serve sandbox screenshot files securely."""
-    screenshot_dir = os.path.join(app.root_path, 'static', 'sandbox_screenshots')
-    
-    # Security: Only allow .jpg files and prevent path traversal
-    if not filename.endswith('.jpg') or '/' in filename or '\\' in filename:
-        return "Invalid filename", 400
-    
-    return send_from_directory(screenshot_dir, filename)
 
-@app.route('/sandbox/<scan_id>')
+@app.route("/sandbox/<scan_id>")
 def sandbox_results(scan_id):
-    """Display dedicated sandbox analysis page."""
-    from pipeline.sandbox import SandboxAnalyzer
-    import json
-    import os
-    
-    # Security: Validate scan_id format
-    if not scan_id or '/' in scan_id or '\\' in scan_id or '..' in scan_id:
-        return render_template('error.html', 
-                             message="Invalid scan ID"), 400
-    
-    analyzer = SandboxAnalyzer()
-    sandbox_data = analyzer.get_result(scan_id)
-    
-    if not sandbox_data:
-        return render_template('error.html', 
-                             message="Sandbox result not found. The scan may have expired."), 404
-    
-    # Try to load full pipeline results (includes 5-layer analysis)
-    full_results = None
-    try:
-        # Check if there's a corresponding full result file
-        result_path = os.path.join(app.root_path, 'static', 'sandbox_results', f"{scan_id}_full.json")
-        if os.path.exists(result_path):
-            with open(result_path, 'r', encoding='utf-8') as f:
-                full_results = json.load(f)
-    except Exception as e:
-        print(f"Could not load full results: {e}")
-    
-    # Determine verdict for display
+    """
+    Display dedicated sandbox analysis page.
+    NO DATA IS STORED - reads from in-memory store only.
+    """
+    import re
+
+    if not scan_id or "/" in scan_id or "\\" in scan_id or ".." in scan_id:
+        return render_template("error.html", message="Invalid scan ID"), 400
+
+    if not re.match(r"^[a-zA-Z0-9_\-]{1,64}$", scan_id):
+        return render_template("error.html", message="Invalid scan ID"), 400
+
+    status = pipeline.get_sandbox_status(scan_id)
+
+    if not status:
+        return render_template(
+            "error.html", message="Scan not found or expired. Please scan again."
+        ), 404
+
+    if not status.get("success"):
+        return render_template(
+            "error.html", message="Sandbox analysis failed or not completed."
+        ), 404
+
+    sandbox_data = {
+        "source_url": status.get("source_url"),
+        "final_url": status.get("final_url"),
+        "ip_address": status.get("ip_address"),
+        "domain": status.get("domain"),
+        "page_title": status.get("page_title"),
+        "redirect_count": status.get("redirect_count", 0),
+        "load_time": status.get("load_time", 0),
+        "timestamp": status.get("timestamp"),
+        "has_login_form": status.get("has_login_form", False),
+        "has_password_field": status.get("has_password_field", False),
+        "has_email_field": status.get("has_email_field", False),
+        "suspicious_keywords": status.get("suspicious_keywords", []),
+        "screenshot_base64": status.get("screenshot_base64"),
+    }
+
+    layers = status.get("layers", {})
+    forensics = status.get("forensics", {})
+    final_status = status.get("final_status", "Safe")
+
     verdict = "safe"
     verdict_text = "Safe"
     verdict_icon = "bx-shield-check"
-    
-    # Enhanced verdict logic based on behavioral flags
-    if sandbox_data.get('has_login_form') or sandbox_data.get('has_password_field'):
+
+    if sandbox_data.get("has_login_form") or sandbox_data.get("has_password_field"):
         verdict = "warning"
         verdict_text = "Warning"
         verdict_icon = "bx-error"
-    
-    # If we have full results, use the overall status
-    if full_results and full_results.get('status'):
-        status = full_results['status']
-        if status == 'PHISHING':
-            verdict = "danger"
-            verdict_text = "Dangerous"
-            verdict_icon = "bx-error-circle"
-        elif status == 'WARNING':
-            verdict = "warning"
-            verdict_text = "Warning"
-            verdict_icon = "bx-error"
-    
-    return render_template('sandbox_results.html', 
-                         sandbox=sandbox_data,
-                         scan_id=scan_id,
-                         verdict=verdict,
-                         verdict_text=verdict_text,
-                         verdict_icon=verdict_icon,
-                         result=full_results,
-                         layers=full_results.get('layers') if full_results else None,
-                         forensics=full_results.get('forensics') if full_results else None)
 
-@app.route('/scan_email', methods=['POST'])
+    if final_status == "Phishing":
+        verdict = "danger"
+        verdict_text = "Dangerous"
+        verdict_icon = "bx-error-circle"
+    elif final_status == "Warning":
+        verdict = "warning"
+        verdict_text = "Warning"
+        verdict_icon = "bx-error"
+
+    return render_template(
+        "sandbox_results.html",
+        sandbox=sandbox_data,
+        scan_id=scan_id,
+        verdict=verdict,
+        verdict_text=verdict_text,
+        verdict_icon=verdict_icon,
+        result={"status": final_status},
+        layers=layers,
+        forensics=forensics,
+    )
+
+
+@app.route("/scan_email", methods=["POST"])
 def scan_email():
     """
     Endpoint for identifying and scanning URLs within email text.
     """
     from pipeline.email_utils import extract_urls_from_text
-    
-    email_text = request.form.get('email_text', '')
+
+    email_text = request.form.get("email_text", "")
     if not email_text:
-        return render_template('index.html', error="No text provided")
-        
+        return render_template("index.html", error="No text provided")
+
     extracted_urls = extract_urls_from_text(email_text)
-    
-    # Limit number of URLs to prevent abuse
+
     extracted_urls = extracted_urls[:10]
-    
+
     scan_results = []
-    
+
     for url in extracted_urls:
-        # Run pipeline on each URL
         try:
             res = pipeline.analyze(url)
-            status = res['status']
-            
-            # Simple verdict for the summary list
+            status = res["status"]
+
             verdict_class = "text-success"
             icon = "bx-check-circle"
-            
+
             if status == "Phishing":
                 verdict_class = "text-danger"
                 icon = "bx-x-circle"
             elif status == "Warning":
                 verdict_class = "text-warning"
                 icon = "bx-error"
-                
-            scan_results.append({
-                'url': url,
-                'status': status,
-                'class': verdict_class,
-                'icon': icon,
-                'details': res
-            })
-        except Exception as e:
-            scan_results.append({
-                'url': url,
-                'status': "Error",
-                'class': "text-secondary",
-                'icon': "bx-help-circle",
-                'details': str(e)
-            })
-            
-    return render_template('index.html', email_results=scan_results, email_text_preview=email_text[:100] + "...")
 
-@app.route('/rescan', methods=['POST'])
+            scan_results.append(
+                {
+                    "url": url,
+                    "status": status,
+                    "class": verdict_class,
+                    "icon": icon,
+                    "details": res,
+                }
+            )
+        except Exception as e:
+            scan_results.append(
+                {
+                    "url": url,
+                    "status": "Error",
+                    "class": "text-secondary",
+                    "icon": "bx-help-circle",
+                    "details": str(e),
+                }
+            )
+
+    return render_template(
+        "index.html",
+        email_results=scan_results,
+        email_text_preview=email_text[:100] + "...",
+    )
+
+
+@app.route("/rescan", methods=["POST"])
 def rescan_url():
     """Re-scan a URL from sandbox page."""
-    url = request.form.get('url')
+    url = request.form.get("url")
     if url:
-        # Redirect to result page with POST data
-        return render_template('index.html', rescan_url=url)
-    return redirect(url_for('home'))
+        return render_template("index.html", rescan_url=url)
+    return redirect(url_for("home"))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ULTRA-FAST PROGRESSIVE SCAN ENDPOINTS
+# NO DATA IS STORED - All results are in-memory only
 # ─────────────────────────────────────────────────────────────────────────────
 
-@app.route('/scan/fast', methods=['POST'])
+
+@app.route("/scan/fast", methods=["POST"])
 def scan_fast():
     """
     FAST PATH: Runs layers 1-5 only (zero sandbox) and returns a preliminary
     verdict within ~1-3 seconds. Also launches sandbox in the background.
+    NO DATA IS STORED - all processing is in-memory.
     """
     from flask import jsonify
-    url = request.form.get('name') or request.json.get('name', '') if request.is_json else request.form.get('name', '')
+
+    url = (
+        request.form.get("name") or request.json.get("name", "")
+        if request.is_json
+        else request.form.get("name", "")
+    )
     if not url:
-        return jsonify({'error': 'No URL provided'}), 400
+        return jsonify({"error": "No URL provided"}), 400
 
     try:
         result = pipeline.analyze_fast(url)
-        scan_id = result['scan_id']
+        scan_id = result["scan_id"]
 
         # Kick off sandbox in background — does NOT block this response
         if pipeline.sandbox:
             pipeline.run_sandbox_background(url, scan_id)
 
-        return jsonify({
-            'status':      result['status'],
-            'is_safe':     result['status'] == 'Safe',
-            'is_warning':  result['status'] == 'Warning',
-            'url':         url,
-            'scan_id':     scan_id,
-            'preliminary': True,
-            'layers':      result.get('layers', {}),
-            'forensics':   result.get('forensics', {})
-        })
+        return jsonify(
+            {
+                "status": result["status"],
+                "is_safe": result["status"] == "Safe",
+                "is_warning": result["status"] == "Warning",
+                "url": url,
+                "scan_id": scan_id,
+                "preliminary": True,
+                "layers": result.get("layers", {}),
+                "forensics": result.get("forensics", {}),
+            }
+        )
     except Exception as e:
         import traceback
+
         print(traceback.format_exc())
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-@app.route('/scan/status/<scan_id>', methods=['GET'])
+@app.route("/scan/status/<scan_id>", methods=["GET"])
 def scan_status(scan_id):
     """
     Polling endpoint: Returns sandbox completion status for a given scan_id.
     Frontend calls this every ~1.5s after receiving the fast verdict.
+    NO DATA IS STORED - all data is in-memory only.
     """
     from flask import jsonify
     import re
 
-    # Security: validate scan_id format (alphanumeric + underscore/hyphen only)
-    if not re.match(r'^[a-zA-Z0-9_\-]{1,64}$', scan_id):
-        return jsonify({'error': 'Invalid scan ID'}), 400
+    if not re.match(r"^[a-zA-Z0-9_\-]{1,64}$", scan_id):
+        return jsonify({"error": "Invalid scan ID"}), 400
 
     status = pipeline.get_sandbox_status(scan_id)
     if status is None:
-        # Not done yet
-        return jsonify({'done': False, 'scan_id': scan_id})
+        return jsonify({"done": False, "scan_id": scan_id})
 
-    # Build screenshot URL if available
-    screenshot_url = None
-    if status.get('screenshot_path'):
-        screenshot_url = f"/sandbox_screenshot/{status['screenshot_path']}"
-
-    return jsonify({
-        'done':              True,
-        'success':           status.get('success', False),
-        'scan_id':           scan_id,
-        'screenshot_url':    screenshot_url,
-        'sandbox_page_url':  f"/sandbox/{scan_id}" if status.get('success') else None,
-        'has_login_form':    status.get('has_login_form', False),
-        'has_password_field':status.get('has_password_field', False),
-        'error':             status.get('error')
-    })
+    return jsonify(
+        {
+            "done": True,
+            "success": status.get("success", False),
+            "scan_id": scan_id,
+            "screenshot": status.get("screenshot_base64"),
+            "source_url": status.get("source_url"),
+            "final_url": status.get("final_url"),
+            "ip_address": status.get("ip_address"),
+            "domain": status.get("domain"),
+            "page_title": status.get("page_title"),
+            "redirect_count": status.get("redirect_count", 0),
+            "load_time": status.get("load_time", 0),
+            "timestamp": status.get("timestamp"),
+            "has_login_form": status.get("has_login_form", False),
+            "has_password_field": status.get("has_password_field", False),
+            "has_email_field": status.get("has_email_field", False),
+            "suspicious_keywords": status.get("suspicious_keywords", []),
+            "sandbox_message": status.get("sandbox_message"),
+            "error": status.get("error"),
+            "layers": status.get("layers", {}),
+            "forensics": status.get("forensics", {}),
+            "final_status": status.get("final_status", "Safe"),
+        }
+    )
 
 
 if __name__ == "__main__":

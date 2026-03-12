@@ -1,0 +1,24 @@
+[2026-03-11 15:09:13.972391] Background scan for https://www.youtube.com/ with ID scan_1773221910_17ca78b8 started.
+[2026-03-11 15:09:45.402785] Exception in background thread: Traceback (most recent call last):
+  File "d:\Phishing Website\Phishing Website Detector\app\pipeline\manager.py", line 115, in _run
+    log_debug(f"analyze() returned: {sandbox_result}")
+  File "d:\Phishing Website\Phishing Website Detector\app\pipeline\manager.py", line 106, in log_debug
+    f.write(f"[{datetime.now()}] {msg}\n")
+  File "C:\Program Files\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 209-270: character maps to <undefined>
+
+[2026-03-11 15:09:45.469723] status_data saved for scan_1773221910_17ca78b8: {'done': True, 'success': False, 'error': "System error in background thread: 'charmap' codec can't encode characters in position 209-270: character maps to <undefined>", 'scan_id': 'scan_1773221910_17ca78b8'}
+[2026-03-11 15:10:11.371143] Background scan for https://chatgpt.com/ with ID scan_1773221973_b9340f7b started.
+[2026-03-11 15:10:25.997218] Exception in background thread: Traceback (most recent call last):
+  File "d:\Phishing Website\Phishing Website Detector\app\pipeline\manager.py", line 115, in _run
+    log_debug(f"analyze() returned: {sandbox_result}")
+  File "d:\Phishing Website\Phishing Website Detector\app\pipeline\manager.py", line 106, in log_debug
+    f.write(f"[{datetime.now()}] {msg}\n")
+  File "C:\Program Files\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 209-270: character maps to <undefined>
+
+[2026-03-11 15:10:26.051080] status_data saved for scan_1773221973_b9340f7b: {'done': True, 'success': False, 'error': "System error in background thread: 'charmap' codec can't encode characters in position 209-270: character maps to <undefined>", 'scan_id': 'scan_1773221973_b9340f7b'}
