@@ -347,8 +347,11 @@
     // ═══════════════════════════════════════════════════════════════════════════
 
     function startPolling(scanId) {
+        console.log('[Scanner] Starting polling for scan:', scanId);
         pollingTimer = setInterval(async () => {
             pollingAttempts++;
+            
+            console.log('[Scanner] Polling attempt:', pollingAttempts);
 
             if (pollingAttempts > MAX_POLL) {
                 clearPolling();
@@ -358,8 +361,12 @@
 
             try {
                 const resp = await fetch(`/scan/status/${scanId}`);
-                if (!resp.ok) return;
+                if (!resp.ok) {
+                    console.warn('[Scanner] Poll response not OK:', resp.status);
+                    return;
+                }
                 const status = await resp.json();
+                console.log('[Scanner] Poll status:', status);
 
                 if (status.done) {
                     clearPolling();
@@ -380,6 +387,7 @@
 
     function onSandboxComplete(status) {
         console.log('[Scanner] Sandbox complete:', status);
+        console.log('[Scanner] currentScanId:', currentScanId);
 
         // Update step 6
         if (status.success) {
@@ -413,38 +421,41 @@
         }
 
         // ── Show sandbox CTA button ─────────────────────────────────────────
-        // Use sandbox_page_url from server; fall back to /sandbox/<scan_id> if
-        // we know the scan_id and sandbox ran (success may be true but URL null
-        // due to a serialisation mismatch).
-        const sandboxPageUrl = status.sandbox_page_url
-            || (status.success && currentScanId ? `/sandbox/${currentScanId}` : null);
-
-        if (sandboxPageUrl) {
-            const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
-            if (sandboxCTA) {
-                sandboxCTA.innerHTML = `
-                    <a href="${escHtml(sandboxPageUrl)}" class="btn-sandbox-primary">
-                        <span>View Sandbox Analysis</span>
-                        <i class='bx bx-right-arrow-alt'></i>
-                    </a>
-                    <p class="sandbox-caption mt-2 mb-0 text-center">
-                        <i class='bx bxs-lock-alt'></i>
-                        Secure sandbox environment &bull; No user interaction performed
-                    </p>`;
-                sandboxCTA.style.display = 'block';
-                sandboxCTA.classList.add('cta-fade-in');
-            }
-        } else if (!status.success && status.error) {
-            // Sandbox failed: show brief inline error instead of CTA
-            const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
-            if (sandboxCTA) {
-                sandboxCTA.innerHTML = `
-                    <p class="text-center mb-0" style="font-size:.82rem;opacity:.7">
-                        <i class='bx bx-info-circle'></i>
-                        Sandbox analysis unavailable for this URL.
-                    </p>`;
-                sandboxCTA.style.display = 'block';
-            }
+        // Always show the button when sandbox succeeds - construct URL from scan_id
+        const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
+        
+        // Get scan_id from either status or currentScanId
+        const scanId = status.scan_id || currentScanId;
+        
+        console.log('[Scanner] sandboxCTA found:', !!sandboxCTA);
+        console.log('[Scanner] status.success:', status.success);
+        console.log('[Scanner] scanId:', scanId);
+        
+        if (sandboxCTA && status.success && scanId) {
+            // Sandbox succeeded - show the View Sandbox button
+            const sandboxUrl = `/sandbox/${scanId}`;
+            console.log('[Scanner] Showing sandbox button with URL:', sandboxUrl);
+            
+            sandboxCTA.innerHTML = `
+                <a href="${escHtml(sandboxUrl)}" class="btn-sandbox-primary">
+                    <span>View Sandbox Analysis</span>
+                    <i class='bx bx-right-arrow-alt'></i>
+                </a>
+                <p class="sandbox-caption mt-2 mb-0 text-center">
+                    <i class='bx bxs-lock-alt'></i>
+                    Secure sandbox environment &bull; No user interaction performed
+                </p>`;
+            sandboxCTA.style.display = 'block';
+            sandboxCTA.classList.add('cta-fade-in');
+        } else if (sandboxCTA && !status.success) {
+            // Sandbox failed - show error message
+            console.log('[Scanner] Sandbox failed, showing error');
+            sandboxCTA.innerHTML = `
+                <p class="text-center mb-0" style="font-size:.82rem;opacity:.7">
+                    <i class='bx bx-info-circle'></i>
+                    Sandbox analysis unavailable for this URL.
+                </p>`;
+            sandboxCTA.style.display = 'block';
         }
     }
 

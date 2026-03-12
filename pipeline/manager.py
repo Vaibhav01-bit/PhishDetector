@@ -1,15 +1,18 @@
-from .layers import Layer1_Blacklist, Layer2_Domain, Layer3_SSL, Layer4_ML_Model, Layer5_Behavioral, SAFE, WARNING, PHISHING
+from .layers import Layer0_Validation, Layer1_Blacklist, Layer2_Domain, Layer3_SSL, Layer4_ML_Model, Layer5_Behavioral, SAFE, WARNING, PHISHING, INVALID
 from .sandbox import SandboxAnalyzer
 from .forensics import ForensicAnalyzer
 from .sandbox_utils import generate_scan_id
 from datetime import datetime
 import threading
 import os
+from typing import Optional
 import json
 
 class PhishingDetectionPipeline:
+    sandbox: Optional[SandboxAnalyzer]
     def __init__(self, enable_sandbox=True):
         self.forensics = ForensicAnalyzer()
+        self.l0 = Layer0_Validation()
         self.l1 = Layer1_Blacklist()
         self.l2 = Layer2_Domain()
         self.l3 = Layer3_SSL()
@@ -26,7 +29,15 @@ class PhishingDetectionPipeline:
         scan_id = generate_scan_id()
         results = {}
 
-        # 0. Forensic / redirect analysis
+        # 0. Sanitize
+        url = self.l0.sanitize(url)
+        
+        # 0.1 Format Validation
+        status, message = self.l0.check(url)
+        if status == INVALID:
+             return self._finalize_fast(INVALID, {'validation': {'status': status, 'message': message}}, {}, scan_id)
+        
+        # 0.1 Forensic / redirect analysis
         forensics_data = self.forensics.analyze(url)
         target_url = forensics_data['final_url']
 
@@ -110,17 +121,20 @@ class PhishingDetectionPipeline:
             # Default to failure so status file is always written
             status_data = {'done': True, 'success': False, 'scan_id': scan_id}
             try:
-                sandbox_result = self.sandbox.analyze(url, scan_id=scan_id)
-
+                sandbox_result = {'success': False, 'error': 'Sandbox uninitialized'}
+                if self.sandbox:
+                    sandbox_result = self.sandbox.analyze(url, scan_id=scan_id)
+                
                 combined = dict(layers_snapshot)
                 combined['sandbox'] = sandbox_result
 
                 if sandbox_result.get('success') and sandbox_result.get('scan_id'):
-                    self.sandbox.save_full_results(scan_id, {
-                        'status': final_status,
-                        'layers': combined,
-                        'forensics': forensics_snap
-                    })
+                    if self.sandbox:
+                        self.sandbox.save_full_results(scan_id, {
+                            'status': final_status,
+                            'layers': combined,
+                            'forensics': forensics_snap
+                        })
 
                 status_data = {
                     'done': True,
@@ -164,7 +178,15 @@ class PhishingDetectionPipeline:
     def analyze(self, url):
         results = {}
         
-        # 0. Forensic Analysis (Pre-scan)
+        # 0. Sanitize
+        url = self.l0.sanitize(url)
+        
+        # 0.1 Format Validation
+        status, message = self.l0.check(url)
+        if status == INVALID:
+             return self._finalize(INVALID, {'validation': {'status': status, 'message': message}}, {})
+             
+        # 0.1 Forensic Analysis (Pre-scan)
         # We analyze redirects first to scan the FINAL destination, which is safer and more accurate.
         forensics_data = self.forensics.analyze(url)
         target_url = forensics_data['final_url']

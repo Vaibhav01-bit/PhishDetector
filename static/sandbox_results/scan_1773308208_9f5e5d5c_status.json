@@ -1,0 +1,9 @@
+{
+  "done": true,
+  "success": false,
+  "screenshot_path": null,
+  "scan_id": "scan_1773308208_9f5e5d5c",
+  "has_login_form": false,
+  "has_password_field": false,
+  "error": "Page load timeout (30 seconds exceeded)"
+}

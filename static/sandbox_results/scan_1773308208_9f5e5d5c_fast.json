@@ -1,0 +1,56 @@
+{
+  "status": "Safe",
+  "layers": {
+    "forensics_check": {
+      "status": "Safe",
+      "message": "Direct link. No redirects."
+    },
+    "layer1": {
+      "status": "Safe",
+      "message": "Domain not in blacklist."
+    },
+    "layer2": {
+      "status": "Safe",
+      "message": "Domain analysis passed."
+    },
+    "layer3": {
+      "status": "Safe",
+      "message": "Valid HTTPS Scheme."
+    },
+    "layer4": {
+      "status": "Safe",
+      "message": "ML Model predicts Safe."
+    },
+    "layer5": {
+      "status": "Safe",
+      "message": "Behavioral analysis passed."
+    }
+  },
+  "forensics": {
+    "input_url": "https://chatgpt.com/",
+    "normalized_url": "https://chatgpt.com/",
+    "final_url": "https://chatgpt.com/",
+    "redirect_chain": [
+      {
+        "url": "https://chatgpt.com/",
+        "status": 403
+      }
+    ],
+    "redirect_count": 0,
+    "is_shortener": false,
+    "domain": "chatgpt.com",
+    "root_domain": "chatgpt.com",
+    "ip_address": "104.18.32.47",
+    "geo_location": "server-dependent",
+    "asn": "Unknown",
+    "whois": {
+      "registrar": "MarkMonitor, Inc.",
+      "creation_date": "2022-11-30",
+      "expiration_date": "2026-11-30",
+      "domain_age_days": 1197
+    },
+    "scan_time": "2026-03-12 15:06:59"
+  },
+  "scan_id": "scan_1773308208_9f5e5d5c",
+  "preliminary": true
+}

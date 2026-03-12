@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "scan_id": "scan_1773293039_50738ea6",
+  "source_url": "https://chatgpt.com",
+  "final_url": "https://chatgpt.com/",
+  "redirect_count": 0,
+  "ip_address": "104.18.32.47",
+  "domain": "chatgpt.com",
+  "page_title": "ChatGPT",
+  "load_time": 20970,
+  "total_time": 31633,
+  "screenshot_path": "scan_1773293039_50738ea6.jpg",
+  "sandbox_message": "Rendered in an isolated sandbox. No user interaction.",
+  "has_login_form": false,
+  "has_password_field": false,
+  "has_email_field": false,
+  "suspicious_keywords": [],
+  "timestamp": "2026-03-12 10:54:41"
+}
