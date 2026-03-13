@@ -7,12 +7,12 @@ from sklearn import metrics
 import warnings
 import pickle
 import os
-from convert import convertion
+from src.convert import convertion
 
 warnings.filterwarnings("ignore")
 
 # Import the new pipeline
-from pipeline.manager import PhishingDetectionPipeline, SAFE, WARNING, PHISHING
+from src.pipeline.manager import PhishingDetectionPipeline, SAFE, WARNING, PHISHING
 
 # Initialize the pipeline
 pipeline = PhishingDetectionPipeline()
@@ -145,7 +145,7 @@ def scan_email():
     """
     Endpoint for identifying and scanning URLs within email text.
     """
-    from pipeline.email_utils import extract_urls_from_text
+    from src.pipeline.email_utils import extract_urls_from_text
 
     email_text = request.form.get("email_text", "")
     if not email_text:

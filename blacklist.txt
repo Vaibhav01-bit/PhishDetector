@@ -1,5 +1,0 @@
-example-phishing.com
-malicious-site.net
-fake-login.com
-phishing-test.org
-secure-login-attempt.com
