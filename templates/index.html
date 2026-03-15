@@ -81,7 +81,6 @@
         <ul>
           <li class="active"><a href="{{ url_for('home') }}">Home</a></li>
           <li><a onclick="scrolldiv()">About</a></li>
-          <li><a href="#file-scanner">File Scanner</a></li>
           <li><a href="{{ url_for('usecases') }}" target="_blank" rel="no-openner no-referrer">Usecases</a></li>
           <li class="drop-down"><a href="{{ url_for('home') }}">Help</a>
             <ul>
@@ -864,45 +863,6 @@
       </div>
     </div>
   </section><!-- End Frequently Asked Questions Section -->
-
-  <!-- ======= File Security Scanner Section ======= -->
-  <section id="file-scanner" class="file-scanner-section">
-    <div class="container">
-      <div class="file-scanner-container">
-        <div class="file-scanner-header">
-          <h2>Advanced File Security Scanner</h2>
-          <p>Analyze files for malware, phishing links, and suspicious content</p>
-        </div>
-
-        <form id="file-scan-form" enctype="multipart/form-data">
-          <div class="file-drop-zone" id="file-drop-zone">
-            <i class="bx bx-cloud-upload file-drop-zone-icon"></i>
-            <h3>Drag & Drop Your File Here</h3>
-            <p>or click to browse</p>
-            <input type="file" id="file-input" name="file" accept=".pdf,.docx,.doc,.xlsx,.xls,.html,.htm,.txt,.zip" style="display: none;">
-            <div class="supported-formats">
-              <span class="format-badge">PDF</span>
-              <span class="format-badge">DOCX</span>
-              <span class="format-badge">XLSX</span>
-              <span class="format-badge">HTML</span>
-              <span class="format-badge">TXT</span>
-              <span class="format-badge">ZIP</span>
-            </div>
-          </div>
-        </form>
-
-        <div id="file-scan-progress">
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-        </div>
-
-        <div id="file-scan-results">
-          <!-- Results will be displayed here -->
-        </div>
-      </div>
-    </div>
-  </section><!-- End File Security Scanner Section -->
 
   <main id="main">
 
