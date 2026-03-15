@@ -226,8 +226,17 @@
 
                 const data = await response.json();
 
+                // Hide upload spinner and show scanning animation
+                this.hideUploadSpinner();
+                
                 if (context === 'hero') {
-                    this.showHeroResults(data);
+                    // Show scanning stages animation
+                    this.showHeroScanning();
+                    
+                    // After animation completes, show results
+                    setTimeout(() => {
+                        this.showHeroResults(data);
+                    }, 4500); // Wait for all 3 stages to complete (3 * 1.5s = 4.5s)
                 } else {
                     this.showProgress(100);
                     this.displayResults(data);

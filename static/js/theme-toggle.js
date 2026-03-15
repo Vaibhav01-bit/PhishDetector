@@ -10,22 +10,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Debug check
     if (!toggleSwitch) {
-        console.warn('Theme toggle switch not found: #theme-toggle-check');
+        console.error('Theme toggle switch NOT FOUND: #theme-toggle-check');
+        console.log('Available elements with theme-toggle:', document.querySelectorAll('[id*="theme"]'));
         // Still check for saved theme to apply it
         applySavedTheme();
         return;
     }
 
+    console.log('Theme toggle switch FOUND, initializing...');
+
     // Apply saved theme on load
     applySavedTheme(toggleSwitch);
 
-    // Event Listener
+    // Event Listener - using both change and click for robustness
     toggleSwitch.addEventListener('change', (e) => {
+        console.log('Theme toggle changed:', e.target.checked);
         if (e.target.checked) {
             enableDarkMode();
         } else {
             enableLightMode();
         }
+    });
+    
+    // Also handle click directly in case change doesn't fire
+    toggleSwitch.addEventListener('click', (e) => {
+        console.log('Theme toggle clicked, checked:', e.target.checked);
     });
 });
 

@@ -181,6 +181,36 @@ body.dark-mode .faq-card::after {
 
 .faq-card.is-active::after {
     opacity: 1;
+    animation: stitchMove 2s linear infinite;
+}
+
+@keyframes stitchMove {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+}
+
+.faq-card.is-active {
+    border-color: var(--color-primary);
+    box-shadow: 0 30px 60px rgba(59, 130, 246, 0.1);
+    transform: translateZ(20px);
+}
+
+body.dark-mode .faq-card.is-active {
+    border-color: #00f2ff;
+    box-shadow: 0 30px 70px rgba(0, 242, 255, 0.2);
+}
+
+.faq-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent, rgba(59, 130, 246, 0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.faq-card.is-active::before {
+    opacity: 1;
 }
 
 /* Response for Mobile */

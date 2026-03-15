@@ -1,23 +1,17 @@
-/**
- * FAQ Scroll-Driven Animations - Ultra Premium Master Suite
- * Coordinated Progress, Stacking, and 3D Depth
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for prefers-reduced-motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
-    // Register ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
 
     const faqSection = document.querySelector('.faq');
     const faqCards = document.querySelectorAll('.faq-card');
     const progressBar = document.querySelector('.faq-progress-bar');
+    const faqHeader = document.querySelector('.faq-header-sticky');
 
     if (!faqSection || faqCards.length === 0) return;
 
-    // 1. MASTER PROGRESS BAR COORDINATION
+    // 1. STITCHED PROGRESS BAR - Dynamic color & pulse based on card activity
     gsap.to(progressBar, {
         height: "100%",
         ease: "none",
@@ -25,22 +19,38 @@ document.addEventListener('DOMContentLoaded', () => {
             trigger: faqSection,
             start: "top 20%",
             end: "bottom 80%",
-            scrub: true
+            scrub: true,
+            onUpdate: (self) => {
+                const hue = 210 + (self.progress * 150); // Shift from Blue to Cyan/Teal
+                gsap.set(progressBar, { 
+                    backgroundColor: `hsl(${hue}, 100%, 50%)`,
+                    boxShadow: `0 0 20px hsla(${hue}, 100%, 50%, 0.6)`
+                });
+            }
         }
     });
 
-    // 2. COORDINATED CARD SEQUENCING
+    // 2. COORDINATED "STITCHED" TIMELINE
+    const mainTl = gsap.timeline({
+        scrollTrigger: {
+            trigger: faqSection,
+            start: "top center",
+            end: "bottom center",
+            scrub: 1.5
+        }
+    });
+
     faqCards.forEach((card, index) => {
         const answer = card.querySelector('.faq-answer');
-        const h3 = card.querySelector('h3');
-
-        // Timeline for the card's entire lifecycle
-        const tl = gsap.timeline({
+        const icon = card.querySelector('h3 i');
+        
+        // Internal Card Timeline
+        const cardTl = gsap.timeline({
             scrollTrigger: {
                 trigger: card,
-                start: "top 95%",    // Enters from bottom
-                end: "bottom 5%",    // Clears from top
-                scrub: 1.2,          // Ultra-smooth follow
+                start: "top 95%",
+                end: "bottom 5%",
+                scrub: 1.2,
                 onToggle: self => {
                     if (self.isActive) card.classList.add('is-active');
                     else card.classList.remove('is-active');
@@ -48,104 +58,77 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 3-PHASE TRANSITION (Entry -> Focus -> Exit)
-
-        // Phase 1: Entry from bottom
-        tl.fromTo(card, {
-            opacity: 0.1,
-            scale: 0.85,
-            y: 80,
-            rotateX: 10,
-            translateZ: -150,
-            filter: "blur(12px)",
+        // Entrance: Magnetic Slide + 3D Rotation
+        cardTl.fromTo(card, {
+            opacity: 0,
+            x: index % 2 === 0 ? -40 : 40,
+            rotateY: index % 2 === 0 ? 15 : -15,
+            scale: 0.9,
+            filter: "blur(10px)",
         }, {
             opacity: 1,
+            x: 0,
+            rotateY: 0,
             scale: 1,
-            y: 0,
-            rotateX: 0,
-            translateZ: 0,
             filter: "blur(0px)",
-            duration: 1.5,
-            ease: "power2.out"
+            duration: 1.2,
+            ease: "expo.out"
         });
 
-        // Answer Expansion (Centered in the lifecycle)
-        tl.to(answer, {
+        // Stitch Effect: Reveal Answer with a coordinated icon spin
+        cardTl.to(answer, {
             height: "auto",
             opacity: 1,
             marginTop: "16px",
             duration: 0.8,
             ease: "power3.out"
-        }, 0.4);
+        }, 0.2);
 
-        // Phase 2: Exit to top (The "Stacking" feel)
-        tl.to(card, {
-            opacity: 0.15,
-            scale: 0.9,
-            y: -80,
+        cardTl.to(icon, {
+            rotate: 360,
+            scale: 1.2,
+            backgroundColor: "rgba(59, 130, 246, 0.2)",
+            duration: 0.8
+        }, 0.2);
+
+        // Exit: Fade and Stack
+        cardTl.to(card, {
+            opacity: 0.3,
+            scale: 0.95,
+            y: -50,
             rotateX: -10,
-            translateZ: -100,
-            filter: "blur(10px)",
-            duration: 1.5,
+            filter: "blur(4px)",
+            duration: 1,
             ease: "power2.in"
-        }, "+=0.4"); // Hold focus before exiting
-
-        // Collapse Answer on exit
-        tl.to(answer, {
-            height: 0,
-            opacity: 0,
-            marginTop: 0,
-            duration: 0.8,
-            ease: "power3.in"
-        }, ">-1");
-
-        // Real-time Theme Color Sync
-        ScrollTrigger.create({
-            trigger: card,
-            start: "top center",
-            end: "bottom center",
-            onUpdate: (self) => {
-                const isDark = document.body.classList.contains('dark-mode');
-                const progress = self.progress;
-
-                if (self.isActive) {
-                    gsap.to(card, {
-                        backgroundColor: isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.98)",
-                        borderColor: isDark ? `rgba(0, 242, 255, ${0.1 + progress * 0.4})` : `rgba(59, 130, 246, ${0.1 + progress * 0.3})`,
-                        boxShadow: isDark ? "0 20px 50px rgba(0, 0, 0, 0.4)" : "0 20px 50px rgba(0, 0, 0, 0.05)",
-                        duration: 0.3
-                    });
-                }
-            }
-        });
+        }, "+=0.5");
     });
 
-    // 3. HOVER MICRO-GLOW (Desktop)
+    // 3. MAGNETIC HOVER EFFECT - Subtle pull towards cursor
     faqCards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            if (window.innerWidth > 991) {
-                gsap.to(card, {
-                    y: -5,
-                    translateZ: 20,
-                    borderColor: document.body.classList.contains('dark-mode') ? "rgba(0, 242, 255, 0.6)" : "rgba(59, 130, 246, 0.6)",
-                    boxShadow: "0 30px 60px rgba(0, 0, 0, 0.15)",
-                    duration: 0.4,
-                    ease: "power2.out"
-                });
-            }
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            
+            gsap.to(card, {
+                x: x * 0.1,
+                y: y * 0.1,
+                rotateX: -y * 0.05,
+                rotateY: x * 0.05,
+                duration: 0.4,
+                ease: "power2.out"
+            });
         });
 
         card.addEventListener('mouseleave', () => {
-            if (window.innerWidth > 991) {
-                gsap.to(card, {
-                    y: 0,
-                    translateZ: 0,
-                    borderColor: "inherit",
-                    boxShadow: "inherit",
-                    duration: 0.4,
-                    ease: "power2.out"
-                });
-            }
+            gsap.to(card, {
+                x: 0,
+                y: 0,
+                rotateX: 0,
+                rotateY: 0,
+                duration: 0.6,
+                ease: "elastic.out(1, 0.3)"
+            });
         });
     });
 });

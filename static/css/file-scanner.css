@@ -2,12 +2,12 @@
 
 /* ==================== HERO FILE DROP ZONE ==================== */
 .file-drop-hero {
-    border: 2px dashed rgba(59, 130, 246, 0.5);
+    border: 2px dashed var(--color-info-border);
     border-radius: 20px;
     padding: 50px 40px;
     text-align: center;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(10px);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
@@ -16,10 +16,10 @@
 }
 
 .file-drop-hero:hover {
-    border-color: #3b82f6;
-    background: rgba(15, 23, 42, 0.8);
+    border-color: var(--color-primary);
+    background: var(--color-bg-elevated);
     transform: translateY(-2px);
-    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.2);
+    box-shadow: var(--shadow-lg);
 }
 
 .file-drop-hero.drag-over {
@@ -54,14 +54,14 @@
 }
 
 .file-drop-hero h4 {
-    color: #fff;
+    color: var(--text-heading-primary);
     font-size: 1.5rem;
     margin-bottom: 10px;
     font-weight: 600;
 }
 
 .file-drop-hero > .file-drop-content > p {
-    color: #94a3b8;
+    color: var(--text-muted);
     margin-bottom: 25px;
     font-size: 1rem;
 }
@@ -228,7 +228,7 @@
 .upload-spinner {
     text-align: center;
     padding: 40px 20px;
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--glass-bg);
     border-radius: 20px;
     margin-top: 20px;
 }
@@ -247,7 +247,7 @@
 }
 
 .spinner-text {
-    color: #94a3b8;
+    color: var(--text-muted);
     font-size: 1.1rem;
     margin: 0;
 }
@@ -290,7 +290,7 @@
 }
 
 .file-info h4 {
-    color: #fff !important;
+    color: var(--text-heading-primary) !important;
     font-size: 1.3rem !important;
     margin-bottom: 5px !important;
 }
@@ -388,7 +388,7 @@
 
 .scan-stage-item.active span,
 .scan-stage-item.completed span {
-    color: #fff;
+    color: var(--text-heading-primary);
 }
 
 @keyframes pulse {
@@ -398,9 +398,9 @@
 }
 
 /* ==================== MAIN FILE SCANNER SECTION ==================== */
-#file-scanner-section {
+.file-scanner-section {
     padding: 60px 0;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: var(--color-bg-light);
     position: relative;
     overflow: hidden;
 }
@@ -434,7 +434,7 @@
     font-family: 'Outfit', sans-serif;
     font-size: 2.5rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-heading-primary);
     margin-bottom: 10px;
 }
 
@@ -445,12 +445,12 @@
 
 /* ==================== DROP ZONE ==================== */
 .file-drop-zone {
-    border: 2px dashed #3b82f6;
+    border: 2px dashed var(--color-primary);
     border-radius: 16px;
     padding: 60px 40px;
     text-align: center;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(10px);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
@@ -489,7 +489,7 @@
 }
 
 .file-drop-zone h3 {
-    color: #fff;
+    color: var(--text-heading-primary);
     font-size: 1.5rem;
     margin-bottom: 10px;
 }
@@ -556,7 +556,7 @@
 }
 
 .file-result-error h4 {
-    color: #fff;
+    color: var(--text-heading-primary);
     margin-bottom: 10px;
 }
 
@@ -570,7 +570,7 @@
     align-items: center;
     gap: 20px;
     padding: 25px;
-    background: rgba(15, 23, 42, 0.8);
+    background: var(--color-bg-elevated);
     border-radius: 16px;
     border-left: 4px solid;
     margin-bottom: 25px;
@@ -592,7 +592,7 @@
 }
 
 .file-result-title h3 {
-    color: #fff;
+    color: var(--text-heading-primary);
     font-size: 1.5rem;
     margin-bottom: 5px;
 }
@@ -610,8 +610,8 @@
 }
 
 .file-result-card {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-info-border);
     border-radius: 12px;
     padding: 20px;
 }
@@ -655,15 +655,15 @@
 
 /* Result Sections */
 .file-result-section {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-info-border);
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
 }
 
 .file-result-section h5 {
-    color: #fff;
+    color: var(--text-heading-primary);
     margin-bottom: 15px;
     display: flex;
     align-items: center;
@@ -706,14 +706,14 @@
 
 /* ==================== RISK METER ==================== */
 .file-result-risk-meter {
-    background: rgba(15, 23, 42, 0.8);
+    background: var(--color-bg-elevated);
     border-radius: 12px;
     padding: 25px;
     margin-bottom: 20px;
 }
 
 .file-result-risk-meter h5 {
-    color: #fff;
+    color: var(--text-heading-primary);
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -770,21 +770,21 @@
 }
 
 .btn-download-report {
-    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent-purple));
     border: none;
     color: #fff;
 }
 
 .btn-download-report:hover {
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-accent-purple));
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(59, 130, 246, 0.4);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-scan-another {
     background: transparent;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
+    border: 2px solid var(--glass-border);
+    color: var(--text-heading-primary);
 }
 
 .btn-scan-another:hover {
