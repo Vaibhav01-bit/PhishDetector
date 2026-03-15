@@ -302,5 +302,44 @@ def scan_status(scan_id):
     )
 
 
+@app.route("/scan-file", methods=["POST"])
+def scan_file():
+    """
+    Upload and analyze a file for security threats.
+    NO DATA IS STORED - All processing in memory.
+    Files are never written to disk.
+    """
+    from flask import jsonify
+    from src.pipeline.file_scanner import FileSecurityScanner
+
+    uploaded_file = request.files.get("file")
+
+    if not uploaded_file:
+        return jsonify({"error": "No file provided"}), 400
+
+    filename = uploaded_file.filename
+    if not filename:
+        return jsonify({"error": "No file provided"}), 400
+
+    try:
+        file_bytes = uploaded_file.read()
+    except Exception as e:
+        return jsonify({"error": "Could not read file"}), 400
+
+    scanner = FileSecurityScanner(phishing_pipeline=pipeline)
+
+    try:
+        result = scanner.analyze(file_bytes, filename)
+    except Exception as e:
+        import traceback
+
+        print(traceback.format_exc())
+        return jsonify({"error": "File could not be analyzed", "details": str(e)}), 500
+    finally:
+        del file_bytes
+
+    return jsonify(result)
+
+
 if __name__ == "__main__":
     app.run(debug=True)

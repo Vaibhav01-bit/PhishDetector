@@ -49,6 +49,7 @@
   <link href="static/css/scan-timeline.css" rel="stylesheet">
   <link href="static/css/modern-hero-bg.css" rel="stylesheet">
   <link href="static/css/faq-scroll.css" rel="stylesheet">
+  <link href="static/css/file-scanner.css" rel="stylesheet">
 
   <style>
     html {
@@ -80,6 +81,7 @@
         <ul>
           <li class="active"><a href="{{ url_for('home') }}">Home</a></li>
           <li><a onclick="scrolldiv()">About</a></li>
+          <li><a href="#file-scanner">File Scanner</a></li>
           <li><a href="{{ url_for('usecases') }}" target="_blank" rel="no-openner no-referrer">Usecases</a></li>
           <li class="drop-down"><a href="{{ url_for('home') }}">Help</a>
             <ul>
@@ -166,10 +168,13 @@
             <ul class="nav nav-pills justify-content-center mb-4" id="scanTabs" role="tablist" data-aos="fade-up"
               data-aos-delay="150">
               <li class="nav-item">
-                <a class="nav-link active" id="url-tab" data-toggle="pill" href="#url-scan" role="tab">Website URL</a>
+                <a class="nav-link active" id="url-tab" data-toggle="pill" href="#url-scan" role="tab"><i class='bx bx-link'></i> Website URL</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" id="email-tab" data-toggle="pill" href="#email-scan" role="tab">Email Content</a>
+                <a class="nav-link" id="email-tab" data-toggle="pill" href="#email-scan" role="tab"><i class='bx bx-envelope'></i> Email Content</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="file-tab" data-toggle="pill" href="#file-scan" role="tab"><i class='bx bx-file'></i> File Upload</a>
               </li>
             </ul>
 
@@ -216,6 +221,96 @@
                   <small class="text-white-50 mt-2 d-block text-center"><i class='bx bx-check-shield'></i> Content is
                     processed securely and never stored.</small>
                 </form>
+              </div>
+
+              <!-- File Scan Form -->
+              <div class="tab-pane fade" id="file-scan" role="tabpanel">
+                <!-- Drop Zone - wrapped in label for click-to-browse -->
+                <label for="file-input-hero" class="file-drop-hero" id="file-drop-hero">
+                  <div class="file-drop-content">
+                    <div class="drop-icon-wrapper">
+                      <i class='bx bx-cloud-upload'></i>
+                    </div>
+                    <h4>Upload File for Security Analysis</h4>
+                    <p>Drag & drop your file here or click to browse</p>
+                    <div class="file-types-row">
+                      <span class="file-type-badge"><i class='bx bxs-file-pdf'></i> PDF <small>(20MB)</small></span>
+                      <span class="file-type-badge"><i class='bx bxs-file-doc'></i> DOCX <small>(10MB)</small></span>
+                      <span class="file-type-badge"><i class='bx bxs-file-xls'></i> XLSX <small>(10MB)</small></span>
+                      <span class="file-type-badge"><i class='bx bxs-file-html'></i> HTML</span>
+                      <span class="file-type-badge"><i class='bx bxs-file-txt'></i> TXT</span>
+                      <span class="file-type-badge"><i class='bx bxs-file-archive'></i> ZIP <small>(10MB)</small></span>
+                    </div>
+                    <button type="button" class="btn btn-analyze mt-4" id="scan-file-hero-btn" disabled>
+                      <span class="btn-icon"><i class='bx bx-scan'></i></span>
+                      <span class="btn-text">Analyze File</span>
+                      <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+                    </button>
+                    <p class="privacy-hint mt-2"><i class='bx bx-lock-alt'></i> Files are analyzed in memory and never stored</p>
+                  </div>
+                  <div class="file-selected-content" id="file-selected-hero" style="display: none;">
+                    <div class="file-preview">
+                      <div class="file-icon-large">
+                        <i class='bx bx-file'></i>
+                      </div>
+                      <div class="file-info">
+                        <h4 id="hero-filename">filename.pdf</h4>
+                        <p id="hero-filesize">2.5 MB</p>
+                      </div>
+                    </div>
+                    <div class="file-actions">
+                      <button type="button" class="btn btn-analyze" id="scan-file-hero-btn-selected">
+                        <span class="btn-icon"><i class='bx bx-scan'></i></span>
+                        <span class="btn-text">Start Analysis</span>
+                        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+                      </button>
+                      <button type="button" class="btn btn-clear" id="clear-file-hero">
+                        <i class='bx bx-x'></i> Remove
+                      </button>
+                    </div>
+                  </div>
+                </label>
+                <input type="file" id="file-input-hero" name="file" accept=".pdf,.docx,.doc,.xlsx,.xls,.html,.htm,.txt,.zip" hidden>
+                
+                <!-- Upload Spinner -->
+                <div class="upload-spinner" id="upload-spinner" style="display: none;">
+                  <div class="spinner-wrapper">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="sr-only">Uploading...</span>
+                    </div>
+                  </div>
+                  <p class="spinner-text">Uploading file...</p>
+                </div>
+                
+                <!-- Scanning Animation -->
+                <div id="file-scan-progress-hero" style="display: none;">
+                  <div class="scan-stages">
+                    <div class="scan-stage-item" data-stage="1">
+                      <div class="stage-icon"><i class='bx bx-upload'></i></div>
+                      <span>Uploading</span>
+                    </div>
+                    <div class="scan-stage-item" data-stage="2">
+                      <div class="stage-icon"><i class='bx bx-scan'></i></div>
+                      <span>Analyzing</span>
+                    </div>
+                    <div class="scan-stage-item" data-stage="3">
+                      <div class="stage-icon"><i class='bx bx-link'></i></div>
+                      <span>URL Scan</span>
+                    </div>
+                    <div class="scan-stage-item" data-stage="4">
+                      <div class="stage-icon"><i class='bx bx-shield'></i></div>
+                      <span>Report</span>
+                    </div>
+                  </div>
+                  <div class="progress mt-3">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                  </div>
+                  <p class="text-center text-white-50 mt-2" id="hero-scan-status">Analyzing file...</p>
+                </div>
+                <!-- Hero Results -->
+                <div id="file-scan-results-hero" style="display: none;">
+                  <!-- Results will be displayed here -->
+                </div>
               </div>
             </div>
 
@@ -770,6 +865,45 @@
     </div>
   </section><!-- End Frequently Asked Questions Section -->
 
+  <!-- ======= File Security Scanner Section ======= -->
+  <section id="file-scanner" class="file-scanner-section">
+    <div class="container">
+      <div class="file-scanner-container">
+        <div class="file-scanner-header">
+          <h2>Advanced File Security Scanner</h2>
+          <p>Analyze files for malware, phishing links, and suspicious content</p>
+        </div>
+
+        <form id="file-scan-form" enctype="multipart/form-data">
+          <div class="file-drop-zone" id="file-drop-zone">
+            <i class="bx bx-cloud-upload file-drop-zone-icon"></i>
+            <h3>Drag & Drop Your File Here</h3>
+            <p>or click to browse</p>
+            <input type="file" id="file-input" name="file" accept=".pdf,.docx,.doc,.xlsx,.xls,.html,.htm,.txt,.zip" style="display: none;">
+            <div class="supported-formats">
+              <span class="format-badge">PDF</span>
+              <span class="format-badge">DOCX</span>
+              <span class="format-badge">XLSX</span>
+              <span class="format-badge">HTML</span>
+              <span class="format-badge">TXT</span>
+              <span class="format-badge">ZIP</span>
+            </div>
+          </div>
+        </form>
+
+        <div id="file-scan-progress">
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+
+        <div id="file-scan-results">
+          <!-- Results will be displayed here -->
+        </div>
+      </div>
+    </div>
+  </section><!-- End File Security Scanner Section -->
+
   <main id="main">
 
     <!-- ======= about Section ======= -->
@@ -956,6 +1090,7 @@
 
   <script src="static/js/theme-toggle.js"></script>
   <script src="static/js/scan-timeline.js"></script>
+  <script src="static/js/file-scanner.js"></script>
 
   <!-- GSAP & ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>

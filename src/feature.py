@@ -11,7 +11,7 @@ from datetime import date, datetime
 import time
 from dateutil.parser import parse as date_parse
 from urllib.parse import urlparse, ParseResult
-from typing import Optional
+from typing import Optional, Any
 
 from urllib3.util import url
 
@@ -47,7 +47,7 @@ def sanitize_url(input_url):
 class FeatureExtraction:
     url: str
     domain: str
-    whois_response: Optional[whois.whois]
+    whois_response: Optional[Any]
     urlparse: ParseResult
     response: Optional[requests.Response]
     soup: BeautifulSoup
