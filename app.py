@@ -7,7 +7,11 @@ from sklearn import metrics
 import warnings
 import pickle
 import os
+from dotenv import load_dotenv
 from src.convert import convertion
+
+# Load environment variables from .env file
+load_dotenv()
 
 warnings.filterwarnings("ignore")
 
@@ -18,6 +22,11 @@ from src.pipeline.manager import PhishingDetectionPipeline, SAFE, WARNING, PHISH
 pipeline = PhishingDetectionPipeline()
 
 app = Flask(__name__)
+
+# Configuration from environment variables
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", os.urandom(24))
+app.config["TELEGRAM_BOT_TOKEN"] = os.getenv("TELEGRAM_BOT_TOKEN")
+app.config["TELEGRAM_CHAT_ID"] = os.getenv("TELEGRAM_CHAT_ID")
 
 
 @app.route("/")
