@@ -1,0 +1,641 @@
+/**
+ * Email Security Scanner Styles
+ * Professional multi-layer phishing detection UI
+ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   EMAIL SCANNER WRAPPER
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.email-scanner-wrapper {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   INPUT SECTION
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.email-input-section {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: var(--glass-blur);
+}
+
+.email-input-section textarea {
+    width: 100%;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    color: var(--text-heading-primary);
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 150px;
+    transition: all 0.3s ease;
+}
+
+.email-input-section textarea:focus {
+    outline: none;
+    border-color: #3b4ef8;
+    box-shadow: 0 0 0 3px rgba(59, 78, 248, 0.2);
+}
+
+.email-input-section textarea::placeholder {
+    color: var(--text-muted);
+}
+
+.email-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.email-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.privacy-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.privacy-hint i {
+    font-size: 14px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCANNING PROGRESS ANIMATION CONTAINER
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.email-scan-progress {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 20px;
+    backdrop-filter: var(--glass-blur);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCANNING PROGRESS ANIMATION
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.email-scan-stages {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    position: relative;
+}
+
+.email-scan-stages::before {
+    content: '';
+    position: absolute;
+    top: 42px;
+    left: 60px;
+    right: 60px;
+    height: 2px;
+    background: var(--glass-border);
+    z-index: 0;
+}
+
+.email-scan-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.email-scan-stage.active {
+    opacity: 1;
+}
+
+.email-scan-stage.completed {
+    opacity: 1;
+}
+
+.email-scan-stage.completed .stage-icon-wrapper {
+    background: #22c55e;
+    border-color: #22c55e;
+}
+
+.email-scan-stage.completed .stage-checkmark {
+    display: flex;
+}
+
+.stage-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(59, 78, 248, 0.2);
+    border: 2px solid #3b4ef8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.email-scan-stage.active .stage-icon-wrapper {
+    background: #3b4ef8;
+    animation: pulse 1s infinite;
+}
+
+.stage-icon-wrapper i {
+    font-size: 24px;
+    color: var(--text-heading-primary);
+}
+
+.stage-name {
+    font-size: 12px;
+    color: var(--text-metadata);
+    text-align: center;
+    max-width: 80px;
+}
+
+.email-scan-stage.completed .stage-name {
+    color: #22c55e;
+}
+
+.stage-checkmark {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 20px;
+    height: 20px;
+    background: #22c55e;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.stage-checkmark i {
+    font-size: 12px;
+    color: white;
+}
+
+.email-scan-status {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.status-text {
+    font-size: 14px;
+    color: var(--text-metadata);
+    margin-bottom: 12px;
+}
+
+.progress-bar-container {
+    height: 4px;
+    background: var(--glass-border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b4ef8, #8b5cf6);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(59, 78, 248, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(59, 78, 248, 0);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESULTS CARD
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.email-result-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    overflow: hidden;
+    backdrop-filter: var(--glass-blur);
+}
+
+.result-header {
+    padding: 24px;
+    background: var(--color-bg-elevated);
+    border-bottom: 1px solid var(--glass-border);
+    border-left: 4px solid;
+}
+
+.risk-meter-container {
+    margin-bottom: 16px;
+}
+
+.risk-meter {
+    height: 8px;
+    background: var(--glass-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.risk-meter-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.risk-meter-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.result-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.result-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.result-icon i {
+    font-size: 32px;
+    color: white;
+}
+
+.result-text h3 {
+    font-size: 24px;
+    margin: 0 0 4px 0;
+}
+
+.result-text p {
+    margin: 0;
+    color: var(--text-metadata);
+    font-size: 14px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESULT SECTIONS
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.result-section {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.result-section:last-of-type {
+    border-bottom: none;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.section-header i {
+    font-size: 20px;
+    color: #60a5fa;
+}
+
+.section-header h4 {
+    margin: 0;
+    font-size: 16px;
+    color: var(--text-heading-primary);
+    font-weight: 600;
+}
+
+/* Sender Section */
+.sender-info {
+    background: var(--color-bg-elevated);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.info-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+}
+
+.info-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    min-width: 60px;
+}
+
+.info-value {
+    font-size: 13px;
+    color: var(--text-heading-primary);
+    word-break: break-all;
+}
+
+.sender-issues {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.issue-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.issue-badge i {
+    font-size: 12px;
+}
+
+/* Links Section */
+.links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.link-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--color-bg-elevated);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border-left: 3px solid #22c55e;
+}
+
+.link-item.warning {
+    border-left-color: #f59e0b;
+}
+
+.link-item.danger {
+    border-left-color: #ef4444;
+}
+
+.link-domain {
+    font-size: 13px;
+    color: var(--text-heading-primary);
+    word-break: break-all;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-safe {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+}
+
+.status-suspicious {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+.status-phishing {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.status-unknown {
+    background: rgba(107, 114, 128, 0.2);
+    color: #9ca3af;
+}
+
+/* Content Section */
+.content-patterns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pattern-badge {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+/* Auth Section */
+.auth-results {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.auth-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.auth-badge.success {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+}
+
+.auth-badge.danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.auth-badge.secondary {
+    background: rgba(107, 114, 128, 0.15);
+    color: #9ca3af;
+}
+
+/* Brand Impersonation */
+.result-section.brand-section.danger {
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 4px solid #ef4444;
+}
+
+.brand-warning {
+    background: rgba(239, 68, 68, 0.15);
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.brand-warning p {
+    margin: 0;
+    color: #f87171;
+    font-size: 14px;
+}
+
+.brand-warning strong {
+    color: white;
+}
+
+/* Explanation Section */
+.explanation-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.explanation-list li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-body);
+}
+
+.explanation-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    background: #f59e0b;
+    border-radius: 50%;
+}
+
+/* Result Actions */
+.result-actions {
+    padding: 20px 24px;
+    text-align: center;
+    border-top: 1px solid var(--glass-border);
+}
+
+.result-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ERROR STATE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.email-result-error {
+    text-align: center;
+    padding: 40px 24px;
+}
+
+.email-result-error i {
+    font-size: 48px;
+    color: #ef4444;
+    margin-bottom: 16px;
+}
+
+.email-result-error h4 {
+    color: var(--text-heading-primary);
+    margin: 0 0 8px 0;
+}
+
+.email-result-error p {
+    color: var(--text-metadata);
+    margin: 0 0 20px 0;
+}
+
+/* Removed hardcoded dark mode adjustments */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 576px) {
+    .email-scan-stages {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+        padding-left: 20px;
+    }
+
+    .email-scan-stages::before {
+        display: none;
+    }
+
+    .email-scan-stage {
+        flex-direction: row;
+        gap: 12px;
+    }
+
+    .stage-name {
+        max-width: none;
+        text-align: left;
+    }
+
+    .email-actions {
+        flex-direction: column;
+    }
+
+    .email-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

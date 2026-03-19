@@ -50,6 +50,7 @@
   <link href="static/css/modern-hero-bg.css" rel="stylesheet">
   <link href="static/css/faq-scroll.css" rel="stylesheet">
   <link href="static/css/file-scanner.css" rel="stylesheet">
+  <link href="static/css/email-scanner.css" rel="stylesheet">
 
   <style>
     html {
@@ -204,22 +205,38 @@
                 </form>
               </div>
 
-              <!-- Email Scan Form -->
+              <!-- Email Scan Form - Enhanced -->
               <div class="tab-pane fade" id="email-scan" role="tabpanel">
-                <form action="/scan_email" method="POST" class="scan-form">
-                  <div class="input-group neon-box">
-                    <div class="input-content-mask email-input-mask">
-                      <textarea name="email_text" class="form-control" rows="3"
-                        placeholder="Paste email content here to scan for links..." required
-                        style="min-height: 80px; resize: none;"></textarea>
-                      <div class="input-group-append">
-                        <button type="submit" class="btn btn-primary" style="height: auto;">Scan Email</button>
-                      </div>
+                <div class="email-scanner-wrapper">
+                  <div class="email-input-section">
+                    <textarea id="email-input" class="form-control" rows="5"
+                      placeholder="Paste email content here (with or without headers) to analyze for phishing..."
+                      maxlength="102400"></textarea>
+                    
+                    <div class="email-actions">
+                      <label for="email-attachment" class="btn btn-outline-secondary">
+                        <i class='bx bx-paperclip'></i> Attach File
+                      </label>
+                      <input type="file" id="email-attachment" hidden accept=".pdf,.docx,.doc,.xlsx,.xls,.zip,.txt,.html">
+                      <button type="button" id="scan-email-btn" class="btn btn-analyze">
+                        <i class='bx bx-scan'></i> Analyze Email
+                      </button>
                     </div>
+                    
+                    <p class="privacy-hint">
+                      <i class='bx bx-lock-alt'></i> 
+                      Max 100KB email, 10MB attachment • Never stored • Ctrl+Enter to scan
+                    </p>
                   </div>
-                  <small class="text-white-50 mt-2 d-block text-center"><i class='bx bx-check-shield'></i> Content is
-                    processed securely and never stored.</small>
-                </form>
+                  
+                  <!-- Scanning Animation -->
+                  <div id="email-scan-progress" class="email-scan-progress" style="display: none;">
+                  </div>
+                  
+                  <!-- Results Section -->
+                  <div id="email-scan-results" class="email-results-container" style="display: none;">
+                  </div>
+                </div>
               </div>
 
               <!-- File Scan Form -->
@@ -1051,6 +1068,7 @@
   <script src="static/js/theme-toggle.js"></script>
   <script src="static/js/scan-timeline.js"></script>
   <script src="static/js/file-scanner.js"></script>
+  <script src="static/js/email-scanner.js"></script>
 
   <!-- GSAP & ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>

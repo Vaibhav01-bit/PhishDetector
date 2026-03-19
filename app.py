@@ -1,6 +1,7 @@
 # importing required libraries
 
 from flask import Flask, request, render_template, redirect, url_for
+from flask_cors import CORS
 import numpy as np
 import pandas as pd
 from sklearn import metrics
@@ -22,6 +23,9 @@ from src.pipeline.manager import PhishingDetectionPipeline, SAFE, WARNING, PHISH
 pipeline = PhishingDetectionPipeline()
 
 app = Flask(__name__)
+
+# Enable CORS for all API endpoints
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Configuration from environment variables
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", os.urandom(24))
@@ -206,6 +210,51 @@ def scan_email():
         email_results=scan_results,
         email_text_preview=email_text[:100] + "...",
     )
+
+
+@app.route("/api/scan_email", methods=["POST"])
+def api_scan_email():
+    """
+    AJAX endpoint for enhanced email scanning.
+    Returns JSON response for progressive UI.
+    """
+    from flask import jsonify
+    from src.pipeline.email_analyzer import EmailAnalyzer
+
+    email_text = request.form.get("email_text", "")
+
+    if not email_text:
+        return jsonify({"success": False, "error": "No email content provided"}), 400
+
+    MAX_EMAIL_SIZE = 100 * 1024
+    if len(email_text) > MAX_EMAIL_SIZE:
+        return jsonify(
+            {
+                "success": False,
+                "error": f"Email content exceeds {MAX_EMAIL_SIZE // 1024}KB limit",
+            }
+        ), 400
+
+    attachment = request.files.get("attachment") if request.files else None
+
+    try:
+        analyzer = EmailAnalyzer()
+        result = analyzer.analyze(email_text, attachment)
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        import sys
+
+        error_trace = "".join(traceback.format_exception(type(e), e, e.__traceback__))
+        print(f"[Email Scan Error] {error_trace}", file=sys.stderr)
+
+        return jsonify(
+            {
+                "success": False,
+                "error": str(e),
+                "trace": error_trace if app.debug else None,
+            }
+        ), 500
 
 
 @app.route("/rescan", methods=["POST"])
