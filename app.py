@@ -400,5 +400,82 @@ def scan_file():
     return jsonify(result)
 
 
+@app.route("/api/scan_qr", methods=["POST"])
+def api_scan_qr():
+    """
+    Analyze QR code for security threats.
+    NO DATA IS STORED - All processing in memory.
+
+    Accepts:
+    - qr_content: Direct text content from QR code
+    - qr_image: Base64 encoded QR image
+    """
+    from flask import jsonify, request
+    from src.pipeline.qr_analyzer import QRAnalyzer
+
+    # Get data from form or JSON body
+    if request.is_json:
+        data = request.get_json()
+        qr_content = data.get("qr_content", "") or ""
+        qr_image = data.get("qr_image", "") or ""
+    else:
+        qr_content = request.form.get("qr_content", "") or ""
+        qr_image = request.form.get("qr_image", "") or ""
+
+    print(
+        f"[QR API] Request - content: '{str(qr_content)[:30]}...', image length: {len(qr_image)}"
+    )
+
+    # Validate image size (limit to 10MB base64)
+    if qr_image and len(qr_image) > 10 * 1024 * 1024:
+        print("[QR API] Image too large")
+        return jsonify(
+            {
+                "success": False,
+                "error": "Image too large. Please use a smaller image.",
+                "risk_score": 0,
+                "risk_level": "Safe",
+            }
+        ), 400
+
+    if not qr_content and not qr_image:
+        print("[QR API] No content provided")
+        return jsonify({"error": "No QR content or image provided"}), 400
+
+    try:
+        analyzer = QRAnalyzer()
+
+        if qr_image and not qr_content:
+            print("[QR API] Decoding image...")
+            qr_content = analyzer.decode_from_image(qr_image)
+            print(f"[QR API] Decoded: {qr_content}")
+            if not qr_content:
+                print("[QR API] No QR code found in image")
+                return jsonify(
+                    {
+                        "success": False,
+                        "error": "No QR code found in the image. Please ensure the image contains a visible QR code.",
+                        "risk_score": 0,
+                        "risk_level": "Safe",
+                    }
+                ), 200  # Return 200 with success:false, not 400
+
+        print(f"[QR API] Analyzing: {str(qr_content)[:50]}...")
+        result = analyzer.analyze(qr_content, qr_image)
+        print(f"[QR API] Result: {result.get('risk_level')}")
+
+        del qr_image
+
+        return jsonify(result)
+
+    except Exception as e:
+        import traceback
+
+        print(f"[QR API] Error: {traceback.format_exc()}")
+        return jsonify(
+            {"success": False, "error": str(e), "risk_score": 0, "risk_level": "Safe"}
+        ), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True)

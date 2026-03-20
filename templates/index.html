@@ -51,6 +51,7 @@
   <link href="static/css/faq-scroll.css" rel="stylesheet">
   <link href="static/css/file-scanner.css" rel="stylesheet">
   <link href="static/css/email-scanner.css" rel="stylesheet">
+  <link href="static/css/qr-scanner.css" rel="stylesheet">
 
   <style>
     html {
@@ -171,6 +172,9 @@
                 <a class="nav-link active" id="url-tab" data-toggle="pill" href="#url-scan" role="tab"><i class='bx bx-link'></i> Website URL</a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" id="qr-tab" data-toggle="pill" href="#qr-scan" role="tab"><i class='bx bx-qr-scan'></i> QR Code</a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link" id="email-tab" data-toggle="pill" href="#email-scan" role="tab"><i class='bx bx-envelope'></i> Email Content</a>
               </li>
               <li class="nav-item">
@@ -203,6 +207,98 @@
                     <span>Your scan results are 100% private and encrypted.</span>
                   </div>
                 </form>
+              </div>
+
+              <!-- QR Code Scan Form -->
+              <div class="tab-pane fade" id="qr-scan" role="tabpanel">
+                <div class="qr-scanner-wrapper">
+                  <div class="qr-input-section">
+                    <div class="qr-actions-row">
+                      <button type="button" id="qr-upload-btn" class="qr-btn qr-btn-primary">
+                        <i class="bx bx-upload"></i> Upload QR Image
+                      </button>
+                      <button type="button" id="qr-camera-btn" class="qr-btn qr-btn-camera">
+                        <i class="bx bx-camera"></i> Start Camera
+                      </button>
+                    </div>
+                    
+                    <input type="file" id="qr-file-input" class="qr-file-input" accept="image/*">
+                    
+                    <div class="qr-preview-area" id="qr-preview-area">
+                      <div class="qr-preview-icon">
+                        <i class="bx bx-qr-scan"></i>
+                      </div>
+                      <p class="qr-preview-text" id="qr-preview-text">Upload QR code image or start camera</p>
+                      <img id="qr-preview-image" class="qr-preview-image" style="display: none;" alt="QR Preview">
+                    </div>
+                    
+                    <div class="qr-camera-section" id="qr-camera-section" style="display: none;">
+                      <div class="qr-camera-wrapper">
+                        <button type="button" id="qr-exit-fullscreen" class="qr-exit-fullscreen" title="Close Scanner">
+                          <i class="bx bx-x"></i>
+                        </button>
+                        <div id="qr-reader"></div>
+                        <div class="qr-scan-overlay">
+                          <div class="qr-scan-box">
+                            <div class="qr-corner top-left"></div>
+                            <div class="qr-corner top-right"></div>
+                            <div class="qr-corner bottom-left"></div>
+                            <div class="qr-corner bottom-right"></div>
+                            <div class="qr-scan-line"></div>
+                          </div>
+                          <p class="qr-scan-instruction" id="qr-scan-instruction">
+                            Align QR code inside the box
+                          </p>
+                        </div>
+                      </div>
+                      <p class="qr-camera-tips">
+                        <i class="bx bx-info-circle"></i>
+                        Ensure good lighting • Keep steady • Move closer if needed
+                      </p>
+                    </div>
+                    
+                    <div class="qr-manual-input" id="qr-manual-section" style="display: none;">
+                      <textarea id="qr-manual-input" class="form-control" rows="2" placeholder="Or paste QR content manually (URL, UPI ID, etc.)"></textarea>
+                    </div>
+                    
+                    <button type="button" id="qr-scan-btn" class="qr-btn qr-btn-secondary" style="margin-top: 16px; width: 100%;">
+                      <i class="bx bx-scan"></i> Analyze QR Code
+                    </button>
+                    
+                    <div style="display: flex; gap: 12px; margin-top: 12px;">
+                      <button type="button" id="qr-manual-toggle" class="qr-btn qr-btn-secondary" style="flex: 0 0 auto;">
+                        <i class="bx bx-edit"></i> Enter Manually
+                      </button>
+                    </div>
+                    
+                    <p class="qr-privacy-hint">
+                      <i class="bx bx-lock-alt"></i> QR images are processed in memory and never stored
+                    </p>
+                  </div>
+                  
+                  <!-- Scanning Progress -->
+                  <div id="qr-scan-progress" class="qr-scan-progress">
+                    <div class="qr-scan-stages">
+                      <div class="qr-scan-stage" data-stage="1">
+                        <div class="qr-scan-stage-icon"><i class="bx bx-qr-scan"></i></div>
+                        <span class="qr-scan-stage-text">Decoding QR Code</span>
+                      </div>
+                      <div class="qr-scan-stage" data-stage="2">
+                        <div class="qr-scan-stage-icon"><i class="bx bx-search-alt"></i></div>
+                        <span class="qr-scan-stage-text">Analyzing Content</span>
+                      </div>
+                      <div class="qr-scan-stage" data-stage="3">
+                        <div class="qr-scan-stage-icon"><i class="bx bx-shield"></i></div>
+                        <span class="qr-scan-stage-text">Calculating Risk</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Results -->
+                  <div id="qr-results-container" class="qr-results-container">
+                    <div id="qr-results-content"></div>
+                  </div>
+                </div>
               </div>
 
               <!-- Email Scan Form - Enhanced -->
@@ -1046,6 +1142,8 @@
   <!-- Vendor JS Files -->
   <script src="https://code.jquery.com/jquery-3.5.1.min.js" defer></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer></script>
+  <script src="https://unpkg.com/html5-qrcode@2.2.3/html5-qrcode.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/venobox/1.9.3/venobox.min.js" defer></script>
@@ -1069,6 +1167,7 @@
   <script src="static/js/scan-timeline.js"></script>
   <script src="static/js/file-scanner.js"></script>
   <script src="static/js/email-scanner.js"></script>
+  <script src="static/js/qr-scanner.js"></script>
 
   <!-- GSAP & ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>

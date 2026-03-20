@@ -53,3 +53,8 @@ htmlcov/
 *.pem
 *.key
 credentials.json
+
+# Corrupted and backup items
+nul
+venv_backup/
+Logs/
