@@ -5,7 +5,7 @@
       "name": "YouTube"
     },
     "google": {
-      "official_domains": ["google.com", "gmail.com", "accounts.google.com", "goo.gl", "googleapis.com"],
+      "official_domains": ["google.com", "gmail.com", "accounts.google.com", "goo.gl", "googleapis.com", "pay.google.com"],
       "name": "Google"
     },
     "paypal": {
@@ -13,7 +13,7 @@
       "name": "PayPal"
     },
     "amazon": {
-      "official_domains": ["amazon.com", "amazon.co.uk", "amazon.de", "amazon.fr", "amazon.in", "ssl-images-amazon.com", "media-amazon.com"],
+      "official_domains": ["amazon.com", "amazon.co.uk", "amazon.de", "amazon.fr", "amazon.in", "ssl-images-amazon.com", "media-amazon.com", "amazonaws.com"],
       "name": "Amazon"
     },
     "facebook": {
@@ -29,7 +29,7 @@
       "name": "Twitter"
     },
     "microsoft": {
-      "official_domains": ["microsoft.com", "live.com", "office.com", "outlook.com", "microsoftonline.com", "windows.com"],
+      "official_domains": ["microsoft.com", "live.com", "office.com", "outlook.com", "microsoftonline.com", "windows.com", "teams.microsoft.com"],
       "name": "Microsoft"
     },
     "apple": {
@@ -99,6 +99,126 @@
     "tiktok": {
       "official_domains": ["tiktok.com", "tiktokcdn.com"],
       "name": "TikTok"
+    },
+    "hdfc": {
+      "official_domains": ["hdfcbank.com", "hdfcnetbanking.com", "hdfcbank.co.in"],
+      "name": "HDFC Bank"
+    },
+    "sbi": {
+      "official_domains": ["sbi.co.in", "onlinesbi.com", "statebankofindia.co.in", "sbigen.in"],
+      "name": "State Bank of India"
+    },
+    "icici": {
+      "official_domains": ["icicibank.com", "icicinetbanking.com", "icicibank.co.in"],
+      "name": "ICICI Bank"
+    },
+    "axis": {
+      "official_domains": ["axisbank.com", "axisbank.co.in", "axisbiz.in"],
+      "name": "Axis Bank"
+    },
+    "kotak": {
+      "official_domains": ["kotak.com", "kotaknetbanking.com", "kotakbanking.com"],
+      "name": "Kotak Bank"
+    },
+    "paytm": {
+      "official_domains": ["paytm.com", "paytmpayments.com", "paytm.in"],
+      "name": "Paytm"
+    },
+    "phonepe": {
+      "official_domains": ["phonepe.com", "phonepe.in"],
+      "name": "PhonePe"
+    },
+    "gpay": {
+      "official_domains": ["pay.google.com", "gpay.app"],
+      "name": "Google Pay"
+    },
+    "upi": {
+      "official_domains": ["upi.co.in", "npci.org.in"],
+      "name": "UPI"
+    },
+    "yesbank": {
+      "official_domains": ["yesbank.in", "yesbank.co.in"],
+      "name": "Yes Bank"
+    },
+    "pnb": {
+      "official_domains": ["pnbindia.in", "punjabnationalbank.co.in"],
+      "name": "Punjab National Bank"
+    },
+    "bob": {
+      "official_domains": ["bankofbaroda.in", "bob.ibps.in"],
+      "name": "Bank of Baroda"
+    },
+    "canara": {
+      "official_domains": ["canarabank.in", "canarabank.co.in"],
+      "name": "Canara Bank"
+    },
+    "unionbank": {
+      "official_domains": ["unionbankofindia.co.in", "unionbankonline.co.in"],
+      "name": "Union Bank"
+    },
+    "bankofindia": {
+      "official_domains": ["bankofindia.co.in"],
+      "name": "Bank of India"
+    },
+    "idbi": {
+      "official_domains": ["idbi.com", "idbibank.in"],
+      "name": "IDBI Bank"
+    },
+    "indusind": {
+      "official_domains": ["indusind.com", "indusindbank.com"],
+      "name": "IndusInd Bank"
+    },
+    "au": {
+      "official_domains": ["aubank.in"],
+      "name": "AU Bank"
+    },
+    "federalbank": {
+      "official_domains": ["federalbank.co.in"],
+      "name": "Federal Bank"
+    },
+    "rbl": {
+      "official_domains": ["rblbank.com"],
+      "name": "RBL Bank"
+    },
+    "bandhan": {
+      "official_domains": ["bandhanbank.com"],
+      "name": "Bandhan Bank"
+    },
+    "ios": {
+      "official_domains": ["apple.com", "icloud.com"],
+      "name": "iCloud"
+    },
+    "steam": {
+      "official_domains": ["steampowered.com", "steamcommunity.com"],
+      "name": "Steam"
+    },
+    "epicgames": {
+      "official_domains": ["epicgames.com"],
+      "name": "Epic Games"
+    },
+    "coinbase": {
+      "official_domains": ["coinbase.com"],
+      "name": "Coinbase"
+    },
+    "binance": {
+      "official_domains": ["binance.com"],
+      "name": "Binance"
+    },
+    "flipkart": {
+      "official_domains": ["flipkart.com", "flipkart.in"],
+      "name": "Flipkart"
+    },
+    "myntra": {
+      "official_domains": ["myntra.com"],
+      "name": "Myntra"
+    },
+    "swiggy": {
+      "official_domains": ["swiggy.com", "swiggy.in"],
+      "name": "Swiggy"
+    },
+    "zomato": {
+      "official_domains": ["zomato.com", "zomato.co.in"],
+      "name": "Zomato"
     }
   }
 }

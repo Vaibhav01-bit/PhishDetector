@@ -28,6 +28,10 @@
     --status-danger-bg: rgba(239, 68, 68, 0.1);
     --status-danger-border: #EF4444;
     --status-danger-text: #DC2626;
+
+    --status-info-bg: rgba(59, 130, 246, 0.1);
+    --status-info-border: #3B82F6;
+    --status-info-text: #3B82F6;
 }
 
 [data-theme="dark"] {
@@ -201,6 +205,13 @@ h2 {
     color: var(--status-danger-text);
     border-color: var(--status-danger-border);
     box-shadow: 0 8px 24px rgba(239, 68, 68, 0.2);
+}
+
+.verdict-badge.info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3B82F6;
+    border-color: #3B82F6;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
 }
 
 .verdict-badge i {
@@ -485,6 +496,16 @@ h2 {
     text-align: center;
     padding: 60px 20px;
     color: var(--text-secondary);
+}
+
+.no-screenshot small {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    max-width: 400px;
+    margin: 8px auto 0;
+    opacity: 0.7;
+    word-break: break-word;
 }
 
 .no-screenshot i {

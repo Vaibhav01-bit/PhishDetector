@@ -238,6 +238,7 @@ class EmailAnalyzer:
             )
             result["risk_score"] = risk_result["score"]
             result["risk_level"] = risk_result["level"]
+            result["critical_flags"] = risk_result.get("critical_flags", [])
 
             result["explanation"] = self._generate_explanation(
                 result["sender"],
@@ -361,6 +362,16 @@ class EmailAnalyzer:
             result["issues"].append(f"Free email domain used: {domain_lower}")
             result["score"] += 5
 
+        # CRITICAL: Check for fake brand impersonation
+        fake_brand = self._check_fake_brand_domain(domain_lower)
+        if fake_brand:
+            result["fake_brand"] = fake_brand
+            result["issues"].append(
+                f"FAKE {fake_brand['name'].upper()} DOMAIN: '{domain_lower}' is NOT official"
+            )
+            result["score"] += 40
+            result["risk_level"] = "high"
+
         lookalike = self._detect_lookalike(domain_base)
         if lookalike:
             result["issues"].append(
@@ -406,6 +417,10 @@ class EmailAnalyzer:
             if len(brand) < 4:
                 continue
 
+            # Skip if domain base exactly matches brand (official domain)
+            if domain_base == brand:
+                continue
+
             distance = self._levenshtein_distance(domain_base, brand)
 
             if distance <= 2 and len(domain_base) == len(brand):
@@ -416,6 +431,42 @@ class EmailAnalyzer:
 
             if self._has_numeric_substitution(domain_base, brand):
                 return brand
+
+        return None
+
+    def _check_fake_brand_domain(self, domain: str) -> Optional[Dict]:
+        """
+        Check if domain claims to be a brand but is NOT official.
+        Returns brand data if fake, None if legitimate.
+
+        Example:
+        - hdfc-secure-login.com -> FAKE (returns HDFC Bank data)
+        - hdfcbank.com -> LEGITIMATE (returns None)
+        """
+        domain_base = domain.split(".")[0].lower()
+
+        for brand_key, brand_data in self.brand_detector.brands.items():
+            # Check if domain contains brand name (as substring)
+            if (
+                brand_key in domain_base
+                or brand_data["name"].lower().replace(" ", "").replace("-", "")
+                in domain_base
+            ):
+                # Check if it's an official domain
+                is_official = False
+                for official in brand_data["official_domains"]:
+                    official_base = official.split(".")[0]
+                    if (
+                        domain_base == official_base
+                        or domain == official
+                        or domain.endswith("." + official)
+                        or official in domain
+                    ):
+                        is_official = True
+                        break
+
+                if not is_official:
+                    return brand_data
 
         return None
 
@@ -786,22 +837,66 @@ class EmailAnalyzer:
         brand: Dict,
         attachments: List,
     ) -> Dict[str, Any]:
-        """Layer 7: Calculate final risk score."""
-        score = 0
+        """
+        Layer 7: Calculate final risk score with CRITICAL OVERRIDE RULES.
 
+        Classification Thresholds:
+        - 0-30: SAFE
+        - 31-69: SUSPICIOUS
+        - 70-100: PHISHING
+
+        Critical Override Rules (Force PHISHING regardless of score):
+        1. Phishing URL detected
+        2. Fake brand domain
+        3. Brand impersonation
+        4. Link mismatch
+        5. HTTP + financial keywords
+        6. Credential harvesting pattern
+        """
+        score = 0
+        critical_flags = []
+
+        # === BASE SENDER SCORING ===
         score += min(sender.get("score", 0), 25)
 
+        # === LINK SCORING ===
         phishing_links = links["summary"].get("phishing", 0)
         suspicious_links = links["summary"].get("suspicious", 0)
         mismatched = links["summary"].get("mismatched", 0)
+        http_financial = links["summary"].get("http_financial", 0)
 
-        score += min(phishing_links * 20, 30)
-        score += min(suspicious_links * 10, 20)
-        score += min(mismatched * 15, 15)
+        # CRITICAL: Phishing URLs - HIGH penalty +50 each
+        if phishing_links > 0:
+            score += phishing_links * 50
+            critical_flags.append(f"PHISHING URL DETECTED ({phishing_links})")
 
+        # Suspicious URLs - NO critical override
+        if suspicious_links > 0:
+            score += suspicious_links * 15
+
+        # CRITICAL: Link mismatch
+        if mismatched > 0:
+            score += mismatched * 25
+            critical_flags.append("LINK MISMATCH DETECTED")
+
+        # CRITICAL: HTTP + financial keywords
+        if http_financial > 0:
+            score += http_financial * 40
+            critical_flags.append("HTTP + FINANCIAL KEYWORDS")
+
+        # === CONTENT SCORING ===
         content_score = content.get("phishing_score", 0)
         score += min(content_score, 20)
 
+        # Check for credential harvesting pattern
+        urgency_keywords = content.get("urgency_indicators", [])
+        has_urgency = len(urgency_keywords) > 0
+        has_suspicious_link = suspicious_links > 0 or phishing_links > 0
+
+        if has_urgency and has_suspicious_link:
+            critical_flags.append("CREDENTIAL HARVESTING PATTERN")
+
+        # === HEADER SCORING ===
         header_score = 0
         if headers.get("spf", {}).get("status") == "fail":
             header_score += 5
@@ -811,25 +906,66 @@ class EmailAnalyzer:
             header_score += 5
         score += min(header_score, 15)
 
+        # === BRAND IMPERSONATION SCORING ===
+        # CRITICAL: Brand impersonation
         if brand.get("is_impersonation"):
             score += brand.get("risk_score", 0)
+            critical_flags.append(f"BRAND IMPERSONATION: {brand.get('claimed_brand')}")
 
+        # === FAKE BRAND DOMAIN SCORING ===
+        # CRITICAL: Fake brand domain
+        if sender.get("fake_brand"):
+            fake_brand_name = sender["fake_brand"]["name"]
+            critical_flags.append(f"FAKE {fake_brand_name.upper()} DOMAIN")
+
+        # === ATTACHMENT SCORING ===
         for attachment in attachments:
             if attachment.get("risk_level") == "high":
                 score += 15
+                critical_flags.append(
+                    f"SUSPICIOUS ATTACHMENT: {attachment.get('name')}"
+                )
             elif attachment.get("risk_level") == "medium":
                 score += 5
 
+        # === FINAL SCORE CLAMPING ===
         score = min(max(score, 0), 100)
 
-        if score <= 20:
+        # === CRITICAL OVERRIDE CHECK ===
+        force_phishing = False
+
+        if phishing_links > 0:
+            force_phishing = True
+        if sender.get("fake_brand"):
+            force_phishing = True
+        if brand.get("is_impersonation"):
+            force_phishing = True
+        if mismatched > 0:
+            force_phishing = True
+        if http_financial > 0:
+            force_phishing = True
+        if has_urgency and has_suspicious_link:
+            force_phishing = True
+
+        # Apply critical override - minimum 70 for phishing
+        if force_phishing:
+            score = max(score, 70)
+            critical_flags.insert(0, "CRITICAL: PHISHING SIGNALS DETECTED")
+
+        # === DETERMINE FINAL LEVEL ===
+        if score <= 30:
             level = "Safe"
-        elif score <= 50:
+        elif score <= 69:
             level = "Suspicious"
         else:
             level = "Phishing"
 
-        return {"score": score, "level": level}
+        # Final safety check - ensure critical overrides are respected
+        if force_phishing and level != "Phishing":
+            level = "Phishing"
+            score = max(score, 70)
+
+        return {"score": score, "level": level, "critical_flags": critical_flags}
 
     def _generate_explanation(
         self,
@@ -840,19 +976,67 @@ class EmailAnalyzer:
         brand: Dict,
         attachments: List,
     ) -> List[str]:
-        """Generate human-readable explanation of findings."""
+        """
+        Generate human-readable explanation of findings.
+        Shows critical flags first, then detailed explanations.
+        """
         reasons = []
+        critical_flags = []
 
+        # Collect critical flags from detections
+        phishing_links = links["summary"].get("phishing", 0)
+        mismatched = links["summary"].get("mismatched", 0)
+        http_financial = links["summary"].get("http_financial", 0)
+        urgency_keywords = content.get("urgency_indicators", [])
+        has_urgency = len(urgency_keywords) > 0
+        has_suspicious_link = (
+            links["summary"].get("suspicious", 0) > 0 or phishing_links > 0
+        )
+
+        # === FIRST: Add Critical Flags (most important) ===
+        if sender.get("fake_brand"):
+            fake_brand_name = sender["fake_brand"]["name"]
+            reasons.append(
+                f"FAKE {fake_brand_name.upper()} DOMAIN: Domain '{sender['domain']}' "
+                f"claims to be {fake_brand_name} but is NOT official"
+            )
+
+        if phishing_links > 0:
+            for url_info in links.get("urls", []):
+                if url_info.get("status") == "phishing":
+                    reasons.append(f"PHISHING URL DETECTED: {url_info['domain']}")
+
+        if mismatched > 0:
+            reasons.append("LINK MISMATCH: Display text differs from actual URL")
+
+        if http_financial > 0:
+            reasons.append("HTTP + FINANCIAL KEYWORDS: Banks NEVER use HTTP")
+
+        if brand.get("is_impersonation"):
+            reasons.append(
+                f"BRAND IMPERSONATION: Claims {brand.get('claimed_brand')} "
+                f"but sent from {brand.get('sender_domain')}"
+            )
+
+        if has_urgency and has_suspicious_link:
+            reasons.append("CREDENTIAL HARVESTING: Urgency + suspicious link combined")
+
+        # === SECOND: Add detailed explanations ===
         for issue in sender.get("issues", []):
-            reasons.append(f"Sender: {issue}")
+            if "FAKE" not in issue.upper():
+                reasons.append(f"Sender: {issue}")
 
         for url_info in links.get("urls", []):
-            if url_info.get("mismatch"):
-                reasons.append(f"Link mismatch: Display text differs from actual URL")
             if url_info.get("status") == "phishing":
-                reasons.append(f"Phishing URL detected: {url_info['domain']}")
+                continue  # Already added above
+            if url_info.get("mismatch"):
+                continue  # Already added above
             if url_info.get("shortened"):
-                reasons.append(f"Shortened URL used (obfuscation technique)")
+                reasons.append(f"Shortened URL: {url_info['domain']}")
+            if url_info.get("http_used"):
+                reasons.append(f"HTTP link (not secure): {url_info['domain']}")
+            if url_info.get("suspicious_domain"):
+                reasons.append(f"Suspicious URL domain: {url_info['domain']}")
 
         if content.get("urgency_indicators"):
             reasons.append(
@@ -871,18 +1055,15 @@ class EmailAnalyzer:
 
         if content.get("prize_indicators"):
             reasons.append(
-                f" Prize/lottery scam indicators: {', '.join(set(content['prize_indicators'][:2]))}"
+                f" Prize/lottery scam: {', '.join(set(content['prize_indicators'][:2]))}"
             )
 
         if headers.get("spf", {}).get("status") == "fail":
-            reasons.append("SPF authentication failed")
+            reasons.append("SPF authentication FAILED")
         if headers.get("dkim", {}).get("status") == "fail":
-            reasons.append("DKIM authentication failed")
+            reasons.append("DKIM authentication FAILED")
         if headers.get("dmarc", {}).get("status") == "fail":
-            reasons.append("DMARC authentication failed")
-
-        if brand.get("is_impersonation"):
-            reasons.append(brand.get("reason", "Brand impersonation detected"))
+            reasons.append("DMARC authentication FAILED")
 
         for attachment in attachments:
             if attachment.get("risk_level") == "high":

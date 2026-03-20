@@ -97,13 +97,8 @@ def sandbox_results(scan_id):
             "error.html", message="Scan not found or expired. Please scan again."
         ), 404
 
-    if not status.get("success"):
-        return render_template(
-            "error.html", message="Sandbox analysis failed or not completed."
-        ), 404
-
     sandbox_data = {
-        "source_url": status.get("source_url"),
+        "source_url": status.get("source_url", "Unknown"),
         "final_url": status.get("final_url"),
         "ip_address": status.get("ip_address"),
         "domain": status.get("domain"),
@@ -116,11 +111,13 @@ def sandbox_results(scan_id):
         "has_email_field": status.get("has_email_field", False),
         "suspicious_keywords": status.get("suspicious_keywords", []),
         "screenshot_base64": status.get("screenshot_base64"),
+        "error": status.get("error"),
     }
 
     layers = status.get("layers", {})
     forensics = status.get("forensics", {})
     final_status = status.get("final_status", "Safe")
+    sandbox_success = status.get("success", False)
 
     verdict = "safe"
     verdict_text = "Safe"
@@ -139,6 +136,10 @@ def sandbox_results(scan_id):
         verdict = "warning"
         verdict_text = "Warning"
         verdict_icon = "bx-error"
+    elif not sandbox_success:
+        verdict = "info"
+        verdict_text = "Partial Results"
+        verdict_icon = "bx-info-circle"
 
     return render_template(
         "sandbox_results.html",
@@ -147,7 +148,7 @@ def sandbox_results(scan_id):
         verdict=verdict,
         verdict_text=verdict_text,
         verdict_icon=verdict_icon,
-        result={"status": final_status},
+        result={"status": final_status, "sandbox_success": sandbox_success},
         layers=layers,
         forensics=forensics,
     )

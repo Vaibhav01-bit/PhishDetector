@@ -126,8 +126,14 @@
                             alt="Website Screenshot" loading="lazy">
                         {% else %}
                         <div class="no-screenshot">
+                            {% if sandbox.error %}
+                            <i class='bx bx-error-circle'></i>
+                            <p>Sandbox Analysis Failed</p>
+                            <small>{{ sandbox.error }}</small>
+                            {% else %}
                             <i class='bx bx-image-alt'></i>
                             <p>Screenshot not available</p>
+                            {% endif %}
                         </div>
                         {% endif %}
                     </div>

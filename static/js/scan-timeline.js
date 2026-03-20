@@ -454,15 +454,17 @@
         console.log('[Scanner] scanId:', scanId);
         console.log('[Scanner] status.screenshot exists:', !!status.screenshot);
         
-        // Show button when screenshot exists (sandbox completed)
-        // OR when success is true and we have a scanId
-        const shouldShowButton = (status.screenshot && scanId) || (status.success && scanId);
+        // Show button when we have a scanId (even if sandbox failed, user can still view partial results)
+        const shouldShowButton = scanId && status.done;
         
         if (sandboxCTA && shouldShowButton) {
-            // Sandbox succeeded - show button to view sandbox details page
+            // Show button to view sandbox details page (even if partially failed)
+            const statusIcon = status.success ? 'bx-check-circle' : 'bx-info-circle';
+            const statusLabel = status.success ? 'View Sandbox Analysis' : 'View Scan Details';
+            
             sandboxCTA.innerHTML = `
                 <a href="/sandbox/${scanId}" class="btn-sandbox-primary">
-                    <span>View Sandbox Analysis</span>
+                    <span>${statusLabel}</span>
                     <i class='bx bx-right-arrow-alt'></i>
                 </a>
                 <p class="sandbox-caption mt-2 mb-0 text-center">
@@ -471,8 +473,8 @@
                 </p>`;
             sandboxCTA.style.display = 'block';
             sandboxCTA.classList.add('cta-fade-in');
-            console.log('[Scanner] Button HTML set for success case');
-        } else if (sandboxCTA && !status.success) {
+            console.log('[Scanner] Button HTML set for scan ID:', scanId);
+        } else if (sandboxCTA && !status.done) {
             // Sandbox failed - show error message
             console.log('[Scanner] Sandbox failed, showing error');
             sandboxCTA.innerHTML = `

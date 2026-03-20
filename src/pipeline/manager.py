@@ -170,7 +170,14 @@ class PhishingDetectionPipeline:
             try:
                 sandbox_result = {"success": False, "error": "Sandbox uninitialized"}
                 if self.sandbox:
-                    sandbox_result = self.sandbox.analyze(url, scan_id=scan_id)
+                    try:
+                        sandbox_result = self.sandbox.analyze(url, scan_id=scan_id)
+                    except Exception as sandbox_e:
+                        sandbox_result = {
+                            "success": False,
+                            "error": str(sandbox_e),
+                            "source_url": url,
+                        }
 
                 combined = dict(layers_snapshot)
                 combined["sandbox"] = sandbox_result
@@ -180,7 +187,7 @@ class PhishingDetectionPipeline:
                     "success": sandbox_result.get("success", False),
                     "screenshot_base64": sandbox_result.get("screenshot_base64"),
                     "scan_id": scan_id,
-                    "source_url": sandbox_result.get("source_url"),
+                    "source_url": sandbox_result.get("source_url", url),
                     "final_url": sandbox_result.get("final_url"),
                     "ip_address": sandbox_result.get("ip_address"),
                     "domain": sandbox_result.get("domain"),
@@ -211,6 +218,7 @@ class PhishingDetectionPipeline:
                     "success": False,
                     "error": str(e),
                     "scan_id": scan_id,
+                    "source_url": url,
                     "layers": layers_snapshot,
                     "forensics": forensics_snap,
                     "final_status": final_status,
