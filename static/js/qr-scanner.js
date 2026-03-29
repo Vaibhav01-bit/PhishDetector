@@ -203,6 +203,9 @@ const QRScanner = {
         try {
             const base64 = imageData.includes(',') ? imageData.split(',')[1] : imageData;
             
+            this.showProgress();
+            this.setProgressStage(1, 'Decoding QR...');
+            
             const response = await fetch('/api/scan_qr', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -214,7 +217,7 @@ const QRScanner = {
             if (data.success && data.content) {
                 this.setProgressStage(2, 'Analyzing...');
                 this.completeProgress();
-                this.displayQRContent(data.content);
+                this.displayQRContent(data);
             } else if (data.success && !data.content) {
                 this.completeProgress();
                 this.showError('No QR code found in the image. Please try a clearer image.');
@@ -483,7 +486,30 @@ const QRScanner = {
         
         setTimeout(async () => {
             await this.stopCamera();
-            this.displayQRContent(decodedText);
+            
+            // Analyze the QR content
+            try {
+                this.showProgress();
+                this.setProgressStage(1, 'Analyzing...');
+                
+                const response = await fetch('/api/scan_qr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ qr_content: decodedText })
+                });
+                
+                const data = await response.json();
+                this.completeProgress();
+                
+                if (data.success) {
+                    this.displayQRContent(data);
+                } else {
+                    this.showError(data.error || 'Failed to analyze QR code');
+                }
+            } catch (err) {
+                this.hideProgress();
+                this.showError('Failed to analyze QR code');
+            }
         }, 500);
     },
 
@@ -588,22 +614,21 @@ const QRScanner = {
         this.showError(errorMsg);
     },
 
-    displayQRContent(content) {
+    displayQRContent(data) {
         const previewArea = document.getElementById('qr-preview-area');
-        const previewImage = document.getElementById('qr-preview-image');
         const previewText = document.getElementById('qr-preview-text');
 
         if (previewArea) {
             previewArea.classList.add('has-image');
         }
 
-        // Keep preview image visible for uploaded images
-        // Just update the text to show it's been scanned
-        if (previewText && !this.previewImageData) {
-            previewText.innerHTML = `<strong>QR Content:</strong><br><code style="word-break: break-all; font-size: 0.85rem;">${this.escapeHtml(content.substring(0, 100))}${content.length > 100 ? '...' : ''}</code>`;
+        // Update preview text if no image is shown
+        if (previewText && data.content && !this.previewImageData) {
+            previewText.innerHTML = `<strong>QR Content:</strong><br><code style="word-break: break-all; font-size: 0.85rem;">${this.escapeHtml(data.content.substring(0, 100))}${data.content.length > 100 ? '...' : ''}</code>`;
         }
 
-        this.analyzeQR(content);
+        // Display results directly (no duplicate API call)
+        this.displayResults(data);
     },
 
     toggleManualInput() {
@@ -701,10 +726,9 @@ const QRScanner = {
 
     showProgress() {
         const progressEl = document.getElementById('qr-scan-progress');
-        if (progressEl) {
-            progressEl.classList.add('active');
-        }
+        if (!progressEl) return;
 
+        progressEl.classList.add('active');
         const stages = progressEl.querySelectorAll('.qr-scan-stage');
         stages.forEach((stage, index) => {
             setTimeout(() => {

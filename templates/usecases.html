@@ -25,6 +25,8 @@
   <link href="static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
   <link href="static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <!-- Boxicons CDN (ensures all icons including bx-qr-scan are available) -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
   <link href="static/assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
   <link href="static/assets/vendor/venobox/venobox.css" rel="stylesheet">
   <link href="static/assets/vendor/aos/aos.css" rel="stylesheet">
@@ -38,6 +40,7 @@
   <link href="static/css/threat-landscape.css" rel="stylesheet">
   <link href="static/css/footer-particles.css" rel="stylesheet">
   <link href="static/css/phishing-education.css" rel="stylesheet">
+  <link href="static/css/scanner-enhanced.css" rel="stylesheet">
 
   <style>
     html {
@@ -220,6 +223,266 @@
   </section>
   <!-- End Threat Landscape Hero Section -->
 
+  <!-- ======= Scanner Education Section ======= -->
+  <section id="scanner-education" class="scanner-education">
+
+    <!-- Animated background orbs -->
+    <div class="scanner-bg-decor" aria-hidden="true">
+      <div class="bg-orb bg-orb-1"></div>
+      <div class="bg-orb bg-orb-2"></div>
+      <div class="bg-orb bg-orb-3"></div>
+    </div>
+
+    <div class="container" data-aos="fade-up">
+
+      <!-- Section Header -->
+      <div class="section-title text-center">
+        <span class="pill-badge">
+          <i class='bx bxs-shield-alt-2'></i>&nbsp; Interactive Protection
+        </span>
+        <h2>Complete Security,<br><span class="scanner-gradient-text">All Scanners in One</span></h2>
+        <p class="section-intro">Protect yourself from every angle. Our tools analyze different threat vectors to keep you safe from phishing, malware, and scams.</p>
+      </div>
+
+      <!-- Quick Stats Strip -->
+      <div class="scanner-stats-strip" data-aos="fade-up" data-aos-delay="60">
+        <div class="stat-pill">
+          <span class="stat-num">4</span>
+          <span class="stat-label">Threat Vectors</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-pill">
+          <span class="stat-num">99%</span>
+          <span class="stat-label">Detection Rate</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-pill">
+          <span class="stat-num">&lt;2s</span>
+          <span class="stat-label">Scan Speed</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-pill">
+          <span class="stat-num">Free</span>
+          <span class="stat-label">No Sign-Up</span>
+        </div>
+      </div>
+
+      <!-- Scanner Grid -->
+      <div class="scanner-grid">
+        <!-- URL Scanner -->
+        <div class="scanner-card sc-url" data-aos="fade-up" data-aos-delay="100">
+          <div class="scanner-header">
+            <div class="scanner-icon-wrapper url-scanner">
+              <i class='bx bx-link'></i>
+              <div class="icon-pulse-ring"></div>
+            </div>
+            <div class="scanner-title">
+              <h3>URL Scanner</h3>
+              <p class="scanner-subtitle">Website link analysis</p>
+            </div>
+            <div class="scanner-badge sc-badge-url">
+              <span class="badge-dot"></span> LIVE
+            </div>
+          </div>
+          <div class="scanner-threats">
+            <h4><i class='bx bxs-shield-x'></i> Detects</h4>
+            <ul>
+              <li><i class='bx bxs-error-circle bad'></i> Phishing websites</li>
+              <li><i class='bx bxs-error-circle bad'></i> Fake login pages</li>
+              <li><i class='bx bxs-error-circle bad'></i> Typosquatting domains</li>
+              <li><i class='bx bxs-error-circle bad'></i> Malicious shortened links</li>
+            </ul>
+          </div>
+          <div class="scanner-example">
+            <div class="example-label"><i class='bx bxs-bulb'></i> Example Threat</div>
+            <div class="example-content">
+              <code>paypa<strong>1</strong>-secure.com</code>
+              <span class="vs">≠</span>
+              <code class="safe-code">paypal.com</code>
+            </div>
+          </div>
+          <div class="scanner-workflow">
+            <div class="workflow-step"><span>1</span> Paste URL</div>
+            <div class="workflow-arrow"><i class='bx bx-chevron-right'></i></div>
+            <div class="workflow-step"><span>2</span> Analyze</div>
+            <div class="workflow-arrow"><i class='bx bx-chevron-right'></i></div>
+            <div class="workflow-step"><span>3</span> Result</div>
+          </div>
+          <div class="scanner-cta">
+            <a href="{{ url_for('home') }}#url-scan" class="btn-scanner btn-url">
+              Try URL Scanner <i class='bx bx-right-arrow-alt'></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- QR Scanner -->
+        <div class="scanner-card sc-qr" data-aos="fade-up" data-aos-delay="200">
+          <div class="scanner-header">
+            <div class="scanner-icon-wrapper qr-scanner">
+              <i class='bx bx-qr-scan'></i>
+              <div class="icon-pulse-ring"></div>
+            </div>
+            <div class="scanner-title">
+              <h3>QR Scanner</h3>
+              <p class="scanner-subtitle">QR code analysis</p>
+            </div>
+            <div class="scanner-badge sc-badge-qr">
+              <span class="badge-dot"></span> LIVE
+            </div>
+          </div>
+          <div class="scanner-threats">
+            <h4><i class='bx bxs-shield-x'></i> Detects</h4>
+            <ul>
+              <li><i class='bx bxs-error-circle bad'></i> Fake UPI payment QR</li>
+              <li><i class='bx bxs-error-circle bad'></i> Malicious QR redirects</li>
+              <li><i class='bx bxs-error-circle bad'></i> Brand impersonation</li>
+              <li><i class='bx bxs-error-circle bad'></i> Hidden phishing links</li>
+            </ul>
+          </div>
+          <div class="scanner-example">
+            <div class="example-label"><i class='bx bxs-bulb'></i> Example Threat</div>
+            <div class="example-content">
+              <code>paytmhelp@upi</code>
+              <span class="vs">→</span>
+              <span class="phishing-tag">PHISHING</span>
+            </div>
+          </div>
+          <div class="scanner-workflow">
+            <div class="workflow-step"><span>1</span> Scan QR</div>
+            <div class="workflow-arrow"><i class='bx bx-chevron-right'></i></div>
+            <div class="workflow-step"><span>2</span> Extract</div>
+            <div class="workflow-arrow"><i class='bx bx-chevron-right'></i></div>
+            <div class="workflow-step"><span>3</span> Result</div>
+          </div>
+          <div class="scanner-cta">
+            <a href="{{ url_for('home') }}#qr-scan" class="btn-scanner btn-qr">
+              Try QR Scanner <i class='bx bx-right-arrow-alt'></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- File Scanner -->
+        <div class="scanner-card sc-file" data-aos="fade-up" data-aos-delay="300">
+          <div class="scanner-header">
+            <div class="scanner-icon-wrapper file-scanner">
+              <i class='bx bxs-file-find'></i>
+              <div class="icon-pulse-ring"></div>
+            </div>
+            <div class="scanner-title">
+              <h3>File Scanner</h3>
+              <p class="scanner-subtitle">Document analysis</p>
+            </div>
+            <div class="scanner-badge sc-badge-file">
+              <span class="badge-dot"></span> LIVE
+            </div>
+          </div>
+          <div class="scanner-threats">
+            <h4><i class='bx bxs-shield-x'></i> Detects</h4>
+            <ul>
+              <li><i class='bx bxs-error-circle bad'></i> Malware in PDFs</li>
+              <li><i class='bx bxs-error-circle bad'></i> Hidden phishing links</li>
+              <li><i class='bx bxs-error-circle bad'></i> Malicious macros</li>
+              <li><i class='bx bxs-error-circle bad'></i> Corrupted executables</li>
+            </ul>
+          </div>
+          <div class="scanner-example">
+            <div class="example-label"><i class='bx bxs-bulb'></i> Example Threat</div>
+            <div class="example-content">
+              <code>invoice.pdf</code>
+              <span class="vs">→</span>
+              <span class="malware-tag">MALWARE</span>
+            </div>
+          </div>
+          <div class="scanner-workflow">
+            <div class="workflow-step"><span>1</span> Upload</div>
+            <div class="workflow-arrow"><i class='bx bx-chevron-right'></i></div>
+            <div class="workflow-step"><span>2</span> Parse</div>
+            <div class="workflow-arrow"><i class='bx bx-chevron-right'></i></div>
+            <div class="workflow-step"><span>3</span> Result</div>
+          </div>
+          <div class="scanner-cta">
+            <a href="{{ url_for('home') }}#file-scan" class="btn-scanner btn-file">
+              Try File Scanner <i class='bx bx-right-arrow-alt'></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Email Scanner -->
+        <div class="scanner-card sc-email" data-aos="fade-up" data-aos-delay="400">
+          <div class="scanner-header">
+            <div class="scanner-icon-wrapper email-scanner">
+              <i class='bx bxs-envelope'></i>
+              <div class="icon-pulse-ring"></div>
+            </div>
+            <div class="scanner-title">
+              <h3>Email Scanner</h3>
+              <p class="scanner-subtitle">Email content analysis</p>
+            </div>
+            <div class="scanner-badge sc-badge-email">
+              <span class="badge-dot"></span> LIVE
+            </div>
+          </div>
+          <div class="scanner-threats">
+            <h4><i class='bx bxs-shield-x'></i> Detects</h4>
+            <ul>
+              <li><i class='bx bxs-error-circle bad'></i> Phishing emails</li>
+              <li><i class='bx bxs-error-circle bad'></i> Spoofed senders</li>
+              <li><i class='bx bxs-error-circle bad'></i> Fake urgent alerts</li>
+              <li><i class='bx bxs-error-circle bad'></i> Malicious attachments</li>
+            </ul>
+          </div>
+          <div class="scanner-example">
+            <div class="example-label"><i class='bx bxs-bulb'></i> Example Threat</div>
+            <div class="example-content">
+              <code>"Account suspended!"</code>
+              <span class="vs">→</span>
+              <span class="phishing-tag">PHISHING</span>
+            </div>
+          </div>
+          <div class="scanner-workflow">
+            <div class="workflow-step"><span>1</span> Paste</div>
+            <div class="workflow-arrow"><i class='bx bx-chevron-right'></i></div>
+            <div class="workflow-step"><span>2</span> Extract</div>
+            <div class="workflow-arrow"><i class='bx bx-chevron-right'></i></div>
+            <div class="workflow-step"><span>3</span> Result</div>
+          </div>
+          <div class="scanner-cta">
+            <a href="{{ url_for('home') }}#email-scan" class="btn-scanner btn-email">
+              Try Email Scanner <i class='bx bx-right-arrow-alt'></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced All-in-One Banner -->
+      <div class="all-in-one-banner" data-aos="fade-up" data-aos-delay="500">
+        <div class="banner-shield-wrap">
+          <div class="shield-ring shield-ring-1"></div>
+          <div class="shield-ring shield-ring-2"></div>
+          <div class="banner-icon">
+            <i class='bx bxs-shield-alt-2'></i>
+          </div>
+        </div>
+        <div class="banner-content">
+          <h3>All-in-One Protection</h3>
+          <p>One platform to scan URLs, QR codes, files, and emails. Complete security without juggling multiple tools.</p>
+        </div>
+        <div class="banner-right">
+          <div class="banner-features">
+            <span><i class='bx bx-check-circle'></i> Links</span>
+            <span><i class='bx bx-check-circle'></i> QR Codes</span>
+            <span><i class='bx bx-check-circle'></i> Files</span>
+            <span><i class='bx bx-check-circle'></i> Emails</span>
+          </div>
+          <a href="{{ url_for('home') }}" class="btn-banner-cta">
+            <i class='bx bx-rocket'></i> Start Scanning Free
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section><!-- End Scanner Education Section -->
+
   <!-- ======= Frequently Asked Questions Section ======= -->
   <section id="faq" class="faq" style="background: transparent;">
     <div class="faq-glow-container">
@@ -396,14 +659,15 @@
       </div>
     </section><!-- End Testimonials Section -->
 
-    <!-- ======= Phishing Education Section (Relocated) ======= -->
+
+
+    <!-- ======= Phishing Education Section (Simplified) ======= -->
     <section id="phishing-education" class="phishing-education" style="background: var(--color-bg-light);">
       <div class="container" data-aos="fade-up">
 
         <div class="section-title">
-          <h2>Understanding Modern Phishing Tactics</h2>
-          <p class="section-intro">This section explains how real phishing attacks deceive users, using techniques shown
-            in the examples above.</p>
+          <h2>Quick Phishing Guide</h2>
+          <p class="section-intro">4 common tricks attackers use to deceive you.</p>
         </div>
 
         <div class="trick-grid">
@@ -411,7 +675,7 @@
           <div class="trick-card" data-aos="fade-up" data-aos-delay="100">
             <div class="trick-icon">🔗</div>
             <h4>Typosquatting</h4>
-            <p>Attackers register domains with slight misspellings to trick users:</p>
+            <p>Fake domains with slight misspellings:</p>
             <div class="example-box">
               <div class="example-item bad">
                 <i class='bx bx-x-circle'></i>
@@ -428,9 +692,8 @@
           <!-- Trick 2: HTTPS Deception -->
           <div class="trick-card" data-aos="fade-up" data-aos-delay="200">
             <div class="trick-icon">🔒</div>
-            <h4>HTTPS Deception</h4>
-            <p>Phishing sites can have valid SSL certificates. HTTPS only encrypts data—it doesn't verify legitimacy.
-            </p>
+            <h4>Fake HTTPS</h4>
+            <p>Phishing sites can have valid SSL certificates. HTTPS doesn't mean safe!</p>
             <div class="warning-badge">
               <i class='bx bx-error-alt'></i>
               <span>HTTPS ≠ Safe</span>
@@ -440,8 +703,8 @@
           <!-- Trick 3: Urgency Tactics -->
           <div class="trick-card" data-aos="fade-up" data-aos-delay="300">
             <div class="trick-icon">⚡</div>
-            <h4>Urgency Tactics</h4>
-            <p>"Your account will be closed in 24 hours!" Legitimate companies don't create panic.</p>
+            <h4>Urgency</h4>
+            <p>"Account suspended!" Legitimate companies don't create panic.</p>
             <div class="tip-box">
               <i class='bx bx-bulb'></i>
               <span>Take your time. Verify independently.</span>
@@ -451,35 +714,13 @@
           <!-- Trick 4: Email Spoofing -->
           <div class="trick-card" data-aos="fade-up" data-aos-delay="400">
             <div class="trick-icon">📧</div>
-            <h4>Email Spoofing</h4>
-            <p>Display names can be faked. Always check the actual sender email address, not just the name.</p>
+            <h4>Spoofed Sender</h4>
+            <p>Display names can be faked. Check the actual email address.</p>
             <div class="example-box">
               <div class="example-item bad">
                 <i class='bx bx-x-circle'></i>
-                <span>support@<strong>paypa1-secure</strong>.com</span>
+                <span>support@<strong>fake</strong>.com</span>
               </div>
-            </div>
-          </div>
-
-          <!-- Trick 5: Suspicious Links -->
-          <div class="trick-card" data-aos="fade-up" data-aos-delay="500">
-            <div class="trick-icon">🎣</div>
-            <h4>Suspicious Links</h4>
-            <p>Hover over links before clicking. The displayed text may not match the actual URL destination.</p>
-            <div class="tip-box">
-              <i class='bx bx-bulb'></i>
-              <span>Use PhishDetector to scan before clicking!</span>
-            </div>
-          </div>
-
-          <!-- Trick 6: Brand Impersonation -->
-          <div class="trick-card" data-aos="fade-up" data-aos-delay="600">
-            <div class="trick-icon">🎭</div>
-            <h4>Brand Impersonation</h4>
-            <p>Fake websites copy logos and designs from legitimate companies to appear trustworthy.</p>
-            <div class="warning-badge">
-              <i class='bx bx-error-alt'></i>
-              <span>Always verify the domain</span>
             </div>
           </div>
         </div>
@@ -487,13 +728,18 @@
         <!-- Education Contextual CTA -->
         <div class="education-cta text-center mt-5" data-aos="fade-up" data-aos-delay="200"
           style="padding-top: 40px; border-top: 1px solid var(--color-border, #e2e8f0);">
-          <h4 class="mb-3" style="color: var(--text-heading-primary); font-weight: 600;">Ready to apply this knowledge?
+          <h4 class="mb-3" style="color: var(--text-heading-primary); font-weight: 600;">Protect Yourself Now
           </h4>
-          <a href="{{ url_for('home') }}#hero" class="btn btn-primary btn-lg"
-            style="border-radius: 50px; padding: 12px 30px; font-weight: 600; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);">
-            Test these techniques using our URL Scanner <i class='bx bx-right-arrow-alt'
-              style="position: relative; top: 1px;"></i>
-          </a>
+          <div class="cta-buttons">
+            <a href="{{ url_for('home') }}#url-scan" class="btn btn-primary"
+              style="border-radius: 50px; padding: 10px 24px; font-weight: 600;">
+              <i class='bx bx-link'></i> Scan URL
+            </a>
+            <a href="{{ url_for('home') }}#qr-scan" class="btn btn-secondary"
+              style="border-radius: 50px; padding: 10px 24px; font-weight: 600; margin-left: 10px;">
+              <i class='bx bx-qr-scan'></i> Scan QR
+            </a>
+          </div>
         </div>
 
       </div>
