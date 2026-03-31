@@ -41,6 +41,8 @@
   <link href="static/css/footer-particles.css" rel="stylesheet">
   <link href="static/css/phishing-education.css" rel="stylesheet">
   <link href="static/css/scanner-enhanced.css" rel="stylesheet">
+  <link href="static/css/scenarios-enhanced.css" rel="stylesheet">
+  <link href="static/css/modern-hero-bg.css" rel="stylesheet">
 
   <style>
     html {
@@ -129,8 +131,17 @@
   </div>
 
   <!-- ======= Threat Landscape Hero Section ======= -->
-  <section class="threat-landscape">
-    <div class="container">
+  <section class="threat-landscape" id="hero">
+    <!-- Ambient Hero Background Decor -->
+    <div class="hero-ambient-elements">
+      <div class="h-orb h-orb-1"></div>
+      <div class="h-orb h-orb-2"></div>
+      <div class="h-orb h-orb-3"></div>
+      <div class="h-cyber-lines"></div>
+      <div class="h-noise-overlay"></div>
+    </div>
+    
+    <div class="container" style="position: relative; z-index: 2;">
       <!-- Section Header -->
       <div class="section-header" data-aos="fade-up">
         <div class="eyebrow">Scams Are Evolving Rapidly</div>
@@ -483,128 +494,124 @@
     </div>
   </section><!-- End Scanner Education Section -->
 
-  <!-- ======= Frequently Asked Questions Section ======= -->
-  <section id="faq" class="faq" style="background: transparent;">
-    <div class="faq-glow-container">
-      <div class="glow-orb orb-1"></div>
-      <div class="glow-orb orb-2"></div>
-      <div class="glow-orb orb-3"></div>
+  <!-- ======= Enhanced Use Case Scenarios Section ======= -->
+  <section id="use-cases" class="scenarios-enhanced">
+    <div class="scenarios-glow-container">
+      <div class="scenarios-glow-orb sc-orb-1"></div>
+      <div class="scenarios-glow-orb sc-orb-2"></div>
+      <div class="scenarios-glow-orb sc-orb-3"></div>
     </div>
+    
     <div class="container" data-aos="fade-up">
-      <div class="section-title" style="text-align: center; margin-bottom: 60px;">
+      <div class="section-title text-center" style="margin-bottom: 50px;">
         <h2 data-aos="fade-up">Use Case Scenarios of Phishing attack</h2>
-        <p data-aos="fade-up" data-aos-delay="100" style="margin-top: 15px; color: var(--color-text-muted);">Real-world
-          examples of how phishing leads to massive data breaches</p>
+        <p data-aos="fade-up" data-aos-delay="100">
+          Real-world examples of how phishing leads to massive data breaches
+        </p>
       </div>
 
-      <div class="faq-list">
-        <ul>
-          <li data-aos="fade-up" data-aos-delay="100">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" class="collapse"
-              href="#faq-list-1">Use Case Scenarios #1 <i class="bx bx-chevron-down icon-show"></i><i
-                class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-1" class="collapse show" data-parent=".faq-list">
-              <p>
-                One of the Biggest Data Breaches from Phishing: <br><br> John Podesta’s Email
-                There was a lot of controversy surrounding the November 2016 election on both sides of the political
-                spectrum. One of the most notable was the hack of John Podesta’s Gmail account. Podesta, chairman of
-                presidential candidate Hillary Clinton’s democratic election campaign, found himself as one of the
-                country’s top phishing attack examples when his account was victimized by a Russian hacker group known
-                as Fancy Bear. The phishers, pretending to be Google, sent an email saying that he needed to change his
-                email after an attempted hack occurred. However, in true phishing attack fashion, the email linked to a
-                malicious website. When someone with access to Podesta’s email used the compromised link, the hackers
-                gained access to his account. This led to the eventual release of thousands of Podesta’s emails via
-                WikiLeaks in the weeks leading up to the November election.
-
-              </p>
+      <div class="scenarios-grid">
+        <!-- Scenario 1 -->
+        <div class="scenario-card sc-c1" data-aos="fade-up" data-aos-delay="100">
+          <div class="scenario-header">
+            <div class="scenario-icon"><i class='bx bxs-envelope'></i></div>
+            <div class="scenario-title-wrap">
+              <h3 class="scenario-organization">John Podesta</h3>
+              <span class="scenario-label">Political Campaign Hack</span>
             </div>
-          </li>
+          </div>
+          <div class="scenario-body">
+            <p>
+              During the 2016 election, John Podesta’s Gmail account was compromised by a hacker group known as Fancy Bear. 
+              They sent a highly convincing fake Google security alert requesting an urgent password change.
+            </p>
+            <p>
+              Clicking the malicious link gave attackers total access, leading to the leak of thousands of highly confidential emails via WikiLeaks.
+            </p>
+          </div>
+        </div>
 
-          <li data-aos="fade-up" data-aos-delay="200">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" href="#faq-list-2"
-              class="collapsed">Use Case Scenarios #2 <i class="bx bx-chevron-down icon-show"></i><i
-                class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-2" class="collapse" data-parent=".faq-list">
-              <p>
-                <strong>One of the Biggest Data Breaches from Phishing:</strong> <br><br>
-                <strong>BenefitMall</strong><br>
-                Among the most recent phishing attacks reported by the media is one that affected BenefitMall, a human
-                resource, employee benefits, and payroll administration solutions company. Between June 2018 and October
-                2018, the company’s website was accessed via employee email login credentials that were exposed during
-                an email phishing attack, according to a press release. The types of consumer information left exposed
-                in the affected mailboxes are thought to include:
-                <br><br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Names <br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Email addresses <br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Birth dates <br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Bank account information <br>
-                <i class='bx bxs-chevron-right-circle icon-circle'></i> Insurance premium payment information <br><br>
-                Although the full extent of the attack is not yet known, BenefitMall works with “a network of more than
-                20,000 Trusted Advisors” to serve more than “200,000 small and medium-sized businesses.” This leaves a
-                potentially enormous group of employees and businesses at risk.
-              </p>
+        <!-- Scenario 2 -->
+        <div class="scenario-card sc-c2" data-aos="fade-up" data-aos-delay="200">
+          <div class="scenario-header">
+            <div class="scenario-icon"><i class='bx bxs-user-badge'></i></div>
+            <div class="scenario-title-wrap">
+              <h3 class="scenario-organization">BenefitMall</h3>
+              <span class="scenario-label">Enterprise Credentials</span>
             </div>
-          </li>
+          </div>
+          <div class="scenario-body">
+            <p>
+              Between June and October 2018, employee email login credentials were exposed via a targeted spear-phishing attack. Access to these mailboxes leaked sensitive consumer data:
+            </p>
+            <ul>
+              <li><i class='bx bx-x'></i> Names and Birth Dates</li>
+              <li><i class='bx bx-x'></i> Bank account details</li>
+              <li><i class='bx bx-x'></i> Insurance premiums info</li>
+            </ul>
+          </div>
+        </div>
 
-          <li data-aos="fade-up" data-aos-delay="300">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" href="#faq-list-3"
-              class="collapsed">Use Case Scenarios #3<i class="bx bx-chevron-down icon-show"></i><i
-                class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-3" class="collapse" data-parent=".faq-list">
-              <p>
-                <strong>One of the Biggest Data Breaches from Phishing:</strong> <br><br>
-                <strong>Sony Pictures</strong><br>
-                In retaliation for the creation of the movie “The Interview,” a film about the plot to kill North
-                Korea’s head of state, a North Korean government-backed hacker group launched a devastating attack on
-                the entertainment giant in November 2014. Using phishing and spear-phishing emails, which contained
-                malware, the attackers gained access to Sony’s network and performed months of covert reconnaissance.
-                <br><br>
-                Once inside, they also threatened company employees and executives, stole confidential data, and
-                disabled thousands of the company’s computers. The attack is thought to have cost the company upwards of
-                $100 million.
-              </p>
+        <!-- Scenario 3 -->
+        <div class="scenario-card sc-c3" data-aos="fade-up" data-aos-delay="300">
+          <div class="scenario-header">
+            <div class="scenario-icon"><i class='bx bxs-movie-play'></i></div>
+            <div class="scenario-title-wrap">
+              <h3 class="scenario-organization">Sony Pictures</h3>
+              <span class="scenario-label">State-Sponsored Hack</span>
             </div>
-          </li>
+          </div>
+          <div class="scenario-body">
+            <p>
+              In November 2014, a government-backed hacker group launched a devastating attack using spear-phishing emails containing malware payloads.
+            </p>
+            <p>
+              Infiltrators gained deep network access, stole confidential data, disabled thousands of systems, and caused over <strong>$100 million</strong> in estimated damages.
+            </p>
+          </div>
+        </div>
 
-          <li data-aos="fade-up" data-aos-delay="400">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" href="#faq-list-4"
-              class="collapsed">Use Case Scenarios #4<i class="bx bx-chevron-down icon-show"></i><i
-                class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-4" class="collapse" data-parent=".faq-list">
-              <p>
-                <strong>Methodist Hospitals – Gary, Indiana</strong><br><br>
-                In August of 2019, investigators confirmed Methodist Hospitals’ worst fear. A phishing attack
-                compromised more than 68,000 patients’ information. The hospital did not discover the breach until June
-                when an employee reported suspicious activity in their email account. The investigation revealed that at
-                least two email accounts had been compromised.
-                <br><br>
-                The data obtained from each affected patient varied but included the following: names, addresses, health
-                insurance information, Social Security numbers, passport numbers, bank account numbers, electronic
-                signatures, login credentials, dates of birth, treatment information, and insurance information.
-              </p>
+        <!-- Scenario 4 -->
+        <div class="scenario-card sc-c4" data-aos="fade-up" data-aos-delay="400">
+          <div class="scenario-header">
+            <div class="scenario-icon"><i class='bx bx-plus-medical'></i></div>
+            <div class="scenario-title-wrap">
+              <h3 class="scenario-organization">Methodist Hospitals</h3>
+              <span class="scenario-label">Healthcare Data Breach</span>
             </div>
-          </li>
+          </div>
+          <div class="scenario-body">
+            <p>
+              In August 2019, an investigation revealed a phishing attack compromised more than 68,000 patients’ information after employee email accounts were breached.
+            </p>
+            <p>
+              Obtained data included Social Security numbers, passport numbers, medical treatment info, and electronic signatures.
+            </p>
+          </div>
+        </div>
 
-          <li data-aos="fade-up" data-aos-delay="500">
-            <i class="bx bx-help-circle icon-help"></i> <a data-toggle="collapse" href="#faq-list-5"
-              class="collapsed">Use Case Scenarios #5<i class="bx bx-chevron-down icon-show"></i><i
-                class="bx bx-chevron-up icon-close"></i></a>
-            <div id="faq-list-5" class="collapse" data-parent=".faq-list">
-              <p>
-                <strong>The University of Wisconsin-Parkside – Kenosha, Wisconsin</strong><br><br>
-                In June of 2019, the University of Wisconsin-Parkside was notified of a new bank account. This new
-                account was a result of a phishing attack where an employee was prompted to change the routing numbers
-                of two UW system vendors. Before discovering the issues, the university lost $315,000 in fraudulent bank
-                transfers.
-              </p>
+        <!-- Scenario 5 -->
+        <div class="scenario-card sc-c5" data-aos="fade-up" data-aos-delay="500">
+          <div class="scenario-header">
+            <div class="scenario-icon"><i class='bx bxs-bank'></i></div>
+            <div class="scenario-title-wrap">
+              <h3 class="scenario-organization">UW-Parkside</h3>
+              <span class="scenario-label">Financial Wire Fraud</span>
             </div>
-          </li>
+          </div>
+          <div class="scenario-body">
+            <p>
+              In June 2019, an employee was targeted by a sophisticated phishing campaign prompting them to change the routing numbers of two university system vendors.
+            </p>
+            <p>
+              The university lost <strong>$315,000</strong> in fraudulent, untraceable bank transfers before discovering the breach.
+            </p>
+          </div>
+        </div>
 
-        </ul>
       </div>
-
     </div>
-  </section><!-- End Frequently Asked Questions Section -->
+  </section><!-- End Enhanced Use Case Scenarios Section -->
 
   <main id="main">
 
@@ -613,8 +620,14 @@
 
 
     <!-- ======= Testimonials Section ======= -->
-    <section id="testimonials" class="testimonials section-bg" style="background: transparent;">
-      <div class="container" data-aos="fade-up">
+    <section id="testimonials" class="testimonials section-bg" style="background: transparent; position: relative; overflow: hidden;">
+      <!-- Enhanced Ambient Background -->
+      <div class="cube-bg-decor">
+        <div class="cube-orb c-orb-1"></div>
+        <div class="cube-orb c-orb-2"></div>
+      </div>
+
+      <div class="container" data-aos="fade-up" style="position: relative; z-index: 1;">
         <div class="section-title" style="text-align: center; margin-bottom: 40px;">
           <h2 data-aos="fade-up">Visual Phishing Examples</h2>
         </div>
@@ -670,10 +683,17 @@
           <p class="section-intro">4 common tricks attackers use to deceive you.</p>
         </div>
 
+        <div class="phishing-edu-bg-mesh">
+          <div class="mesh-blob mb-1"></div>
+          <div class="mesh-blob mb-2"></div>
+        </div>
+
         <div class="trick-grid">
           <!-- Trick 1: Typosquatting -->
           <div class="trick-card" data-aos="fade-up" data-aos-delay="100">
-            <div class="trick-icon">🔗</div>
+            <div class="trick-icon-wrapper ti-1">
+              <i class='bx bx-link-alt'></i>
+            </div>
             <h4>Typosquatting</h4>
             <p>Fake domains with slight misspellings:</p>
             <div class="example-box">
@@ -691,7 +711,9 @@
 
           <!-- Trick 2: HTTPS Deception -->
           <div class="trick-card" data-aos="fade-up" data-aos-delay="200">
-            <div class="trick-icon">🔒</div>
+            <div class="trick-icon-wrapper ti-2">
+              <i class='bx bxs-lock-alt'></i>
+            </div>
             <h4>Fake HTTPS</h4>
             <p>Phishing sites can have valid SSL certificates. HTTPS doesn't mean safe!</p>
             <div class="warning-badge">
@@ -702,7 +724,9 @@
 
           <!-- Trick 3: Urgency Tactics -->
           <div class="trick-card" data-aos="fade-up" data-aos-delay="300">
-            <div class="trick-icon">⚡</div>
+            <div class="trick-icon-wrapper ti-3">
+              <i class='bx bxs-zap'></i>
+            </div>
             <h4>Urgency</h4>
             <p>"Account suspended!" Legitimate companies don't create panic.</p>
             <div class="tip-box">
@@ -713,7 +737,9 @@
 
           <!-- Trick 4: Email Spoofing -->
           <div class="trick-card" data-aos="fade-up" data-aos-delay="400">
-            <div class="trick-icon">📧</div>
+            <div class="trick-icon-wrapper ti-4">
+              <i class='bx bxs-envelope-open'></i>
+            </div>
             <h4>Spoofed Sender</h4>
             <p>Display names can be faked. Check the actual email address.</p>
             <div class="example-box">
@@ -725,21 +751,26 @@
           </div>
         </div>
 
-        <!-- Education Contextual CTA -->
-        <div class="education-cta text-center mt-5" data-aos="fade-up" data-aos-delay="200"
-          style="padding-top: 40px; border-top: 1px solid var(--color-border, #e2e8f0);">
-          <h4 class="mb-3" style="color: var(--text-heading-primary); font-weight: 600;">Protect Yourself Now
-          </h4>
-          <div class="cta-buttons">
-            <a href="{{ url_for('home') }}#url-scan" class="btn btn-primary"
-              style="border-radius: 50px; padding: 10px 24px; font-weight: 600;">
-              <i class='bx bx-link'></i> Scan URL
-            </a>
-            <a href="{{ url_for('home') }}#qr-scan" class="btn btn-secondary"
-              style="border-radius: 50px; padding: 10px 24px; font-weight: 600; margin-left: 10px;">
-              <i class='bx bx-qr-scan'></i> Scan QR
-            </a>
+        <!-- Enhanced Education CTA -->
+        <div class="education-cta-modern" data-aos="zoom-in" data-aos-delay="200">
+          <div class="cta-modern-content">
+            <div class="cta-icon-pulse">
+              <i class='bx bxs-shield-plus'></i>
+            </div>
+            <h4>Protect Yourself Now</h4>
+            <p>Don't wait until it's too late. Use our advanced scanners to verify links, QR codes, and files instantly.</p>
+            <div class="cta-action-group">
+              <a href="{{ url_for('home') }}#url-scan" class="btn-modern-primary">
+                <i class='bx bx-link'></i> Scan URL
+              </a>
+              <a href="{{ url_for('home') }}#qr-scan" class="btn-modern-secondary">
+                <i class='bx bx-qr-scan'></i> Scan QR
+              </a>
+            </div>
           </div>
+          <!-- Decorative Background Elements -->
+          <div class="cta-decor-circle cd-1"></div>
+          <div class="cta-decor-circle cd-2"></div>
         </div>
 
       </div>

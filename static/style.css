@@ -128,6 +128,11 @@ body.dark-mode,
   /* Slate-700 - Cards */
   --color-white: #1E293B;
 
+  background-image: 
+    radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 0% 100%, rgba(139, 92, 246, 0.06) 0%, transparent 60%);
+  background-attachment: fixed;
+
   /* Dark Mode Text - Higher Contrast */
   --text-heading-primary: #F8FAFC;
   /* Slate-50 */
@@ -194,6 +199,10 @@ body {
   font-family: var(--font-body);
   color: var(--text-body);
   background-color: var(--color-bg-light);
+  background-image: 
+    radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.03) 0%, transparent 60%),
+    radial-gradient(circle at 0% 100%, rgba(139, 92, 246, 0.03) 0%, transparent 60%);
+  background-attachment: fixed;
   overflow-x: hidden;
 }
 
@@ -378,25 +387,42 @@ p {
 # Header
 --------------------------------------------------------------*/
 #header {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 20px;
+  top: 15px;
+  left: 15px;
+  width: calc(100% - 30px);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 997;
-  padding: 10px 0;
-  /* Slimmer padding */
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  padding: 12px 20px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
   animation: slideDown 1s cubic-bezier(0.16, 1, 0.3, 1);
   transform-style: preserve-3d;
   perspective: 1200px;
 }
 
+body.dark-mode #header {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
 #header.header-scrolled {
-  padding: 8px 0;
+  padding: 8px 15px;
+  top: 10px;
+  left: 10px;
+  width: calc(100% - 20px);
   /* Ultra slim on scroll */
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode #header.header-scrolled {
+  background: rgba(15, 23, 42, 0.85);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 @keyframes slideDown {
@@ -782,7 +808,7 @@ p {
   min-height: 100vh;
   /* Light Mode: Professional Soft Gradient */
   background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
-  padding: 100px 0 60px 0;
+  padding: 105px 0 20px 0;
   display: flex;
   align-items: center;
   position: relative;
@@ -894,25 +920,25 @@ body.dark-mode #hero .trust-item:hover {
 }
 
 #hero .main-heading {
-  margin: 0 0 16px 0;
-  font-size: 56px;
-  /* Larger impact */
+  margin: 0 0 10px 0;
+  font-size: 50px;
+  /* Slightly scaled down for 1-frame fit */
   font-weight: 700;
   line-height: 1.1;
   background: linear-gradient(135deg, var(--text-heading-primary) 0%, var(--color-primary) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   letter-spacing: -0.03em;
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 
 #hero .sub-heading {
   color: var(--text-muted);
-  margin-bottom: 32px;
-  font-size: 18px;
-  line-height: 1.7;
+  margin-bottom: 20px;
+  font-size: 17px;
+  line-height: 1.6;
   font-weight: 400;
   max-width: 90%;
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
@@ -967,7 +993,7 @@ body.dark-mode #hero .hero-img-container img {
 
 #hero .scan-form .input-group {
   background: var(--color-white);
-  padding: 8px;
+  padding: 6px;
   border-radius: 16px;
   box-shadow: var(--shadow-lg);
   border: 1px solid rgba(226, 232, 240, 0.8);
@@ -995,10 +1021,10 @@ body.dark-mode #hero .hero-img-container img {
 }
 
 #hero .scan-form .btn-primary {
-  padding: 12px 36px;
+  padding: 10px 28px;
   border-radius: 10px;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 15px;
   background: #3b4ef8;
   border: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);

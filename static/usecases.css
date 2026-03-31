@@ -7,25 +7,12 @@ body {
 }
 
 body {
-  /* Light mode: Premium Mesh Gradient Background */
-  background:
-    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
-    radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%),
-    #F8FAFC;
-  background-attachment: fixed;
   font-family: var(--font-body);
   color: var(--color-text-dark);
 }
 
 /* Dark mode body override */
 body.dark-mode {
-  background:
-    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
-    radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
-    #0F172A;
-  background-attachment: fixed;
   color: #CBD5E1;
 }
 
@@ -208,7 +195,45 @@ body.dark-mode .faq .faq-list p {
   vertical-align: middle;
 }
 
-/* Testimonials / Visual Examples */
+/* Testimonials / Visual Examples Background Decor */
+.cube-bg-decor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+.cube-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.2;
+  animation: orbit 20s infinite linear;
+}
+body.dark-mode .cube-orb { opacity: 0.35; }
+.c-orb-1 {
+  width: 600px;
+  height: 600px;
+  background: #3b82f6;
+  top: 20%;
+  left: -20%;
+}
+.c-orb-2 {
+  width: 500px;
+  height: 500px;
+  background: #a855f7;
+  bottom: -20%;
+  right: -15%;
+  animation-duration: 25s;
+  animation-direction: reverse;
+}
+@keyframes orbit {
+  0% { transform: rotate(0deg) translateX(80px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(80px) rotate(-360deg); }
+}
+
 /* 3D Carousel Container */
 .carousel-container {
   margin: 100px auto;

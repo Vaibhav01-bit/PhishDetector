@@ -333,22 +333,20 @@ const QRScanner = {
 
         this.html5QrCode = new Html5Qrcode("qr-reader");
         
+        const isMobileDevice = this.isMobile();
         const scanBoxSize = this.getOptimalScanBoxSize();
+        const fps = isMobileDevice ? 15 : 10;
         
         const config = {
-            fps: 20,
+            fps: fps,
             qrbox: scanBoxSize,
             aspectRatio: 1.0,
-            disableFlip: false,
-            experimentalFeatures: {
-                useBarCodeDetectorIfSupported: false
-            },
-            videoConstraints: {
-                facingMode: { ideal: "environment" },
-                width: { ideal: 1280, min: 640 },
-                height: { ideal: 720, min: 480 },
-                aspectRatio: { ideal: 1.0, min: 0.75, max: 1.5 }
-            }
+            formatsToSupport: [
+                0, // QR_CODE
+                Html5QrcodeScannerState
+            ],
+            rememberLastUsedCamera: true,
+            supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
         };
 
         try {
@@ -356,6 +354,7 @@ const QRScanner = {
             
             if (cameras && cameras.length) {
                 let cameraId = cameras[0].id;
+                let cameraType = 'default';
                 
                 const backCamera = cameras.find(c => 
                     c.label.toLowerCase().includes('back') ||
@@ -363,18 +362,41 @@ const QRScanner = {
                     c.label.toLowerCase().includes('environment')
                 );
                 
+                const frontCamera = cameras.find(c => 
+                    c.label.toLowerCase().includes('front') ||
+                    c.label.toLowerCase().includes('webcam') ||
+                    c.label.toLowerCase().includes('user')
+                );
+                
                 if (backCamera) {
                     cameraId = backCamera.id;
-                    console.log('[QR Scanner] Selected back camera:', backCamera.label);
+                    cameraType = 'back';
+                    console.log('[QR Scanner] Selected BACK camera:', backCamera.label);
+                } else if (frontCamera) {
+                    cameraId = frontCamera.id;
+                    cameraType = 'front';
+                    console.log('[QR Scanner] Selected FRONT camera:', frontCamera.label);
+                } else {
+                    cameraId = cameras[0].id;
+                    cameraType = 'default';
+                    console.log('[QR Scanner] Using first available camera:', cameras[0].label);
                 }
 
-                console.log('[QR Scanner] Starting camera:', cameraId);
+                console.log('[QR Scanner] Camera type:', cameraType, '| FPS:', fps, '| Device:', isMobileDevice ? 'Mobile' : 'Desktop/Laptop');
+                console.log('[QR Scanner] Starting scanner with config:', JSON.stringify(config, null, 2));
 
                 await this.html5QrCode.start(
                     cameraId,
                     config,
-                    (decodedText) => this.onScanSuccess(decodedText),
-                    (errorMessage) => this.onScanFailure(errorMessage)
+                    (decodedText) => {
+                        console.log('[QR Scanner] QR Code detected:', decodedText);
+                        this.onScanSuccess(decodedText);
+                    },
+                    (errorMessage) => {
+                        if (!errorMessage.includes('No MultiFormat Readers')) {
+                            console.log('[QR Scanner] Scan error (ignored):', errorMessage);
+                        }
+                    }
                 );
 
                 this.isScanning = true;
@@ -386,24 +408,35 @@ const QRScanner = {
                 }
 
                 if (instruction) {
-                    instruction.textContent = 'Align QR code inside the box';
+                    if (isMobileDevice) {
+                        instruction.textContent = 'Align QR code inside the box';
+                    } else {
+                        instruction.textContent = 'Hold QR steady • Bring closer • Good lighting helps';
+                    }
                     instruction.className = 'qr-scan-instruction';
                 }
 
                 if (cameraWrapper) {
                     cameraWrapper.classList.add('camera-active');
+                    if (!isMobileDevice) {
+                        cameraWrapper.classList.add('laptop-mode');
+                        cameraWrapper.dataset.cameraType = cameraType;
+                    }
                 }
 
-                if (this.isMobile()) {
+                if (isMobileDevice) {
                     this.requestFullscreen(cameraWrapper);
                     this.lockOrientation();
                 }
 
-                this.applyZoomAfterDelay();
+                if (!isMobileDevice) {
+                    this.applyZoomAfterDelay();
+                }
 
                 this.scanTimeout = setTimeout(() => {
                     if (this.isScanning) {
-                        this.updateGuidance('Unable to detect QR. Try better lighting or upload image.', 'warning');
+                        this.updateGuidance('Having trouble? Try uploading an image instead.', 'warning');
+                        this.showUploadFallback();
                     }
                 }, 15000);
 
@@ -460,6 +493,21 @@ const QRScanner = {
             instruction.classList.add('guidance-success');
         } else if (type === 'scanning') {
             instruction.classList.add('guidance-scanning');
+        }
+    },
+
+    showUploadFallback() {
+        const uploadBtn = document.getElementById('qr-upload-btn');
+        if (uploadBtn) {
+            uploadBtn.classList.add('pulse-upload');
+            uploadBtn.style.display = 'inline-flex';
+        }
+    },
+
+    hideUploadFallback() {
+        const uploadBtn = document.getElementById('qr-upload-btn');
+        if (uploadBtn) {
+            uploadBtn.classList.remove('pulse-upload');
         }
     },
 
@@ -577,11 +625,14 @@ const QRScanner = {
             scanOverlay.classList.remove('scanning', 'scan-success');
         }
         if (cameraWrapper) {
-            cameraWrapper.classList.remove('camera-active', 'scan-success');
+            cameraWrapper.classList.remove('camera-active', 'scan-success', 'laptop-mode');
+            delete cameraWrapper.dataset.cameraType;
         }
         if (video) {
             video.style.transform = '';
         }
+        
+        this.hideUploadFallback();
         
         const instruction = document.getElementById('qr-scan-instruction');
         if (instruction) {
@@ -592,6 +643,8 @@ const QRScanner = {
 
     onCameraError(err) {
         this.isScanning = false;
+        
+        this.hideUploadFallback();
         
         const cameraSection = document.getElementById('qr-camera-section');
         const cameraBtn = document.getElementById('qr-camera-btn');

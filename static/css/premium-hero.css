@@ -141,7 +141,7 @@ body.dark-mode .trust-pill {
     display: flex;
     align-items: center;
     overflow: hidden;
-    height: 64px;
+    height: 56px;
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
@@ -239,7 +239,7 @@ body.dark-mode .form-control::placeholder {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 16px;
+    margin-top: 10px;
     font-size: 0.9rem;
     color: rgba(148, 163, 184, 0.8);
     transition: color 0.3s ease;

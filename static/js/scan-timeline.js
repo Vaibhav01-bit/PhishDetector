@@ -20,7 +20,17 @@
     const timelineEl = document.getElementById('scan-timeline');
     const resultCard = document.getElementById('legacy-result-card');
 
-    if (!form || !timelineEl || !resultCard) return;
+    console.log('[Scanner] Initializing - form:', !!form, 'timeline:', !!timelineEl, 'resultCard:', !!resultCard);
+    console.log('[Scanner] Checking elements:');
+    console.log('  - url-scan-form:', !!document.getElementById('url-scan-form'));
+    console.log('  - scan-timeline:', !!document.getElementById('scan-timeline'));
+    console.log('  - legacy-result-card:', !!document.getElementById('legacy-result-card'));
+    console.log('  - primary-cta-wrapper:', !!document.querySelector('.primary-cta-wrapper'));
+
+    if (!form || !timelineEl || !resultCard) {
+        console.log('[Scanner] ERROR: Required elements not found, aborting');
+        return;
+    }
 
     // ─── Step metadata ────────────────────────────────────────────────────────
     // "fast" steps update together when /scan/fast resolves.
@@ -421,11 +431,17 @@
         }
 
         // ── Show sandbox CTA button ─────────────────────────────────────────
-        // Button now opens the sandbox details page
         const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
         
         // Get scan_id - use either from status or from the initial scan
         const scanId = status.scan_id || currentScanId;
+        
+        console.log('[Scanner] === Sandbox Complete Handler ===');
+        console.log('[Scanner] sandboxCTA element found:', !!sandboxCTA);
+        console.log('[Scanner] scanId:', scanId);
+        console.log('[Scanner] status.done:', status.done);
+        console.log('[Scanner] status.success:', status.success);
+        console.log('[Scanner] status.error:', status.error);
         
         // Store all sandbox data
         window.latestSandboxData = {
@@ -449,18 +465,12 @@
             finalStatus: status.final_status
         };
         
-        console.log('[Scanner] sandboxCTA found:', !!sandboxCTA);
-        console.log('[Scanner] status.success:', status.success);
-        console.log('[Scanner] scanId:', scanId);
-        console.log('[Scanner] status.screenshot exists:', !!status.screenshot);
-        
-        // Show button when we have a scanId (even if sandbox failed, user can still view partial results)
-        const shouldShowButton = scanId && status.done;
-        
-        if (sandboxCTA && shouldShowButton) {
-            // Show button to view sandbox details page (even if partially failed)
-            const statusIcon = status.success ? 'bx-check-circle' : 'bx-info-circle';
+        // Always show button if scan is done and we have a scanId
+        if (sandboxCTA && scanId && status.done) {
+            console.log('[Scanner] Showing sandbox button for scan ID:', scanId);
+            
             const statusLabel = status.success ? 'View Sandbox Analysis' : 'View Scan Details';
+            const statusIcon = status.success ? 'bx-check-circle' : 'bx-info-circle';
             
             sandboxCTA.innerHTML = `
                 <a href="/sandbox/${scanId}" class="btn-sandbox-primary">
@@ -473,18 +483,15 @@
                 </p>`;
             sandboxCTA.style.display = 'block';
             sandboxCTA.classList.add('cta-fade-in');
-            console.log('[Scanner] Button HTML set for scan ID:', scanId);
-        } else if (sandboxCTA && !status.done) {
-            // Sandbox failed - show error message
-            console.log('[Scanner] Sandbox failed, showing error');
+        } else if (sandboxCTA && !scanId) {
+            // No scanId - show fallback message
+            console.log('[Scanner] No scanId - showing fallback message');
             sandboxCTA.innerHTML = `
                 <p class="text-center mb-0" style="font-size:.82rem;opacity:.7">
                     <i class='bx bx-info-circle'></i>
-                    Sandbox analysis unavailable for this URL.
+                    Quick scan complete. Full sandbox analysis skipped.
                 </p>`;
             sandboxCTA.style.display = 'block';
-        } else if (sandboxCTA && !scanId) {
-            console.log('[Scanner] WARNING: No scanId available');
         }
     }
 

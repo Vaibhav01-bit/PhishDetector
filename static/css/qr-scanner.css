@@ -1052,3 +1052,55 @@
     margin-bottom: 8px;
     display: block;
 }
+
+/* Laptop Mode Styles */
+.qr-camera-wrapper.laptop-mode .qr-scan-box {
+    width: min(65vw, 280px);
+    height: min(65vw, 280px);
+}
+
+.qr-camera-wrapper.laptop-mode .qr-scan-instruction {
+    font-size: 0.85rem;
+    padding: 8px 16px;
+    max-width: 90%;
+}
+
+.qr-camera-wrapper.laptop-mode .qr-scan-line {
+    left: 3%;
+    right: 3%;
+}
+
+/* Upload Button Pulse Animation */
+.qr-btn.pulse-upload {
+    animation: upload-pulse 2s ease-in-out infinite;
+}
+
+@keyframes upload-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+    }
+}
+
+/* Front Camera Mirror Correction */
+.qr-camera-wrapper.front-camera #qr-reader video {
+    transform: scaleX(-1);
+}
+
+/* Guidance Styles for Laptop */
+.guidance-laptop {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive Laptop Styles */
+@media (max-width: 768px) {
+    .qr-camera-wrapper.laptop-mode .qr-scan-box {
+        width: min(60vw, 220px);
+        height: min(60vw, 220px);
+    }
+}
