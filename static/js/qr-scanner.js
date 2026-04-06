@@ -46,6 +46,10 @@ const QRScanner = {
     nativeDetector: null,
     nativeDetectionPending: false,
     usingNativeScanner: false,
+    usingServerScanner: false,
+    serverScanTimer: null,
+    serverScanInFlight: false,
+    serverFrameCanvas: null,
     isScanning: false,
     isStartingCamera: false,
     libraryLoadPromise: null,
@@ -121,27 +125,90 @@ const QRScanner = {
 
     loadScript(src) {
         return new Promise((resolve, reject) => {
-            const existingScript = document.querySelector(`script[data-qr-lib="${src}"], script[src="${src}"]`);
-            if (existingScript && existingScript.dataset.loaded === 'true') {
+            if (window.Html5Qrcode) {
                 resolve();
                 return;
             }
 
+            const existingScript = document.querySelector(`script[data-qr-lib="${src}"], script[src="${src}"]`);
+
             if (existingScript) {
-                existingScript.addEventListener('load', () => resolve(), { once: true });
-                existingScript.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)), { once: true });
-                return;
+                if (existingScript.dataset.loaded === 'true') {
+                    resolve();
+                    return;
+                }
+
+                if (existingScript.dataset.qrManaged === 'true') {
+                    let timeoutId = null;
+
+                    const cleanup = () => {
+                        existingScript.removeEventListener('load', onLoad);
+                        existingScript.removeEventListener('error', onError);
+                        if (timeoutId) {
+                            window.clearTimeout(timeoutId);
+                        }
+                    };
+
+                    const onLoad = () => {
+                        cleanup();
+                        resolve();
+                    };
+
+                    const onError = () => {
+                        cleanup();
+                        existingScript.dataset.failed = 'true';
+                        reject(new Error(`Failed to load ${src}`));
+                    };
+
+                    timeoutId = window.setTimeout(() => {
+                        cleanup();
+                        existingScript.dataset.failed = 'true';
+                        reject(new Error(`Timed out while loading ${src}`));
+                    }, 6000);
+
+                    existingScript.addEventListener('load', onLoad, { once: true });
+                    existingScript.addEventListener('error', onError, { once: true });
+                    return;
+                }
+
+                existingScript.remove();
             }
 
             const script = document.createElement('script');
             script.src = src;
             script.async = true;
             script.dataset.qrLib = src;
+            script.dataset.qrManaged = 'true';
+            let timeoutId = null;
+
+            const cleanup = () => {
+                script.onerror = null;
+                script.onload = null;
+                if (timeoutId) {
+                    window.clearTimeout(timeoutId);
+                }
+            };
+
             script.onload = () => {
+                cleanup();
                 script.dataset.loaded = 'true';
                 resolve();
             };
-            script.onerror = () => reject(new Error(`Failed to load ${src}`));
+            script.onerror = () => {
+                cleanup();
+                script.dataset.failed = 'true';
+                reject(new Error(`Failed to load ${src}`));
+            };
+
+            timeoutId = window.setTimeout(() => {
+                cleanup();
+                script.dataset.failed = 'true';
+                if (script.parentNode) {
+                    script.parentNode.removeChild(script);
+                }
+                reject(new Error(`Timed out while loading ${src}`));
+            }, 6000);
+
             document.head.appendChild(script);
         });
     },
@@ -423,10 +490,6 @@ const QRScanner = {
             hasHtml5Library = !!window.Html5Qrcode;
         } catch (libraryError) {
             console.warn('[QR Scanner] Html5Qrcode library unavailable:', libraryError.message);
-            if (!hasNativeSupport) {
-                this.onCameraError(libraryError);
-                return;
-            }
         }
 
         this.isStartingCamera = true;
@@ -468,17 +531,29 @@ const QRScanner = {
                     startResult = await this.startWithFallback(startCandidates, config);
                 } catch (html5StartError) {
                     console.warn('[QR Scanner] Html5Qrcode camera start failed:', html5StartError.message);
-                    if (!hasNativeSupport) {
-                        throw html5StartError;
-                    }
-
                     await this.stopCamera({ preserveLayout: true, preserveButtonState: true });
-                    startResult = await this.startNativeCameraScanner(isMobileDevice);
+                    if (hasNativeSupport) {
+                        try {
+                            startResult = await this.startNativeCameraScanner(isMobileDevice);
+                        } catch (nativeStartError) {
+                            console.warn('[QR Scanner] Native QR detection failed:', nativeStartError.message);
+                            await this.stopCamera({ preserveLayout: true, preserveButtonState: true });
+                            startResult = await this.startServerCameraScanner(isMobileDevice);
+                        }
+                    } else {
+                        startResult = await this.startServerCameraScanner(isMobileDevice);
+                    }
                 }
             } else if (hasNativeSupport) {
-                startResult = await this.startNativeCameraScanner(isMobileDevice);
+                try {
+                    startResult = await this.startNativeCameraScanner(isMobileDevice);
+                } catch (nativeStartError) {
+                    console.warn('[QR Scanner] Native QR detection failed:', nativeStartError.message);
+                    await this.stopCamera({ preserveLayout: true, preserveButtonState: true });
+                    startResult = await this.startServerCameraScanner(isMobileDevice);
+                }
             } else {
-                throw new Error('No supported QR scanner backend is available in this browser.');
+                startResult = await this.startServerCameraScanner(isMobileDevice);
             }
 
             this.activeCameraType = startResult.cameraType;
@@ -719,6 +794,19 @@ const QRScanner = {
         throw new Error('No camera found');
     },
 
+    buildMediaStreamCandidates(isMobileDevice) {
+        return isMobileDevice
+            ? [
+                { label: 'rear camera', cameraType: 'back', constraints: { facingMode: { exact: 'environment' } } },
+                { label: 'environment fallback', cameraType: 'back', constraints: { facingMode: 'environment' } },
+                { label: 'any camera', cameraType: 'default', constraints: true }
+            ]
+            : [
+                { label: 'front camera', cameraType: 'front', constraints: { facingMode: 'user' } },
+                { label: 'default camera', cameraType: 'default', constraints: true }
+            ];
+    },
+
     async startNativeCameraScanner(isMobileDevice) {
         if (!(await this.hasNativeQrSupport())) {
             throw new Error('Native QR detection is not supported in this browser.');
@@ -730,16 +818,7 @@ const QRScanner = {
         }
 
         const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
-        const candidates = isMobileDevice
-            ? [
-                { label: 'rear camera', cameraType: 'back', constraints: { facingMode: { exact: 'environment' } } },
-                { label: 'environment fallback', cameraType: 'back', constraints: { facingMode: 'environment' } },
-                { label: 'any camera', cameraType: 'default', constraints: true }
-            ]
-            : [
-                { label: 'front camera', cameraType: 'front', constraints: { facingMode: 'user' } },
-                { label: 'default camera', cameraType: 'default', constraints: true }
-            ];
+        const candidates = this.buildMediaStreamCandidates(isMobileDevice);
 
         let lastError = null;
 
@@ -768,6 +847,45 @@ const QRScanner = {
                     stream.getTracks().forEach(track => track.stop());
                 }
                 console.log('[QR Scanner] Native camera candidate failed:', candidate.label, err.message);
+            }
+        }
+
+        throw lastError || new Error('No camera found');
+    },
+
+    async startServerCameraScanner(isMobileDevice) {
+        const reader = document.getElementById('qr-reader');
+        if (!reader) {
+            throw new Error('QR reader element not found.');
+        }
+
+        const candidates = this.buildMediaStreamCandidates(isMobileDevice);
+        let lastError = null;
+
+        for (const candidate of candidates) {
+            let stream = null;
+
+            try {
+                console.log('[QR Scanner] Trying server-assisted camera candidate:', candidate.label);
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: candidate.constraints,
+                    audio: false
+                });
+
+                await this.attachNativeVideoStream(reader, stream);
+
+                this.nativeStream = stream;
+                this.usingServerScanner = true;
+                this.serverScanInFlight = false;
+                this.queueServerScan(300);
+
+                return { cameraType: candidate.cameraType };
+            } catch (err) {
+                lastError = err;
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                console.log('[QR Scanner] Server-assisted camera candidate failed:', candidate.label, err.message);
             }
         }
 
@@ -810,7 +928,94 @@ const QRScanner = {
             };
 
             reader.appendChild(video);
-        });
+            });
+    },
+
+    queueServerScan(delay = 900) {
+        if (this.serverScanTimer) {
+            clearTimeout(this.serverScanTimer);
+        }
+
+        if (!this.usingServerScanner) {
+            return;
+        }
+
+        this.serverScanTimer = setTimeout(() => {
+            this.serverScanTimer = null;
+            this.scanServerFrame();
+        }, delay);
+    },
+
+    captureFrameAsBase64(video) {
+        if (!video || !video.videoWidth || !video.videoHeight) {
+            return null;
+        }
+
+        const maxWidth = 960;
+        const scale = video.videoWidth > maxWidth ? maxWidth / video.videoWidth : 1;
+        const width = Math.max(1, Math.round(video.videoWidth * scale));
+        const height = Math.max(1, Math.round(video.videoHeight * scale));
+        const canvas = this.serverFrameCanvas || document.createElement('canvas');
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const context = canvas.getContext('2d', { willReadFrequently: false });
+        if (!context) {
+            return null;
+        }
+
+        context.drawImage(video, 0, 0, width, height);
+        this.serverFrameCanvas = canvas;
+
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        return dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl;
+    },
+
+    async scanServerFrame() {
+        if (!this.usingServerScanner || !this.nativeVideoEl) {
+            return;
+        }
+
+        if (this.nativeVideoEl.readyState < 2) {
+            this.queueServerScan(300);
+            return;
+        }
+
+        if (this.serverScanInFlight) {
+            this.queueServerScan(250);
+            return;
+        }
+
+        const frameData = this.captureFrameAsBase64(this.nativeVideoEl);
+        if (!frameData) {
+            this.queueServerScan(400);
+            return;
+        }
+
+        this.serverScanInFlight = true;
+
+        try {
+            const response = await fetch('/api/scan_qr', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ qr_image: frameData })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.content) {
+                this.usingServerScanner = false;
+                this.onScanSuccess(data.content, data);
+                return;
+            }
+        } catch (err) {
+            console.log('[QR Scanner] Server-assisted frame scan error:', err.message);
+        } finally {
+            this.serverScanInFlight = false;
+        }
+
+        this.queueServerScan(900);
     },
 
     scanNativeFrame() {
@@ -918,7 +1123,7 @@ const QRScanner = {
         }
     },
 
-    onScanSuccess(decodedText) {
+    onScanSuccess(decodedText, analysisData = null) {
         const timeSinceLastScan = Date.now() - this.lastScanTime;
         if (timeSinceLastScan < 1000) {
             return;
@@ -936,6 +1141,14 @@ const QRScanner = {
         setTimeout(async () => {
             await this.stopCamera();
             
+            if (analysisData && analysisData.success) {
+                this.showProgress();
+                this.setProgressStage(1, 'Analyzing...');
+                this.completeProgress();
+                this.displayQRContent(analysisData);
+                return;
+            }
+
             // Analyze the QR content
             try {
                 this.showProgress();
@@ -1017,6 +1230,11 @@ const QRScanner = {
             this.nativeScanRaf = null;
         }
 
+        if (this.serverScanTimer) {
+            clearTimeout(this.serverScanTimer);
+            this.serverScanTimer = null;
+        }
+
         if (this.nativeVideoEl) {
             try {
                 this.nativeVideoEl.pause();
@@ -1034,6 +1252,8 @@ const QRScanner = {
         this.nativeDetector = null;
         this.nativeDetectionPending = false;
         this.usingNativeScanner = false;
+        this.usingServerScanner = false;
+        this.serverScanInFlight = false;
         
         this.isScanning = false;
         this.isStartingCamera = false;
