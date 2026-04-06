@@ -40,11 +40,20 @@ window.addEventListener('error', function(e) {
 
 const QRScanner = {
     html5QrCode: null,
+    nativeStream: null,
+    nativeVideoEl: null,
+    nativeScanRaf: null,
+    nativeDetector: null,
+    nativeDetectionPending: false,
+    usingNativeScanner: false,
     isScanning: false,
+    isStartingCamera: false,
+    libraryLoadPromise: null,
     previewImageData: null,
     scanTimeout: null,
     zoomApplied: false,
     lastScanTime: 0,
+    activeCameraType: 'default',
 
     init() {
         console.log('[QR Scanner] Initializing...');
@@ -69,6 +78,89 @@ const QRScanner = {
             }
         } catch (e) {
             console.log('[QR Scanner] BarCodeDetector cleanup:', e.message);
+        }
+    },
+
+    async ensureScannerLibraryLoaded() {
+        if (window.Html5Qrcode) {
+            return true;
+        }
+
+        if (this.libraryLoadPromise) {
+            return this.libraryLoadPromise;
+        }
+
+        const sources = [
+            'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.10/html5-qrcode.min.js',
+            'https://unpkg.com/html5-qrcode@2.3.10/html5-qrcode.min.js'
+        ];
+
+        this.libraryLoadPromise = (async () => {
+            for (const source of sources) {
+                try {
+                    await this.loadScript(source);
+                    if (window.Html5Qrcode) {
+                        return true;
+                    }
+                } catch (err) {
+                    console.log('[QR Scanner] Failed to load scanner library from', source, err.message);
+                }
+            }
+
+            throw new Error('Scanner library not loaded. Please refresh the page.');
+        })();
+
+        try {
+            return await this.libraryLoadPromise;
+        } finally {
+            if (!window.Html5Qrcode) {
+                this.libraryLoadPromise = null;
+            }
+        }
+    },
+
+    loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const existingScript = document.querySelector(`script[data-qr-lib="${src}"], script[src="${src}"]`);
+            if (existingScript && existingScript.dataset.loaded === 'true') {
+                resolve();
+                return;
+            }
+
+            if (existingScript) {
+                existingScript.addEventListener('load', () => resolve(), { once: true });
+                existingScript.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)), { once: true });
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.dataset.qrLib = src;
+            script.onload = () => {
+                script.dataset.loaded = 'true';
+                resolve();
+            };
+            script.onerror = () => reject(new Error(`Failed to load ${src}`));
+            document.head.appendChild(script);
+        });
+    },
+
+    async hasNativeQrSupport() {
+        if (typeof window === 'undefined' || typeof window.BarcodeDetector === 'undefined') {
+            return false;
+        }
+
+        if (typeof window.BarcodeDetector.getSupportedFormats !== 'function') {
+            return true;
+        }
+
+        try {
+            const formats = await window.BarcodeDetector.getSupportedFormats();
+            return Array.isArray(formats) && formats.includes('qr_code');
+        } catch (err) {
+            console.log('[QR Scanner] Native BarcodeDetector format check failed:', err.message);
+            return false;
         }
     },
 
@@ -304,17 +396,16 @@ const QRScanner = {
         const cameraSection = document.getElementById('qr-camera-section');
         const previewArea = document.getElementById('qr-preview-area');
 
+        if (!cameraBtn || !cameraSection || !previewArea || this.isStartingCamera) {
+            return;
+        }
+
         if (this.isScanning) {
             await this.stopCamera();
-            cameraBtn.innerHTML = '<i class="bx bx-camera"></i> Start Camera';
-            cameraBtn.classList.remove('active');
-            cameraSection.style.display = 'none';
-            previewArea.style.display = 'flex';
         } else {
             cameraSection.style.display = 'block';
             previewArea.style.display = 'none';
-            cameraBtn.innerHTML = '<i class="bx bx-stop"></i> Stop Camera';
-            cameraBtn.classList.add('active');
+            this.setCameraButtonState('starting');
             
             await this.startCameraScanner();
         }
@@ -324,84 +415,82 @@ const QRScanner = {
         const instruction = document.getElementById('qr-scan-instruction');
         const cameraWrapper = document.querySelector('.qr-camera-wrapper');
         const scanOverlay = document.querySelector('.qr-scan-overlay');
-        
-        if (!window.Html5Qrcode) {
-            console.error('Html5Qrcode library not loaded');
-            this.onCameraError({ message: 'Scanner library not loaded. Please refresh the page.' });
-            return;
+        const hasNativeSupport = await this.hasNativeQrSupport();
+        let hasHtml5Library = false;
+
+        try {
+            await this.ensureScannerLibraryLoaded();
+            hasHtml5Library = !!window.Html5Qrcode;
+        } catch (libraryError) {
+            console.warn('[QR Scanner] Html5Qrcode library unavailable:', libraryError.message);
+            if (!hasNativeSupport) {
+                this.onCameraError(libraryError);
+                return;
+            }
         }
 
-        this.html5QrCode = new Html5Qrcode("qr-reader");
-        
+        this.isStartingCamera = true;
+        this.updateGuidance('Requesting camera access...', 'scanning');
+        this.hideProgress();
+        this.hideUploadFallback();
+        await this.stopCamera({ preserveLayout: true, preserveButtonState: true });
+
         const isMobileDevice = this.isMobile();
         const scanBoxSize = this.getOptimalScanBoxSize();
-        const fps = isMobileDevice ? 15 : 10;
+        const fps = isMobileDevice ? 12 : 10;
+        const qrFormat = typeof Html5QrcodeSupportedFormats !== 'undefined'
+            ? Html5QrcodeSupportedFormats.QR_CODE
+            : 0;
         
         const config = {
             fps: fps,
             qrbox: scanBoxSize,
-            aspectRatio: 1.0,
-            formatsToSupport: [
-                0, // QR_CODE
-                Html5QrcodeScannerState
-            ],
-            rememberLastUsedCamera: true,
-            supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+            aspectRatio: isMobileDevice ? 1.0 : 1.333334,
+            formatsToSupport: [qrFormat],
+            rememberLastUsedCamera: true
         };
 
-        try {
-            const cameras = await Html5Qrcode.getCameras();
-            
-            if (cameras && cameras.length) {
-                let cameraId = cameras[0].id;
-                let cameraType = 'default';
-                
-                const backCamera = cameras.find(c => 
-                    c.label.toLowerCase().includes('back') ||
-                    c.label.toLowerCase().includes('rear') ||
-                    c.label.toLowerCase().includes('environment')
-                );
-                
-                const frontCamera = cameras.find(c => 
-                    c.label.toLowerCase().includes('front') ||
-                    c.label.toLowerCase().includes('webcam') ||
-                    c.label.toLowerCase().includes('user')
-                );
-                
-                if (backCamera) {
-                    cameraId = backCamera.id;
-                    cameraType = 'back';
-                    console.log('[QR Scanner] Selected BACK camera:', backCamera.label);
-                } else if (frontCamera) {
-                    cameraId = frontCamera.id;
-                    cameraType = 'front';
-                    console.log('[QR Scanner] Selected FRONT camera:', frontCamera.label);
-                } else {
-                    cameraId = cameras[0].id;
-                    cameraType = 'default';
-                    console.log('[QR Scanner] Using first available camera:', cameras[0].label);
-                }
+        if (typeof Html5QrcodeScanType !== 'undefined') {
+            config.supportedScanTypes = [Html5QrcodeScanType.SCAN_TYPE_CAMERA];
+        }
 
-                console.log('[QR Scanner] Camera type:', cameraType, '| FPS:', fps, '| Device:', isMobileDevice ? 'Mobile' : 'Desktop/Laptop');
+        try {
+            this.ensureCameraSupport();
+            await this.primeCameraAccess(isMobileDevice);
+            let startResult;
+
+            if (hasHtml5Library) {
+                this.html5QrCode = new Html5Qrcode("qr-reader");
+                const cameras = await this.getAvailableCameras();
+                const selectedCamera = this.selectBestCamera(cameras, isMobileDevice);
+                const startCandidates = this.buildStartCandidates(selectedCamera, cameras, isMobileDevice);
+                try {
+                    startResult = await this.startWithFallback(startCandidates, config);
+                } catch (html5StartError) {
+                    console.warn('[QR Scanner] Html5Qrcode camera start failed:', html5StartError.message);
+                    if (!hasNativeSupport) {
+                        throw html5StartError;
+                    }
+
+                    await this.stopCamera({ preserveLayout: true, preserveButtonState: true });
+                    startResult = await this.startNativeCameraScanner(isMobileDevice);
+                }
+            } else if (hasNativeSupport) {
+                startResult = await this.startNativeCameraScanner(isMobileDevice);
+            } else {
+                throw new Error('No supported QR scanner backend is available in this browser.');
+            }
+
+            this.activeCameraType = startResult.cameraType;
+
+                console.log('[QR Scanner] Camera type:', startResult.cameraType, '| FPS:', fps, '| Device:', isMobileDevice ? 'Mobile' : 'Desktop/Laptop');
                 console.log('[QR Scanner] Starting scanner with config:', JSON.stringify(config, null, 2));
 
-                await this.html5QrCode.start(
-                    cameraId,
-                    config,
-                    (decodedText) => {
-                        console.log('[QR Scanner] QR Code detected:', decodedText);
-                        this.onScanSuccess(decodedText);
-                    },
-                    (errorMessage) => {
-                        if (!errorMessage.includes('No MultiFormat Readers')) {
-                            console.log('[QR Scanner] Scan error (ignored):', errorMessage);
-                        }
-                    }
-                );
-
                 this.isScanning = true;
+                this.isStartingCamera = false;
                 this.zoomApplied = false;
                 this.lastScanTime = Date.now();
+                this.setCameraButtonState('active');
 
                 if (scanOverlay) {
                     scanOverlay.classList.add('scanning');
@@ -418,9 +507,10 @@ const QRScanner = {
 
                 if (cameraWrapper) {
                     cameraWrapper.classList.add('camera-active');
+                    cameraWrapper.classList.toggle('front-camera', startResult.cameraType === 'front');
                     if (!isMobileDevice) {
                         cameraWrapper.classList.add('laptop-mode');
-                        cameraWrapper.dataset.cameraType = cameraType;
+                        cameraWrapper.dataset.cameraType = startResult.cameraType;
                     }
                 }
 
@@ -440,14 +530,325 @@ const QRScanner = {
                     }
                 }, 15000);
 
-            } else {
-                throw new Error('No cameras found');
-            }
-
         } catch (err) {
             console.error('[QR Scanner] Camera error:', err);
             this.onCameraError(err);
         }
+    },
+
+    async primeCameraAccess(isMobileDevice) {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            return;
+        }
+
+        let stream = null;
+
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { ideal: isMobileDevice ? 'environment' : 'user' }
+                },
+                audio: false
+            });
+        } catch (err) {
+            // html5-qrcode will surface the final permission/device error during start().
+            console.log('[QR Scanner] Camera priming skipped:', err.message);
+        } finally {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        }
+    },
+
+    ensureCameraSupport() {
+        if (!window.isSecureContext) {
+            const secureError = new Error('Camera access requires a secure context (HTTPS or localhost).');
+            secureError.code = 'INSECURE_CONTEXT';
+            throw secureError;
+        }
+
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            const mediaError = new Error('This browser does not expose camera APIs.');
+            mediaError.code = 'MEDIA_DEVICES_UNAVAILABLE';
+            throw mediaError;
+        }
+    },
+
+    async getAvailableCameras() {
+        try {
+            const cameras = await Html5Qrcode.getCameras();
+            return Array.isArray(cameras) ? cameras : [];
+        } catch (err) {
+            console.log('[QR Scanner] Camera enumeration failed:', err.message);
+            return [];
+        }
+    },
+
+    selectBestCamera(cameras, isMobileDevice) {
+        if (!cameras || !cameras.length) {
+            return null;
+        }
+
+        const normalizedCameras = cameras.map((camera, index) => ({
+            ...camera,
+            label: (camera.label || '').toLowerCase(),
+            sortIndex: index
+        }));
+
+        const environmentHints = ['back', 'rear', 'environment', 'world'];
+        const userHints = ['front', 'user', 'face', 'webcam'];
+
+        const preferred = normalizedCameras.find(camera =>
+            environmentHints.some(hint => camera.label.includes(hint))
+        );
+        const secondary = normalizedCameras.find(camera =>
+            userHints.some(hint => camera.label.includes(hint))
+        );
+
+        const selected = isMobileDevice
+            ? (preferred || normalizedCameras[0])
+            : (secondary || preferred || normalizedCameras[0]);
+
+        let type = 'default';
+        if (preferred && selected.id === preferred.id) {
+            type = 'back';
+        } else if (secondary && selected.id === secondary.id) {
+            type = 'front';
+        }
+
+        console.log('[QR Scanner] Available cameras:', normalizedCameras.map(camera => camera.label || `camera-${camera.sortIndex + 1}`));
+        console.log('[QR Scanner] Selected camera:', selected.label || selected.id);
+
+        return { id: selected.id, type };
+    },
+
+    buildStartCandidates(selectedCamera, cameras, isMobileDevice) {
+        const candidates = [];
+
+        if (isMobileDevice) {
+            candidates.push({
+                label: 'rear-facing camera',
+                source: { facingMode: { exact: 'environment' } },
+                cameraType: 'back'
+            });
+            candidates.push({
+                label: 'environment camera fallback',
+                source: { facingMode: 'environment' },
+                cameraType: 'back'
+            });
+        } else {
+            candidates.push({
+                label: 'default webcam',
+                source: { facingMode: 'user' },
+                cameraType: 'front'
+            });
+        }
+
+        if (selectedCamera && selectedCamera.id) {
+            candidates.push({
+                label: `named ${selectedCamera.type} camera`,
+                source: selectedCamera.id,
+                cameraType: selectedCamera.type
+            });
+        }
+
+        if (cameras && cameras.length) {
+            cameras.forEach((camera, index) => {
+                if (!camera.id || (selectedCamera && camera.id === selectedCamera.id)) {
+                    return;
+                }
+
+                candidates.push({
+                    label: `camera ${index + 1}`,
+                    source: camera.id,
+                    cameraType: 'default'
+                });
+            });
+        }
+
+        if (!isMobileDevice) {
+            candidates.push({
+                label: 'generic camera fallback',
+                source: { facingMode: { ideal: 'environment' } },
+                cameraType: selectedCamera ? selectedCamera.type : 'default'
+            });
+        }
+
+        return candidates;
+    },
+
+    async startWithFallback(candidates, config) {
+        let lastError = null;
+
+        for (const candidate of candidates) {
+            try {
+                console.log('[QR Scanner] Trying camera candidate:', candidate.label, candidate.source);
+                await this.html5QrCode.start(
+                    candidate.source,
+                    config,
+                    (decodedText) => {
+                        console.log('[QR Scanner] QR Code detected:', decodedText);
+                        this.onScanSuccess(decodedText);
+                    },
+                    (errorMessage) => {
+                        if (!errorMessage.includes('No MultiFormat Readers')) {
+                            console.log('[QR Scanner] Scan error (ignored):', errorMessage);
+                        }
+                    }
+                );
+
+                return candidate;
+            } catch (err) {
+                lastError = err;
+                console.log('[QR Scanner] Camera candidate failed:', candidate.label, err.message);
+
+                try {
+                    if (this.html5QrCode) {
+                        this.html5QrCode.clear();
+                    }
+                } catch (clearErr) {
+                    console.log('[QR Scanner] Scanner clear after failed start:', clearErr.message);
+                }
+            }
+        }
+
+        if (lastError) {
+            throw lastError;
+        }
+
+        throw new Error('No camera found');
+    },
+
+    async startNativeCameraScanner(isMobileDevice) {
+        if (!(await this.hasNativeQrSupport())) {
+            throw new Error('Native QR detection is not supported in this browser.');
+        }
+
+        const reader = document.getElementById('qr-reader');
+        if (!reader) {
+            throw new Error('QR reader element not found.');
+        }
+
+        const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+        const candidates = isMobileDevice
+            ? [
+                { label: 'rear camera', cameraType: 'back', constraints: { facingMode: { exact: 'environment' } } },
+                { label: 'environment fallback', cameraType: 'back', constraints: { facingMode: 'environment' } },
+                { label: 'any camera', cameraType: 'default', constraints: true }
+            ]
+            : [
+                { label: 'front camera', cameraType: 'front', constraints: { facingMode: 'user' } },
+                { label: 'default camera', cameraType: 'default', constraints: true }
+            ];
+
+        let lastError = null;
+
+        for (const candidate of candidates) {
+            let stream = null;
+
+            try {
+                console.log('[QR Scanner] Trying native camera candidate:', candidate.label);
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: candidate.constraints,
+                    audio: false
+                });
+
+                await this.attachNativeVideoStream(reader, stream);
+
+                this.nativeStream = stream;
+                this.nativeDetector = detector;
+                this.usingNativeScanner = true;
+                this.nativeDetectionPending = false;
+                this.scanNativeFrame();
+
+                return { cameraType: candidate.cameraType };
+            } catch (err) {
+                lastError = err;
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                console.log('[QR Scanner] Native camera candidate failed:', candidate.label, err.message);
+            }
+        }
+
+        throw lastError || new Error('No camera found');
+    },
+
+    attachNativeVideoStream(reader, stream) {
+        return new Promise((resolve, reject) => {
+            reader.innerHTML = '';
+
+            const video = document.createElement('video');
+            video.setAttribute('playsinline', 'true');
+            video.setAttribute('autoplay', 'true');
+            video.setAttribute('muted', 'true');
+            video.muted = true;
+            video.autoplay = true;
+            video.playsInline = true;
+            video.srcObject = stream;
+
+            const cleanup = () => {
+                video.onloadedmetadata = null;
+                video.onerror = null;
+            };
+
+            video.onloadedmetadata = async () => {
+                try {
+                    await video.play();
+                    this.nativeVideoEl = video;
+                    cleanup();
+                    resolve();
+                } catch (err) {
+                    cleanup();
+                    reject(err);
+                }
+            };
+
+            video.onerror = () => {
+                cleanup();
+                reject(new Error('Native camera preview failed to start.'));
+            };
+
+            reader.appendChild(video);
+        });
+    },
+
+    scanNativeFrame() {
+        if (!this.usingNativeScanner || !this.nativeVideoEl || !this.nativeDetector) {
+            return;
+        }
+
+        if (this.nativeVideoEl.readyState < 2) {
+            this.nativeScanRaf = window.requestAnimationFrame(() => this.scanNativeFrame());
+            return;
+        }
+
+        if (this.nativeDetectionPending) {
+            this.nativeScanRaf = window.requestAnimationFrame(() => this.scanNativeFrame());
+            return;
+        }
+
+        this.nativeDetectionPending = true;
+
+        this.nativeDetector.detect(this.nativeVideoEl)
+            .then(codes => {
+                if (codes && codes.length) {
+                    const firstCode = codes.find(code => code.rawValue);
+                    if (firstCode && firstCode.rawValue) {
+                        this.onScanSuccess(firstCode.rawValue);
+                        return;
+                    }
+                }
+
+                this.nativeScanRaf = window.requestAnimationFrame(() => this.scanNativeFrame());
+            })
+            .catch(err => {
+                console.log('[QR Scanner] Native detection error:', err.message);
+                this.nativeScanRaf = window.requestAnimationFrame(() => this.scanNativeFrame());
+            })
+            .finally(() => {
+                this.nativeDetectionPending = false;
+            });
     },
 
     requestFullscreen(element) {
@@ -590,13 +991,18 @@ const QRScanner = {
         }, 600);
     },
 
-    async stopCamera() {
+    async stopCamera(options = {}) {
+        const {
+            preserveLayout = false,
+            preserveButtonState = false
+        } = options;
+
         clearTimeout(this.scanTimeout);
         
         if (this.html5QrCode) {
             try {
                 const state = this.html5QrCode.getState();
-                if (state === 2) {
+                if (state !== 1) {
                     await this.html5QrCode.stop();
                 }
             } catch (e) {
@@ -605,9 +1011,34 @@ const QRScanner = {
             this.html5QrCode.clear();
             this.html5QrCode = null;
         }
+
+        if (this.nativeScanRaf) {
+            cancelAnimationFrame(this.nativeScanRaf);
+            this.nativeScanRaf = null;
+        }
+
+        if (this.nativeVideoEl) {
+            try {
+                this.nativeVideoEl.pause();
+            } catch (e) {}
+            this.nativeVideoEl.srcObject = null;
+            this.nativeVideoEl.remove();
+            this.nativeVideoEl = null;
+        }
+
+        if (this.nativeStream) {
+            this.nativeStream.getTracks().forEach(track => track.stop());
+            this.nativeStream = null;
+        }
+
+        this.nativeDetector = null;
+        this.nativeDetectionPending = false;
+        this.usingNativeScanner = false;
         
         this.isScanning = false;
+        this.isStartingCamera = false;
         this.zoomApplied = false;
+        this.activeCameraType = 'default';
         
         if (document.fullscreenElement) {
             document.exitFullscreen().catch(() => {});
@@ -625,7 +1056,7 @@ const QRScanner = {
             scanOverlay.classList.remove('scanning', 'scan-success');
         }
         if (cameraWrapper) {
-            cameraWrapper.classList.remove('camera-active', 'scan-success', 'laptop-mode');
+            cameraWrapper.classList.remove('camera-active', 'scan-success', 'laptop-mode', 'front-camera');
             delete cameraWrapper.dataset.cameraType;
         }
         if (video) {
@@ -639,9 +1070,24 @@ const QRScanner = {
             instruction.textContent = 'Align QR code inside the box';
             instruction.className = 'qr-scan-instruction';
         }
+
+        if (!preserveButtonState) {
+            this.setCameraButtonState('idle');
+        }
+
+        const cameraSection = document.getElementById('qr-camera-section');
+        const previewArea = document.getElementById('qr-preview-area');
+
+        if (cameraSection && !preserveLayout) {
+            cameraSection.style.display = 'none';
+        }
+        if (previewArea && !preserveLayout) {
+            previewArea.style.display = 'flex';
+        }
     },
 
     onCameraError(err) {
+        this.stopCamera();
         this.isScanning = false;
         
         this.hideUploadFallback();
@@ -657,14 +1103,99 @@ const QRScanner = {
         }
         if (previewArea) previewArea.style.display = 'flex';
         
-        let errorMsg = 'Camera not available. Please use image upload instead.';
-        if (err.message && err.message.includes('Permission')) {
-            errorMsg = 'Camera permission denied. Please allow camera access or use image upload.';
-        } else if (err.message && err.message.includes('NotFoundError')) {
-            errorMsg = 'No camera found. Please connect a camera or use image upload.';
+        this.showError(
+            this.getCameraErrorMessage(err),
+            this.buildCameraErrorDetails(err)
+        );
+    },
+
+    getCameraErrorMessage(err) {
+        const errorText = `${err && err.name ? err.name : ''} ${err && err.message ? err.message : ''}`.toLowerCase();
+
+        if (err && err.code === 'INSECURE_CONTEXT') {
+            return 'Camera access requires HTTPS or localhost. Open this site on https:// or on http://localhost and try again.';
         }
-        
-        this.showError(errorMsg);
+
+        if (err && err.code === 'MEDIA_DEVICES_UNAVAILABLE') {
+            return 'This browser does not expose camera access. Use Chrome, Edge, or Safari, or upload a QR image instead.';
+        }
+
+        if (
+            errorText.includes('permission') ||
+            errorText.includes('notallowederror') ||
+            errorText.includes('permission denied')
+        ) {
+            return 'Camera permission was denied. Allow camera access in the browser and try again.';
+        }
+
+        if (
+            errorText.includes('notfounderror') ||
+            errorText.includes('devicesnotfounderror') ||
+            errorText.includes('requested device not found')
+        ) {
+            return 'No camera was found on this device. Connect or enable a camera, or upload a QR image instead.';
+        }
+
+        if (
+            errorText.includes('notreadableerror') ||
+            errorText.includes('trackstarterror') ||
+            errorText.includes('could not start video source')
+        ) {
+            return 'The camera is busy in another app or browser tab. Close other apps using the camera and try again.';
+        }
+
+        if (
+            errorText.includes('overconstrainederror') ||
+            errorText.includes('constraint')
+        ) {
+            return 'The preferred camera could not be opened on this device. Try again or use image upload instead.';
+        }
+
+        if (
+            errorText.includes('scanner backend') ||
+            errorText.includes('native qr detection is not supported')
+        ) {
+            return 'This browser cannot start any QR scanning backend. Try Chrome or Edge, or use image upload instead.';
+        }
+
+        return 'Camera could not be started. If you opened this page on a network IP over HTTP, switch to HTTPS or localhost. Otherwise try image upload instead.';
+    },
+
+    buildCameraErrorDetails(err) {
+        const detailParts = [];
+        const rawName = err && err.name ? err.name : 'UnknownError';
+        const rawMessage = err && err.message ? err.message : 'No browser error message was provided.';
+
+        detailParts.push(`Browser error: ${rawName} - ${rawMessage}`);
+        detailParts.push(`Context: ${window.isSecureContext ? 'secure' : 'not secure'}`);
+        detailParts.push(`Origin: ${window.location.origin}`);
+        detailParts.push(
+            `Camera API: ${navigator.mediaDevices && navigator.mediaDevices.getUserMedia ? 'available' : 'unavailable'}`
+        );
+
+        return detailParts.join(' | ');
+    },
+
+    setCameraButtonState(state) {
+        const cameraBtn = document.getElementById('qr-camera-btn');
+        if (!cameraBtn) return;
+
+        cameraBtn.disabled = state === 'starting';
+
+        if (state === 'starting') {
+            cameraBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Starting Camera...';
+            cameraBtn.classList.remove('active');
+            return;
+        }
+
+        if (state === 'active') {
+            cameraBtn.innerHTML = '<i class="bx bx-stop"></i> Stop Camera';
+            cameraBtn.classList.add('active');
+            return;
+        }
+
+        cameraBtn.innerHTML = '<i class="bx bx-camera"></i> Start Camera';
+        cameraBtn.classList.remove('active');
     },
 
     displayQRContent(data) {
@@ -1054,7 +1585,7 @@ const QRScanner = {
         return flagLabels[flag] || flag.replace(/_/g, ' ');
     },
 
-    showError(message) {
+    showError(message, details = '') {
         const resultsContainer = document.getElementById('qr-results-container');
         const resultsContent = document.getElementById('qr-results-content');
 
@@ -1063,6 +1594,7 @@ const QRScanner = {
                 <div class="qr-error-message">
                     <i class="bx bx-error-circle"></i>
                     <p>${this.escapeHtml(message)}</p>
+                    ${details ? `<small class="qr-error-details">${this.escapeHtml(details)}</small>` : ''}
                 </div>
             `;
         }
