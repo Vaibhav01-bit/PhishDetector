@@ -171,7 +171,7 @@ body.dark-mode .faq-step-dot.active {
     display: flex;
     flex-direction: column;
     gap: 2rem; /* Spacing Scale 6 */
-    padding-bottom: 300px;
+    padding-bottom: 140px;
     perspective: 2000px;
 }
 
@@ -186,15 +186,16 @@ body.dark-mode .faq-step-dot.active {
     cursor: pointer;
     position: relative;
     overflow: hidden;
-
-    /* Initial GSAP State */
-    opacity: 0.1;
-    transform: scale(0.9) translateY(60px) translateZ(-100px) rotateX(5deg);
-    filter: blur(12px);
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transform-style: preserve-3d;
+    will-change: transform, box-shadow;
 
     transition: background 0.6s cubic-bezier(0.23, 1, 0.32, 1),
         border-color 0.6s cubic-bezier(0.23, 1, 0.32, 1),
-        box-shadow 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+        transform 0.4s ease;
 }
 
 body.dark-mode .faq-card {
@@ -241,9 +242,10 @@ body.dark-mode .faq-card h3 i {
     font-size: 1rem; /* Body-lg */
     line-height: 1.6;
     margin: 0;
-    height: 0;
-    overflow: hidden;
-    opacity: 0;
+    margin-top: 16px;
+    height: auto;
+    overflow: visible;
+    opacity: 1;
 }
 
 body.dark-mode .faq-card .faq-answer {
@@ -297,4 +299,22 @@ body.dark-mode .faq-card.is-active::before {
         margin-right: auto;
     }
     .faq-progress-container { display: none; }
+    .faq-scroll-list { padding-bottom: 0; }
+    .faq-card {
+        padding: 1.5rem;
+        transform: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .faq-card {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+    }
+
+    .faq-card .faq-answer {
+        height: auto !important;
+        opacity: 1 !important;
+    }
 }
