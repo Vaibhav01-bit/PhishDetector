@@ -5,14 +5,14 @@ Captures screenshots (in-memory), extracts metadata, and performs behavioral ins
 NO DATA IS STORED - All processing is in-memory only.
 """
 
-import os
-import time
-import json
+import atexit
 import base64
-from datetime import datetime
-from urllib.parse import urlparse
+import threading
+import time
 from io import BytesIO
-from PIL import Image
+from urllib.parse import urlparse
+
+from PIL import Image as PILImage
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 from .sandbox_utils import (
     is_private_ip,
@@ -21,7 +21,6 @@ from .sandbox_utils import (
     resolve_domain_ip,
     detect_suspicious_keywords,
     generate_scan_id,
-    ensure_directory_exists,
     is_localhost_domain,
     extract_domain_from_url,
 )
@@ -34,7 +33,14 @@ class SandboxAnalyzer:
     NO DATA IS STORED - All screenshots and results are in-memory only.
     """
 
-    def __init__(self, timeout_ms=30000):
+    def __init__(
+        self,
+        timeout_ms=15000,
+        settle_timeout_ms=1500,
+        screenshot_width=1200,
+        screenshot_quality=82,
+        capture_full_page=False,
+    ):
         """
         Initialize the sandbox analyzer.
 
@@ -42,15 +48,23 @@ class SandboxAnalyzer:
             timeout_ms: Maximum time to wait for page load (milliseconds)
         """
         self.timeout_ms = timeout_ms
+        self.settle_timeout_ms = settle_timeout_ms
+        self.screenshot_width = screenshot_width
+        self.screenshot_quality = screenshot_quality
+        self.capture_full_page = capture_full_page
         self.max_redirects = 10
+        self._runtime_lock = threading.Lock()
+        self._thread_runtimes = {}
+        atexit.register(self.close)
 
-    def analyze(self, url, scan_id=None):
+    def analyze(self, url, scan_id=None, preflight=None):
         """
         Main analysis entry point.
 
         Args:
             url (str): URL to analyze
             scan_id (str): Optional scan ID (generated if not provided)
+            preflight (dict): Optional resolved forensic hints from the fast scan
 
         Returns:
             dict: Analysis results (including Base64 screenshot)
@@ -59,8 +73,7 @@ class SandboxAnalyzer:
             if not scan_id:
                 scan_id = generate_scan_id()
 
-            result = self._analyze_sync(url, scan_id)
-            return result
+            return self._analyze_sync(url, scan_id, preflight=preflight or {})
 
         except Exception as e:
             return self._error_result(f"Sandbox analysis failed: {str(e)}")
@@ -76,13 +89,10 @@ class SandboxAnalyzer:
             bytes: Optimized JPEG image bytes
         """
         try:
-            from PIL import Image as PILImage
-
             img = PILImage.open(BytesIO(image_bytes))
 
-            max_width = 1200
-            if img.width > max_width:
-                ratio = max_width / img.width
+            if img.width > self.screenshot_width:
+                ratio = self.screenshot_width / img.width
                 new_height = int(img.height * ratio)
                 # Use Lanczos resampling for high-quality downscaling
                 resample_method = getattr(
@@ -90,23 +100,96 @@ class SandboxAnalyzer:
                     "LANCZOS",
                     getattr(PILImage, "RESAMPLE", PILImage.BILINEAR),
                 )
-                img = img.resize((max_width, new_height), resample_method)
+                img = img.resize((self.screenshot_width, new_height), resample_method)
 
             output = BytesIO()
-            img.save(output, format="JPEG", quality=85, optimize=True)
+            if img.mode not in ("RGB", "L"):
+                img = img.convert("RGB")
+            img.save(
+                output,
+                format="JPEG",
+                quality=self.screenshot_quality,
+                optimize=True,
+            )
             return output.getvalue()
         except Exception as e:
             print(f"Screenshot optimization failed: {e}")
             # Return original bytes if optimization fails
             return image_bytes
 
-    def _analyze_sync(self, url, scan_id):
+    def _get_runtime(self):
+        """Reuse one Playwright/Chromium runtime per worker thread."""
+        thread_id = threading.get_ident()
+        with self._runtime_lock:
+            runtime = self._thread_runtimes.get(thread_id)
+            if runtime:
+                return runtime
+
+        playwright = sync_playwright().start()
+        browser = playwright.chromium.launch(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-accelerated-2d-canvas",
+                "--disable-gpu",
+                "--disable-background-networking",
+                "--disable-background-timer-throttling",
+                "--disable-breakpad",
+                "--disable-sync",
+                "--metrics-recording-only",
+                "--mute-audio",
+                "--no-first-run",
+            ],
+        )
+        runtime = {"playwright": playwright, "browser": browser}
+
+        with self._runtime_lock:
+            self._thread_runtimes[thread_id] = runtime
+
+        return runtime
+
+    def _reset_runtime(self):
+        """Drop the current thread runtime so a later attempt can recreate it."""
+        thread_id = threading.get_ident()
+        with self._runtime_lock:
+            runtime = self._thread_runtimes.pop(thread_id, None)
+        if not runtime:
+            return
+        try:
+            runtime["browser"].close()
+        except Exception:
+            pass
+        try:
+            runtime["playwright"].stop()
+        except Exception:
+            pass
+
+    def close(self):
+        """Release all persistent browser runtimes."""
+        with self._runtime_lock:
+            runtimes = list(self._thread_runtimes.values())
+            self._thread_runtimes.clear()
+
+        for runtime in runtimes:
+            try:
+                runtime["browser"].close()
+            except Exception:
+                pass
+            try:
+                runtime["playwright"].stop()
+            except Exception:
+                pass
+
+    def _analyze_sync(self, url, scan_id, preflight):
         """
         Synchronous analysis implementation.
 
         Args:
             url (str): URL to analyze
             scan_id (str): Unique scan identifier
+            preflight (dict): Optional resolved forensic hints
 
         Returns:
             dict: Analysis results
@@ -125,51 +208,53 @@ class SandboxAnalyzer:
         if is_localhost_domain(domain):
             return self._error_result("Localhost URLs are blocked for security")
 
-        ip_address, ip_error = resolve_domain_ip(domain)
+        ip_address = preflight.get("ip_address")
+        if not ip_address or ip_address == "Unknown":
+            ip_address, ip_error = resolve_domain_ip(domain)
+        else:
+            ip_error = None
+            if is_private_ip(ip_address):
+                ip_error = f"Domain resolves to private IP: {ip_address}"
 
         if ip_error:
             return self._error_result(ip_error)
 
-        with sync_playwright() as p:
-            browser = None
-            try:
-                browser = p.chromium.launch(
-                    headless=True,
-                    args=[
-                        "--no-sandbox",
-                        "--disable-setuid-sandbox",
-                        "--disable-dev-shm-usage",
-                        "--disable-accelerated-2d-canvas",
-                        "--disable-gpu",
-                        "--disable-web-security",
-                        "--disable-features=IsolateOrigins,site-per-process",
-                    ],
-                )
+        navigation_url = self._choose_navigation_url(url, preflight)
 
-                context = browser.new_context(
+        for attempt in range(2):
+            context = None
+            page = None
+            try:
+                runtime = self._get_runtime()
+                context = runtime["browser"].new_context(
                     viewport={"width": 1280, "height": 720},
                     user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                     ignore_https_errors=True,
                     accept_downloads=False,
                     java_script_enabled=True,
-                    bypass_csp=True,
                 )
+                context.set_default_timeout(self.timeout_ms)
+                context.set_default_navigation_timeout(self.timeout_ms)
+                context.route("**/*", self._route_request)
 
                 page = context.new_page()
+                page.on("dialog", lambda dialog: dialog.dismiss())
 
-                load_result = self._load_page(page, url)
+                load_result = self._load_page(
+                    page,
+                    url,
+                    navigation_url=navigation_url,
+                    preflight=preflight,
+                )
 
                 if load_result.get("error"):
-                    browser.close()
                     return self._error_result(load_result["error"])
 
                 screenshot_base64 = self._capture_screenshot_in_memory(page)
 
                 metadata = self._extract_metadata(page, url, load_result)
 
-                behavioral = self._inspect_behavior(page, domain)
-
-                browser.close()
+                behavioral = self._inspect_behavior(page)
 
                 total_time = int((time.time() - start_time) * 1000)
 
@@ -196,20 +281,49 @@ class SandboxAnalyzer:
                 return result
 
             except Exception as e:
-                if browser:
+                self._reset_runtime()
+                if attempt == 1:
+                    return self._error_result(f"Browser error: {str(e)}")
+            finally:
+                if page:
                     try:
-                        browser.close()
-                    except:
+                        page.close()
+                    except Exception:
+                        pass
+                if context:
+                    try:
+                        context.close()
+                    except Exception:
                         pass
 
-                return self._error_result(f"Browser error: {str(e)}")
-
-    def _load_page(self, page, url):
+    def _load_page(self, page, original_url, navigation_url=None, preflight=None):
         """Load page with redirect tracking and timeout."""
         start_time = time.time()
+        preferred_url = navigation_url or original_url
+        preflight = preflight or {}
+        response = None
 
         try:
-            response = page.goto(url, timeout=self.timeout_ms, wait_until="networkidle")
+            try:
+                response = page.goto(
+                    preferred_url,
+                    timeout=self.timeout_ms,
+                    wait_until="domcontentloaded",
+                )
+            except Exception:
+                if preferred_url != original_url:
+                    response = page.goto(
+                        original_url,
+                        timeout=self.timeout_ms,
+                        wait_until="domcontentloaded",
+                    )
+                else:
+                    raise
+
+            try:
+                page.wait_for_load_state("load", timeout=self.settle_timeout_ms)
+            except PlaywrightTimeout:
+                pass
 
             final_url = page.url
 
@@ -220,19 +334,43 @@ class SandboxAnalyzer:
                     redirect_count += 1
                     r = r.redirected_from
 
+            redirect_count = max(redirect_count, preflight.get("redirect_count", 0) or 0)
             load_time = int((time.time() - start_time) * 1000)
 
             return {
-                "final_url": final_url,
+                "final_url": final_url or preflight.get("final_url") or original_url,
                 "redirect_count": redirect_count,
                 "load_time": load_time,
                 "status_code": response.status if response else None,
             }
 
         except PlaywrightTimeout:
-            return {"error": "Page load timeout (30 seconds exceeded)"}
+            return {"error": f"Page load timeout ({self.timeout_ms // 1000} seconds exceeded)"}
         except Exception as e:
             return {"error": f"Page load failed: {str(e)}"}
+
+    def _choose_navigation_url(self, original_url, preflight):
+        """Prefer the already-resolved final URL when the fast path found redirects."""
+        candidate = (preflight or {}).get("final_url")
+        if not candidate or candidate == original_url:
+            return original_url
+
+        candidate = normalize_url(candidate)
+        is_valid, _ = validate_url_format(candidate)
+        if not is_valid:
+            return original_url
+
+        if (preflight or {}).get("redirect_count", 0) > 0:
+            return candidate
+
+        return original_url
+
+    def _route_request(self, route):
+        """Abort background-heavy resource types that do not help the screenshot."""
+        if route.request.resource_type in {"media", "websocket", "eventsource"}:
+            route.abort()
+            return
+        route.continue_()
 
     def _capture_screenshot_in_memory(self, page):
         """
@@ -242,9 +380,16 @@ class SandboxAnalyzer:
             str: Base64-encoded JPEG image (data URL format)
         """
         try:
-            screenshot_bytes = page.screenshot(full_page=True, type="jpeg", quality=85)
+            screenshot_bytes = page.screenshot(
+                full_page=self.capture_full_page,
+                type="jpeg",
+                quality=self.screenshot_quality,
+            )
 
-            optimized_bytes = self._optimize_screenshot_in_memory(screenshot_bytes)
+            if len(screenshot_bytes) <= 250_000:
+                optimized_bytes = screenshot_bytes
+            else:
+                optimized_bytes = self._optimize_screenshot_in_memory(screenshot_bytes)
 
             base64_encoded = base64.b64encode(optimized_bytes).decode("utf-8")
 
@@ -262,10 +407,10 @@ class SandboxAnalyzer:
 
             return {"title": title if title else "No Title", "final_url": final_url}
 
-        except Exception as e:
+        except Exception:
             return {"title": "N/A", "final_url": original_url}
 
-    def _inspect_behavior(self, page, domain):
+    def _inspect_behavior(self, page):
         """Perform behavioral inspection."""
         result = {
             "has_login_form": False,
@@ -275,43 +420,35 @@ class SandboxAnalyzer:
         }
 
         try:
-            password_fields = page.query_selector_all('input[type="password"]')
-            result["has_password_field"] = len(password_fields) > 0
+            page_data = page.evaluate(
+                """() => {
+                    const matchesAny = (selectors) => selectors.some((selector) => !!document.querySelector(selector));
+                    const bodyText = document.body
+                        ? (document.body.innerText || document.body.textContent || "")
+                        : "";
 
-            email_selectors = [
-                'input[type="email"]',
-                'input[name*="email"]',
-                'input[placeholder*="email"]',
-            ]
+                    return {
+                        hasPasswordField: !!document.querySelector('input[type="password"]'),
+                        hasEmailField: matchesAny([
+                            'input[type="email"]',
+                            'input[name*="email" i]',
+                            'input[placeholder*="email" i]'
+                        ]),
+                        hasLoginForm: matchesAny([
+                            'form[action*="login" i]',
+                            'form[action*="signin" i]',
+                            'form[id*="login" i]',
+                            'form[class*="login" i]'
+                        ]),
+                        bodyText: bodyText.slice(0, 20000)
+                    };
+                }"""
+            )
 
-            for selector in email_selectors:
-                elements = page.query_selector_all(selector)
-                if len(elements) > 0:
-                    result["has_email_field"] = True
-                    break
-
-            login_selectors = [
-                'form[action*="login"]',
-                'form[action*="signin"]',
-                'form[id*="login"]',
-                'form[class*="login"]',
-            ]
-
-            for selector in login_selectors:
-                element = page.query_selector(selector)
-                if element:
-                    result["has_login_form"] = True
-                    break
-
-            if result["has_password_field"]:
-                result["has_login_form"] = True
-
-            try:
-                body_text = page.inner_text("body")
-                keywords = detect_suspicious_keywords(body_text)
-                result["keywords"] = keywords
-            except:
-                pass
+            result["has_password_field"] = bool(page_data.get("hasPasswordField"))
+            result["has_email_field"] = bool(page_data.get("hasEmailField"))
+            result["has_login_form"] = bool(page_data.get("hasLoginForm")) or result["has_password_field"]
+            result["keywords"] = detect_suspicious_keywords(page_data.get("bodyText", ""))
 
             return result
 

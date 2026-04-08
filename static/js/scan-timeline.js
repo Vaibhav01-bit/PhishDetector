@@ -244,9 +244,11 @@
             }
         }
 
-        // ── Sandbox primary CTA: hide until sandbox is done ──────────────────
+        // ── Sandbox primary CTA: show loading state until sandbox is done ────
         const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
-        if (sandboxCTA) sandboxCTA.style.display = 'none';
+        if (sandboxCTA) {
+            renderSandboxCTA('loading', { scanId: data.scan_id || currentScanId });
+        }
     }
 
     function injectSandboxBadge(visible) {
@@ -468,30 +470,14 @@
         // Always show button if scan is done and we have a scanId
         if (sandboxCTA && scanId && status.done) {
             console.log('[Scanner] Showing sandbox button for scan ID:', scanId);
-            
-            const statusLabel = status.success ? 'View Sandbox Analysis' : 'View Scan Details';
-            const statusIcon = status.success ? 'bx-check-circle' : 'bx-info-circle';
-            
-            sandboxCTA.innerHTML = `
-                <a href="/sandbox/${scanId}" class="btn-sandbox-primary">
-                    <span>${statusLabel}</span>
-                    <i class='bx bx-right-arrow-alt'></i>
-                </a>
-                <p class="sandbox-caption mt-2 mb-0 text-center">
-                    <i class='bx bxs-lock-alt'></i>
-                    Secure sandbox environment &bull; No user interaction performed
-                </p>`;
-            sandboxCTA.style.display = 'block';
-            sandboxCTA.classList.add('cta-fade-in');
+            renderSandboxCTA('ready', {
+                scanId,
+                success: status.success
+            });
         } else if (sandboxCTA && !scanId) {
             // No scanId - show fallback message
             console.log('[Scanner] No scanId - showing fallback message');
-            sandboxCTA.innerHTML = `
-                <p class="text-center mb-0" style="font-size:.82rem;opacity:.7">
-                    <i class='bx bx-info-circle'></i>
-                    Quick scan complete. Full sandbox analysis skipped.
-                </p>`;
-            sandboxCTA.style.display = 'block';
+            renderSandboxCTA('unavailable');
         }
     }
 
@@ -524,6 +510,67 @@
         const badge = resultCard.querySelector('#sandbox-progress-badge');
         if (badge) badge.remove();
         removeScreenshotFrame();
+        renderSandboxCTA('timeout', { scanId: currentScanId });
+    }
+
+    function renderSandboxCTA(state, opts = {}) {
+        const sandboxCTA = resultCard.querySelector('.primary-cta-wrapper');
+        if (!sandboxCTA) return;
+
+        const { scanId = null, success = true } = opts;
+        sandboxCTA.classList.remove('cta-fade-in');
+
+        if (state === 'ready' && scanId) {
+            const statusLabel = success ? 'View Sandbox Analysis' : 'View Scan Details';
+            sandboxCTA.innerHTML = `
+                <a href="/sandbox/${scanId}" class="btn-sandbox-primary">
+                    <span>${statusLabel}</span>
+                    <i class='bx bx-right-arrow-alt'></i>
+                </a>
+                <p class="sandbox-caption mt-2 mb-0 text-center">
+                    <i class='bx bxs-lock-alt'></i>
+                    Secure sandbox environment &bull; No user interaction performed
+                </p>`;
+            sandboxCTA.style.display = 'flex';
+            sandboxCTA.classList.add('cta-fade-in');
+            return;
+        }
+
+        if (state === 'loading') {
+            sandboxCTA.innerHTML = `
+                <button type="button" class="btn-sandbox-primary is-disabled" disabled aria-disabled="true">
+                    <span>Preparing Sandbox Analysis</span>
+                    <i class='bx bx-loader-alt bx-spin'></i>
+                </button>
+                <p class="sandbox-caption is-pending mt-2 mb-0 text-center">
+                    <i class='bx bx-time-five'></i>
+                    Sandbox is still running. The button will activate here automatically.
+                </p>`;
+            sandboxCTA.style.display = 'flex';
+            return;
+        }
+
+        if (state === 'timeout' && scanId) {
+            sandboxCTA.innerHTML = `
+                <a href="/sandbox/${scanId}" class="btn-sandbox-primary">
+                    <span>Open Sandbox Status</span>
+                    <i class='bx bx-right-arrow-alt'></i>
+                </a>
+                <p class="sandbox-caption is-pending mt-2 mb-0 text-center">
+                    <i class='bx bx-error-circle'></i>
+                    Sandbox is taking longer than expected. You can open its status page.
+                </p>`;
+            sandboxCTA.style.display = 'flex';
+            sandboxCTA.classList.add('cta-fade-in');
+            return;
+        }
+
+        sandboxCTA.innerHTML = `
+            <p class="sandbox-caption is-pending mt-2 mb-0 text-center">
+                <i class='bx bx-info-circle'></i>
+                Quick scan complete. Full sandbox analysis is unavailable for this result.
+            </p>`;
+        sandboxCTA.style.display = 'flex';
     }
 
 

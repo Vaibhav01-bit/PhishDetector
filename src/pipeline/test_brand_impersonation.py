@@ -96,6 +96,13 @@ class TestBrandImpersonation:
         )
 
         self.test(
+            "Ledger Official",
+            "https://www.ledger.com/live",
+            False,
+            "Official Ledger domain",
+        )
+
+        self.test(
             "Amazon Official",
             "https://www.amazon.com/gp/product/B08N5WRWNW",
             False,
@@ -206,6 +213,20 @@ class TestBrandImpersonation:
             "https://microsoft-verify-account.com/login",
             True,
             "Multiple hyphens + verify + account + login",
+        )
+
+        self.test(
+            "eBay Subdomain Trick",
+            "https://ebay.dsktsd.com/receive/906018380",
+            True,
+            "Brand in subdomain but root domain is unrelated",
+        )
+
+        self.test(
+            "Ledger Free Hosting",
+            "https://learnldgrlive.wixstudio.com/app-eng",
+            True,
+            "Ledger-like subdomain on Wix Studio hosting",
         )
 
         print()

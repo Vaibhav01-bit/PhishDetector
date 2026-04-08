@@ -200,6 +200,11 @@
       "official_domains": ["coinbase.com"],
       "name": "Coinbase"
     },
+    "ledger": {
+      "official_domains": ["ledger.com"],
+      "aliases": ["ldgr", "ledgr", "ledgerlive"],
+      "name": "Ledger"
+    },
     "binance": {
       "official_domains": ["binance.com"],
       "name": "Binance"

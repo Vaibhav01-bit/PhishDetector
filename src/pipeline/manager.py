@@ -1,3 +1,4 @@
+import atexit
 from .layers import (
     Layer0_Validation,
     Layer1_Blacklist,
@@ -13,10 +14,10 @@ from .layers import (
 from .sandbox import SandboxAnalyzer
 from .forensics import ForensicAnalyzer
 from .sandbox_utils import generate_scan_id
-from datetime import datetime
+import os
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from typing import Optional
-import json
 
 
 class InMemoryStatusStore:
@@ -61,6 +62,13 @@ class PhishingDetectionPipeline:
 
         self._fast_results = InMemoryStatusStore()
         self._sandbox_status = InMemoryStatusStore()
+        self._sandbox_executor = ThreadPoolExecutor(
+            max_workers=max(2, min(4, os.cpu_count() or 2)),
+            thread_name_prefix="sandbox-worker",
+        )
+        atexit.register(self._shutdown_sandbox_resources)
+        if self.sandbox:
+            self._prewarm_sandbox_workers()
 
     def analyze_fast(self, url):
         """
@@ -116,6 +124,8 @@ class PhishingDetectionPipeline:
 
         status, message = self.l2.check(target_url)
         results["layer2"] = {"status": status, "message": message}
+        if status == PHISHING:
+            return self._finalize_fast(PHISHING, results, forensics_data, scan_id)
 
         status, message = self.l3.check(target_url)
         results["layer3"] = {"status": status, "message": message}
@@ -151,8 +161,8 @@ class PhishingDetectionPipeline:
 
     def run_sandbox_background(self, url, scan_id):
         """
-        Launch sandbox analysis in a background daemon thread.
-        ALL work happens in the thread — never blocks the HTTP response.
+        Launch sandbox analysis on the shared background worker pool.
+        ALL work happens off the request thread — never blocks the HTTP response.
         NO DATA IS STORED - all data is in-memory only.
         """
         fast_data = self._fast_results.get(scan_id)
@@ -171,16 +181,17 @@ class PhishingDetectionPipeline:
                 sandbox_result = {"success": False, "error": "Sandbox uninitialized"}
                 if self.sandbox:
                     try:
-                        sandbox_result = self.sandbox.analyze(url, scan_id=scan_id)
+                        sandbox_result = self.sandbox.analyze(
+                            url,
+                            scan_id=scan_id,
+                            preflight=self._build_sandbox_preflight(forensics_snap),
+                        )
                     except Exception as sandbox_e:
                         sandbox_result = {
                             "success": False,
                             "error": str(sandbox_e),
                             "source_url": url,
                         }
-
-                combined = dict(layers_snapshot)
-                combined["sandbox"] = sandbox_result
 
                 status_data = {
                     "done": True,
@@ -229,8 +240,7 @@ class PhishingDetectionPipeline:
                 f"[Sandbox] status stored in memory: success={status_data['success']}"
             )
 
-        t = threading.Thread(target=_run, daemon=True)
-        t.start()
+        self._sandbox_executor.submit(_run)
 
     def get_sandbox_status(self, scan_id):
         """
@@ -284,6 +294,8 @@ class PhishingDetectionPipeline:
 
         status, message = self.l2.check(target_url)
         results["layer2"] = {"status": status, "message": message}
+        if status == PHISHING:
+            return self._finalize(PHISHING, results, forensics_data)
 
         status, message = self.l3.check(target_url)
         results["layer3"] = {"status": status, "message": message}
@@ -310,7 +322,10 @@ class PhishingDetectionPipeline:
 
         if self.sandbox:
             try:
-                sandbox_result = self.sandbox.analyze(url)
+                sandbox_result = self.sandbox.analyze(
+                    url,
+                    preflight=self._build_sandbox_preflight(forensics_data),
+                )
                 results["sandbox"] = sandbox_result
             except Exception as e:
                 import traceback
@@ -327,3 +342,47 @@ class PhishingDetectionPipeline:
 
     def _finalize(self, final_status, results, forensics_data):
         return {"status": final_status, "layers": results, "forensics": forensics_data}
+
+    def _build_sandbox_preflight(self, forensics_data):
+        """Pass already-resolved forensic hints into the sandbox step."""
+        if not forensics_data:
+            return {}
+        return {
+            "ip_address": forensics_data.get("ip_address"),
+            "final_url": forensics_data.get("final_url"),
+            "domain": forensics_data.get("domain"),
+            "redirect_count": forensics_data.get("redirect_count", 0),
+        }
+
+    def _shutdown_sandbox_resources(self):
+        """Allow the process to exit cleanly while reusing browser workers during runtime."""
+        try:
+            self._sandbox_executor.shutdown(wait=False, cancel_futures=True)
+        except Exception:
+            pass
+        if self.sandbox:
+            try:
+                self.sandbox.close()
+            except Exception:
+                pass
+
+    def _prewarm_sandbox_workers(self):
+        """Warm Playwright runtimes in the background so the first scan returns sooner."""
+        for _ in range(getattr(self._sandbox_executor, "_max_workers", 0)):
+            future = self._sandbox_executor.submit(self._warm_single_sandbox_worker)
+            future.add_done_callback(self._consume_background_exception)
+
+    def _warm_single_sandbox_worker(self):
+        if not self.sandbox:
+            return
+        try:
+            self.sandbox._get_runtime()
+        except Exception:
+            pass
+
+    @staticmethod
+    def _consume_background_exception(future):
+        try:
+            future.exception()
+        except Exception:
+            pass

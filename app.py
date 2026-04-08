@@ -114,8 +114,57 @@ def sandbox_results(scan_id):
         "error": status.get("error"),
     }
 
-    layers = status.get("layers", {})
-    forensics = status.get("forensics", {})
+    raw_layers = status.get("layers", {}) or {}
+    layer_defaults = {
+        "layer1": "Blacklist Check",
+        "layer2": "Domain Analysis",
+        "layer3": "SSL Certificate",
+        "layer4": "Machine Learning Model",
+        "layer5": "Behavioral Analysis",
+    }
+    layers = {}
+    for layer_key, layer_name in layer_defaults.items():
+        layer_data = raw_layers.get(layer_key) or {}
+        layer_status = layer_data.get("status", "Warning")
+        layer_message = layer_data.get(
+            "message", "This check was not executed for this scan."
+        )
+        layers[layer_key] = {
+            "status": layer_status,
+            "message": layer_message,
+            "description": layer_data.get("description", layer_message or layer_name),
+        }
+
+    raw_forensics = status.get("forensics", {}) or {}
+    raw_whois = raw_forensics.get("whois", {}) or {}
+    forensics = {
+        "input_url": raw_forensics.get("input_url", sandbox_data["source_url"]),
+        "normalized_url": raw_forensics.get(
+            "normalized_url", sandbox_data["source_url"]
+        ),
+        "final_url": raw_forensics.get("final_url", sandbox_data.get("final_url")),
+        "redirect_chain": raw_forensics.get("redirect_chain", []) or [],
+        "redirect_count": raw_forensics.get("redirect_count", 0) or 0,
+        "is_shortener": raw_forensics.get("is_shortener", False),
+        "domain": raw_forensics.get("domain", sandbox_data.get("domain") or "Unknown"),
+        "root_domain": raw_forensics.get(
+            "root_domain", sandbox_data.get("domain") or "Unknown"
+        ),
+        "ip_address": raw_forensics.get(
+            "ip_address", sandbox_data.get("ip_address") or "Unknown"
+        ),
+        "geo_location": raw_forensics.get("geo_location", "Unknown"),
+        "asn": raw_forensics.get("asn", "Unknown"),
+        "scan_time": raw_forensics.get(
+            "scan_time", sandbox_data.get("timestamp") or "Unknown"
+        ),
+        "whois": {
+            "registrar": raw_whois.get("registrar", "Unknown"),
+            "creation_date": raw_whois.get("creation_date", "Unknown"),
+            "expiration_date": raw_whois.get("expiration_date", "Unknown"),
+            "domain_age_days": raw_whois.get("domain_age_days", "Unknown"),
+        },
+    }
     final_status = status.get("final_status", "Safe")
     sandbox_success = status.get("success", False)
 

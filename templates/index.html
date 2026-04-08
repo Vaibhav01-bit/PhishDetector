@@ -606,9 +606,8 @@
 
                 <!-- ── CTA Section ─────────────────────────────────────────── -->
                 <div class="cta-section mt-4">
-                  <!-- Sandbox CTA: hidden by default; JS or Jinja reveals it -->
-                  <div class="primary-cta-wrapper mb-3" {% if not (name and details and details.layers.get('sandbox')
-                    and details.layers.sandbox.success) %}style="display:none" {% endif %}>
+                  <!-- Sandbox CTA: visible in the result card, upgraded when sandbox finishes -->
+                  <div class="primary-cta-wrapper mb-3" {% if not name %}style="display:none" {% endif %}>
                     {% if name and details and details.layers.get('sandbox') and details.layers.sandbox.success %}
                     <a href="{{ url_for('sandbox_results', scan_id=details.layers.sandbox.scan_id) }}"
                       class="btn-sandbox-primary">
@@ -617,6 +616,14 @@
                     </a>
                     <p class="sandbox-caption mt-2 mb-0 text-center">
                       <i class='bx bxs-lock-alt'></i> Secure sandbox environment • No user interaction performed
+                    </p>
+                    {% elif name %}
+                    <button type="button" class="btn-sandbox-primary is-disabled" disabled aria-disabled="true">
+                      <span>Preparing Sandbox Analysis</span>
+                      <i class='bx bx-loader-alt bx-spin'></i>
+                    </button>
+                    <p class="sandbox-caption is-pending mt-2 mb-0 text-center">
+                      <i class='bx bx-time-five'></i> Sandbox results will appear here when ready
                     </p>
                     {% endif %}
                   </div>
