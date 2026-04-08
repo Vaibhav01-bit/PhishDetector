@@ -224,6 +224,41 @@
     "zomato": {
       "official_domains": ["zomato.com", "zomato.co.in"],
       "name": "Zomato"
+    },
+    "openai": {
+      "official_domains": ["openai.com", "chatgpt.com", "api.openai.com", "platform.openai.com"],
+      "aliases": ["chatgpt", "gpt", "openai", "dall-e", "dalle"],
+      "name": "OpenAI"
+    },
+    "notion": {
+      "official_domains": ["notion.so", "www.notion.so"],
+      "aliases": ["notion"],
+      "name": "Notion"
+    },
+    "slack": {
+      "official_domains": ["slack.com", "www.slack.com", "slack-redir.net"],
+      "aliases": ["slack"],
+      "name": "Slack"
+    },
+    "zoom": {
+      "official_domains": ["zoom.us", "www.zoom.us", "zoom.com"],
+      "aliases": ["zoom"],
+      "name": "Zoom"
+    },
+    "discord": {
+      "official_domains": ["discord.com", "www.discord.com", "discordapp.net"],
+      "aliases": ["discord"],
+      "name": "Discord"
+    },
+    "telegram": {
+      "official_domains": ["telegram.org", "t.me", "telegram.me"],
+      "aliases": ["telegram", "tg"],
+      "name": "Telegram"
+    },
+    "claude": {
+      "official_domains": ["claude.ai", "www.claude.ai", "anthropic.com"],
+      "aliases": ["claude", "anthropic"],
+      "name": "Claude"
     }
   }
 }

@@ -102,6 +102,32 @@ LEGITIMATE_DOMAINS = {
     "www.citi.com",
     "capitalone.com",
     "www.capitalone.com",
+    "openai.com",
+    "www.openai.com",
+    "chat.openai.com",
+    "api.openai.com",
+    "platform.openai.com",
+    "chatgpt.com",
+    "www.chatgpt.com",
+    "claude.ai",
+    "www.claude.ai",
+    "anthropic.com",
+    "www.anthropic.com",
+    "gitlab.com",
+    "www.gitlab.com",
+    "bitbucket.org",
+    "www.bitbucket.org",
+    "notion.so",
+    "www.notion.so",
+    "slack.com",
+    "www.slack.com",
+    "zoom.us",
+    "www.zoom.us",
+    "teams.microsoft.com",
+    "discord.com",
+    "www.discord.com",
+    "telegram.org",
+    "www.telegram.org",
 }
 
 
@@ -253,14 +279,18 @@ class Layer1_Blacklist:
         return False
 
     def _find_suspicious_keyword(self, registrable_domain):
-        root_label = registrable_domain.split(".")[0].lower() if registrable_domain else ""
+        root_label = (
+            registrable_domain.split(".")[0].lower() if registrable_domain else ""
+        )
         for keyword in self.SUSPICIOUS_DOMAIN_KEYWORDS:
             if keyword in root_label:
                 return keyword
         return None
 
     def _looks_random_domain(self, registrable_domain):
-        root_label = registrable_domain.split(".")[0].lower() if registrable_domain else ""
+        root_label = (
+            registrable_domain.split(".")[0].lower() if registrable_domain else ""
+        )
         if not root_label:
             return False
 
@@ -313,7 +343,10 @@ class Layer1_Blacklist:
 
             return WARNING, " ".join(reasons)
         except Exception:
-            return WARNING, "Domain trust analysis incomplete. Treating domain as unknown."
+            return (
+                WARNING,
+                "Domain trust analysis incomplete. Treating domain as unknown.",
+            )
 
 
 class Layer2_Domain:
@@ -433,114 +466,101 @@ class Layer2_Domain:
         self.brand_detector = BrandImpersonationDetector()
 
     def check(self, url):
+        """
+        Priority-based domain analysis:
+        1. TRUSTED DOMAIN → SAFE
+        2. BRAND IMPERSONATION → PHISHING
+        3. FREE HOSTING (Smart Rule) → PHISHING (brand) / WARNING (other)
+        4. SUSPICIOUS KEYWORDS → PHISHING
+        5. DEFAULT → WARNING
+        """
         parsed = urlparse(url)
         domain = parsed.netloc or url
         domain = domain.lower()
         registrable_domain = self.brand_detector._extract_registrable_domain(domain)
         subdomain = self.brand_detector._extract_subdomain(domain)
+
+        # =============================================
+        # PRIORITY 1: Check if DOMAIN is TRUSTED
+        # =============================================
+        is_trusted_domain = self._is_trusted_domain(domain)
+        if is_trusted_domain:
+            return SAFE, "Trusted verified domain."
+
+        # =============================================
+        # PRIORITY 2: Check BRAND IMPERSONATION
+        # =============================================
+        brand_result = self.brand_detector.check(url, domain)
+
+        if brand_result["details"].get("force_phishing"):
+            return PHISHING, brand_result["message"]
+
+        if brand_result["risk_score"] >= 60:
+            return PHISHING, brand_result["message"]
+
+        # =============================================
+        # PRIORITY 3: FREE HOSTING (Smart Rule)
+        # =============================================
         hosted_on_shared_platform = any(
             domain == gateway or domain.endswith("." + gateway)
             for gateway in self.DECENTRALIZED_GATEWAYS
         )
-        is_trusted_domain = self._is_trusted_domain(domain)
-
-        risk_score = 0
-        reasons = []
-
-        # Feature 1: Brand Impersonation Detection (NEW - Enhanced)
-        # Use the advanced brand impersonation detector
-        brand_result = self.brand_detector.check(url, domain)
-
-        if brand_result["details"].get("force_phishing") or brand_result["risk_score"] >= 60:
-            return PHISHING, "; ".join(brand_result["reasons"][:4]) or brand_result["message"]
-
-        if brand_result["risk_score"] >= 30:
-            risk_score += 20
-            reasons.extend(brand_result["reasons"][:3])
 
         if hosted_on_shared_platform:
-            risk_score += 20
-            reasons.append(
-                f"Hosted on shared/free platform '{registrable_domain}'."
+            sub_tokens = [s.lower() for s in re.split(r"[.\-_]", subdomain) if s]
+            brand_in_subdomain = any(
+                token in self.brand_detector.brand_identifier_map
+                for token in sub_tokens
             )
 
+            if brand_in_subdomain:
+                return (
+                    PHISHING,
+                    f"Phishing domain impersonation detected on free hosting.",
+                )
+
+            return WARNING, f"Hosted on free/shared platform '{registrable_domain}'."
+
+        # =============================================
+        # PRIORITY 4: Suspicious Keywords
+        # =============================================
         suspicious_domain_keyword = self._find_suspicious_domain_keyword(
             registrable_domain
         )
-        if suspicious_domain_keyword:
-            risk_score += 30
-            reasons.append(
-                f"Suspicious domain keyword detected: '{suspicious_domain_keyword}'."
-            )
-
         financial_domain_keyword = self._find_financial_domain_keyword(
             registrable_domain
         )
-        if financial_domain_keyword and not is_trusted_domain:
-            risk_score += 40
-            reasons.append(
-                f"Financial keyword detected in domain: '{financial_domain_keyword}'."
+
+        if financial_domain_keyword:
+            return (
+                PHISHING,
+                f"Financial keyword '{financial_domain_keyword}' in untrusted domain.",
             )
 
-        if not is_trusted_domain:
-            risk_score += 20
-            reasons.append("Unknown or untrusted domain.")
-
-        if financial_domain_keyword and not is_trusted_domain:
-            risk_score += 10
-            reasons.append(
-                "Sensitive financial/payment domain is not an official trusted source."
+        if suspicious_domain_keyword:
+            random_path_segment = self._find_random_path_segment(parsed.path)
+            if random_path_segment:
+                return (
+                    PHISHING,
+                    f"Suspicious keyword + random path = high risk phishing.",
+                )
+            return (
+                WARNING,
+                f"Suspicious domain keyword '{suspicious_domain_keyword}' detected.",
             )
+
+        # =============================================
+        # PRIORITY 5: Suspicious Structure
+        # =============================================
+        suspicious_subdomain = self._is_suspicious_subdomain(subdomain)
+        if suspicious_subdomain and subdomain:
+            return WARNING, f"Suspicious subdomain structure detected: '{subdomain}'."
 
         random_path_segment = self._find_random_path_segment(parsed.path)
         if random_path_segment:
-            risk_score += 30
-            reasons.append(
-                f"Random-looking path detected: '{random_path_segment}'."
-            )
+            return WARNING, f"Random-looking path detected: '{random_path_segment}'."
 
-        suspicious_query = self._analyze_query_string(parsed.query)
-        if suspicious_query:
-            risk_score += 10
-            reasons.append(suspicious_query)
-
-        suspicious_subdomain = self._is_suspicious_subdomain(subdomain)
-        if suspicious_subdomain:
-            risk_score += 15
-            reasons.append(
-                f"Suspicious subdomain structure detected: '{subdomain}'."
-            )
-
-        if subdomain and not is_trusted_domain:
-            risk_score += 10
-            reasons.append(
-                f"Subdomain usage detected on non-trusted main domain '{registrable_domain}'."
-            )
-
-        if financial_domain_keyword and not is_trusted_domain:
-            return PHISHING, "; ".join(reasons[:4])
-
-        if (
-            suspicious_domain_keyword
-            and random_path_segment
-            and not is_trusted_domain
-        ):
-            return PHISHING, "; ".join(reasons[:4])
-
-        # Feature 2: Long Domain
-        if len(domain) > 50:
-            risk_score += 10
-            reasons.append("Domain is unusually long.")
-
-        # Feature 3: High Subdomain Count
-        subdomains = domain.split(".")
-        # Filter out empty strings from split (e.g., trailing dot)
-        subdomains = [s for s in subdomains if s]
-        if len(subdomains) > 4:
-            risk_score += 10
-            reasons.append("High number of subdomains.")
-
-        # Feature 4: Suspicious TLD Weighting
+        # High risk TLD check
         high_risk_tlds = [
             ".xyz",
             ".top",
@@ -551,23 +571,13 @@ class Layer2_Domain:
             ".work",
             ".gq",
         ]
-        low_risk_tlds = [".gov", ".edu", ".mil"]
-
         if any(domain.endswith(tld) for tld in high_risk_tlds):
-            risk_score += 10
-            reasons.append("Suspicious or high-risk Top Level Domain (TLD).")
+            return WARNING, "Suspicious or high-risk Top Level Domain (TLD)."
 
-        elif any(domain.endswith(tld) for tld in low_risk_tlds):
-            risk_score -= 10  # Reduce risk for trusted TLDs
-
-        # Ensure score floor is 0
-        risk_score = max(0, risk_score)
-
-        if risk_score >= 60:
-            return PHISHING, "; ".join(reasons[:4])
-        if risk_score >= 30:
-            return WARNING, f"Suspicious domain features: {', '.join(reasons)}"
-        return SAFE, "Domain analysis passed."
+        # =============================================
+        # DEFAULT: Unknown Domain
+        # =============================================
+        return WARNING, "Unknown domain is not in the trusted list."
 
     def _is_trusted_domain(self, domain):
         domain = (domain or "").lower()
@@ -591,14 +601,18 @@ class Layer2_Domain:
         return False
 
     def _find_suspicious_domain_keyword(self, registrable_domain):
-        root_label = registrable_domain.split(".")[0].lower() if registrable_domain else ""
+        root_label = (
+            registrable_domain.split(".")[0].lower() if registrable_domain else ""
+        )
         for keyword in self.SUSPICIOUS_DOMAIN_KEYWORDS:
             if keyword in root_label:
                 return keyword
         return None
 
     def _find_financial_domain_keyword(self, registrable_domain):
-        root_label = registrable_domain.split(".")[0].lower() if registrable_domain else ""
+        root_label = (
+            registrable_domain.split(".")[0].lower() if registrable_domain else ""
+        )
         for keyword in self.FINANCIAL_DOMAIN_KEYWORDS:
             if keyword in root_label:
                 return keyword
