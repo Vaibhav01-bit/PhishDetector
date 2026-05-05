@@ -35,8 +35,8 @@ class SandboxAnalyzer:
 
     def __init__(
         self,
-        timeout_ms=15000,
-        settle_timeout_ms=1500,
+        timeout_ms=20000,
+        settle_timeout_ms=3000,
         screenshot_width=1200,
         screenshot_quality=82,
         capture_full_page=False,
@@ -250,7 +250,11 @@ class SandboxAnalyzer:
                 if load_result.get("error"):
                     return self._error_result(load_result["error"])
 
-                screenshot_base64 = self._capture_screenshot_in_memory(page)
+                page.wait_for_timeout(3000)
+
+                screenshot_base64 = self._capture_screenshot_in_memory(page, page_ref=page)
+                if screenshot_base64 is None:
+                    print(f"[Sandbox] Warning: Screenshot is None for {url}")
 
                 metadata = self._extract_metadata(page, url, load_result)
 
@@ -304,25 +308,17 @@ class SandboxAnalyzer:
         response = None
 
         try:
-            try:
-                response = page.goto(
-                    preferred_url,
-                    timeout=self.timeout_ms,
-                    wait_until="domcontentloaded",
-                )
-            except Exception:
-                if preferred_url != original_url:
-                    response = page.goto(
-                        original_url,
-                        timeout=self.timeout_ms,
-                        wait_until="domcontentloaded",
-                    )
-                else:
-                    raise
+            response = page.goto(
+                preferred_url,
+                timeout=self.timeout_ms,
+                wait_until="domcontentloaded",
+            )
 
             try:
-                page.wait_for_load_state("load", timeout=self.settle_timeout_ms)
+                page.wait_for_load_state("networkidle", timeout=5000)
             except PlaywrightTimeout:
+                pass
+            except Exception:
                 pass
 
             final_url = page.url
@@ -372,32 +368,37 @@ class SandboxAnalyzer:
             return
         route.continue_()
 
-    def _capture_screenshot_in_memory(self, page):
+    def _capture_screenshot_in_memory(self, page, page_ref=None):
         """
         Capture full-page screenshot to memory (Base64 encoded).
+        Retries up to 2 times if capture fails.
 
         Returns:
             str: Base64-encoded JPEG image (data URL format)
         """
-        try:
-            screenshot_bytes = page.screenshot(
-                full_page=self.capture_full_page,
-                type="jpeg",
-                quality=self.screenshot_quality,
-            )
+        for attempt in range(3):
+            try:
+                screenshot_bytes = page.screenshot(
+                    full_page=self.capture_full_page,
+                    type="jpeg",
+                    quality=self.screenshot_quality,
+                )
 
-            if len(screenshot_bytes) <= 250_000:
-                optimized_bytes = screenshot_bytes
-            else:
-                optimized_bytes = self._optimize_screenshot_in_memory(screenshot_bytes)
+                if len(screenshot_bytes) <= 250_000:
+                    optimized_bytes = screenshot_bytes
+                else:
+                    optimized_bytes = self._optimize_screenshot_in_memory(screenshot_bytes)
 
-            base64_encoded = base64.b64encode(optimized_bytes).decode("utf-8")
+                base64_encoded = base64.b64encode(optimized_bytes).decode("utf-8")
+                print(f"[Screenshot] Captured successfully ({len(optimized_bytes)} bytes)")
+                return f"data:image/jpeg;base64,{base64_encoded}"
 
-            return f"data:image/jpeg;base64,{base64_encoded}"
-
-        except Exception as e:
-            print(f"Screenshot capture failed: {e}")
-            return None
+            except Exception as e:
+                print(f"[Screenshot] Capture failed (attempt {attempt + 1}/3): {e}")
+                if attempt < 2:
+                    page.wait_for_timeout(1500)
+        print("[Screenshot] All capture attempts failed")
+        return None
 
     def _extract_metadata(self, page, original_url, load_result):
         """Extract page metadata."""
