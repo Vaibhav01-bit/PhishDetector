@@ -206,7 +206,7 @@
                 <div class="signals-grid">
                     <div class="signal-item {{ 'detected' if sandbox.has_login_form else 'clear' }}">
                         <div class="signal-icon">
-                            <i class='bx {{ ' bx-error' if sandbox.has_login_form else 'bx-check-circle' }}'></i>
+                            <i class='bx {{ 'bx-error' if sandbox.has_login_form else 'bx-check-circle' }}'></i>
                         </div>
                         <div class="signal-content">
                             <h4>Login Form</h4>
@@ -215,7 +215,7 @@
                     </div>
                     <div class="signal-item {{ 'detected' if sandbox.has_password_field else 'clear' }}">
                         <div class="signal-icon">
-                            <i class='bx {{ ' bx-error' if sandbox.has_password_field else 'bx-check-circle' }}'></i>
+                            <i class='bx {{ 'bx-error' if sandbox.has_password_field else 'bx-check-circle' }}'></i>
                         </div>
                         <div class="signal-content">
                             <h4>Password Field</h4>
@@ -224,7 +224,7 @@
                     </div>
                     <div class="signal-item {{ 'detected' if sandbox.has_email_field else 'clear' }}">
                         <div class="signal-icon">
-                            <i class='bx {{ ' bx-error' if sandbox.has_email_field else 'bx-check-circle' }}'></i>
+                            <i class='bx {{ 'bx-error' if sandbox.has_email_field else 'bx-check-circle' }}'></i>
                         </div>
                         <div class="signal-content">
                             <h4>Email Input</h4>
@@ -233,7 +233,7 @@
                     </div>
                     <div class="signal-item {{ 'detected' if sandbox.suspicious_keywords else 'clear' }}">
                         <div class="signal-icon">
-                            <i class='bx {{ ' bx-error' if sandbox.suspicious_keywords else 'bx-check-circle' }}'></i>
+                            <i class='bx {{ 'bx-error' if sandbox.suspicious_keywords else 'bx-check-circle' }}'></i>
                         </div>
                         <div class="signal-content">
                             <h4>Suspicious Keywords</h4>
@@ -272,7 +272,7 @@
                             </div>
                             <span
                                 class="layer-status {{ 'safe' if layers.layer1.status == 'Safe' else ('warning' if layers.layer1.status == 'Warning' else 'danger') }}">
-                                <i class='bx {{ ' bx-check-circle' if layers.layer1.status=='Safe' else 'bx-error'
+                                <i class='bx {{ 'bx-check-circle' if layers.layer1.status=='Safe' else 'bx-error'
                                     }}'></i>
                                 {{ layers.layer1.status }}
                             </span>
@@ -292,7 +292,7 @@
                             </div>
                             <span
                                 class="layer-status {{ 'safe' if layers.layer2.status == 'Safe' else ('warning' if layers.layer2.status == 'Warning' else 'danger') }}">
-                                <i class='bx {{ ' bx-check-circle' if layers.layer2.status=='Safe' else 'bx-error'
+                                <i class='bx {{ 'bx-check-circle' if layers.layer2.status=='Safe' else 'bx-error'
                                     }}'></i>
                                 {{ layers.layer2.status }}
                             </span>
@@ -312,7 +312,7 @@
                             </div>
                             <span
                                 class="layer-status {{ 'safe' if layers.layer3.status == 'Safe' else ('warning' if layers.layer3.status == 'Warning' else 'danger') }}">
-                                <i class='bx {{ ' bx-check-circle' if layers.layer3.status=='Safe' else 'bx-error'
+                                <i class='bx {{ 'bx-check-circle' if layers.layer3.status=='Safe' else 'bx-error'
                                     }}'></i>
                                 {{ layers.layer3.status }}
                             </span>
@@ -332,7 +332,7 @@
                             </div>
                             <span
                                 class="layer-status {{ 'safe' if layers.layer4.status == 'Safe' else ('warning' if layers.layer4.status == 'Warning' else 'danger') }}">
-                                <i class='bx {{ ' bx-check-circle' if layers.layer4.status=='Safe' else 'bx-error'
+                                <i class='bx {{ 'bx-check-circle' if layers.layer4.status=='Safe' else 'bx-error'
                                     }}'></i>
                                 {{ layers.layer4.status }}
                             </span>
@@ -352,7 +352,7 @@
                             </div>
                             <span
                                 class="layer-status {{ 'safe' if layers.layer5.status == 'Safe' else ('warning' if layers.layer5.status == 'Warning' else 'danger') }}">
-                                <i class='bx {{ ' bx-check-circle' if layers.layer5.status=='Safe' else 'bx-error'
+                                <i class='bx {{ 'bx-check-circle' if layers.layer5.status=='Safe' else 'bx-error'
                                     }}'></i>
                                 {{ layers.layer5.status }}
                             </span>

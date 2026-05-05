@@ -726,25 +726,6 @@ class QRAnalyzer:
 
         return False
 
-        username = parts[0]
-
-        if len(username) < 8:
-            return False
-
-        digit_count = sum(1 for c in username if c.isdigit())
-        digit_ratio = digit_count / len(username)
-
-        if digit_ratio >= 0.30:
-            return True
-
-        if re.match(r"^[a-z]{8,}$", username):
-            return True
-
-        if re.match(r"^[a-z]{3,}[0-9]{3,}$", username):
-            return True
-
-        return False
-
     def _check_high_risk_keywords(self, upi_id: str) -> list:
         """Check for high-risk keywords in UPI ID."""
         parts = upi_id.split("@")

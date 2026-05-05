@@ -372,4 +372,45 @@ body.dark-mode .quick-scanner-btn:hover {
     .quick-scanner-btn i {
         font-size: 1rem;
     }
+
+    /* Mobile optimization for URL input field */
+    .neon-box {
+        border-radius: 16px;
+    }
+    
+    .input-content-mask {
+        flex-direction: column;
+        height: auto;
+        border-radius: 16px;
+        padding: 6px;
+        align-items: stretch;
+    }
+    
+    .input-icon {
+        position: absolute;
+        top: 6px;
+        left: 8px;
+        height: 48px;
+        width: 40px;
+        padding: 0;
+    }
+    
+    .form-control {
+        padding-left: 45px !important;
+        height: 48px !important;
+    }
+    
+    .neon-box .input-group-append {
+        height: auto;
+        margin-top: 6px;
+        width: 100%;
+    }
+    
+    .neon-box .btn-primary {
+        width: 100%;
+        margin: 0;
+        border-radius: 12px !important;
+        justify-content: center;
+        height: 46px !important;
+    }
 }

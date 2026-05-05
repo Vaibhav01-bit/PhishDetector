@@ -552,23 +552,23 @@
                     <!-- JS populates this list; Jinja fills it on server-side renders -->
                     <ul class="list-unstyled mb-0" style="font-size:0.9rem">
                       {% if name and details %}
-                      {% if details.layers.forensics_check.status != 'Safe' %}
+                      {% if details.layers.forensics_check is defined and details.layers.forensics_check.status != 'Safe' %}
                       <li class="mb-2 text-warning"><i class='bx bx-search-alt'></i> <strong>Forensics:</strong>
                         {{details.layers.forensics_check.message}}</li>
                       {% endif %}
-                      {% if details.layers.layer2.status != 'Safe' %}
+                      {% if details.layers.layer2 is defined and details.layers.layer2.status != 'Safe' %}
                       <li class="mb-2 text-warning"><i class='bx bx-globe'></i> <strong>Domain:</strong>
                         {{details.layers.layer2.message}}</li>
                       {% endif %}
-                      {% if details.layers.layer3.status != 'Safe' %}
+                      {% if details.layers.layer3 is defined and details.layers.layer3.status != 'Safe' %}
                       <li class="mb-2 text-warning"><i class='bx bx-lock-open-alt'></i> <strong>SSL:</strong>
                         {{details.layers.layer3.message}}</li>
                       {% endif %}
-                      {% if details.layers.layer5.status != 'Safe' %}
+                      {% if details.layers.layer5 is defined and details.layers.layer5.status != 'Safe' %}
                       <li class="mb-2 text-warning"><i class='bx bx-radar'></i> <strong>Behavior:</strong>
                         {{details.layers.layer5.message}}</li>
                       {% endif %}
-                      {% if details.layers.layer4.status == 'Phishing' %}
+                      {% if details.layers.layer4 is defined and details.layers.layer4.status == 'Phishing' %}
                       <li class="mb-2 text-danger"><i class='bx bx-brain'></i> <strong>AI Detection:</strong> High
                         confidence phishing pattern detected.</li>
                       {% endif %}
@@ -608,7 +608,7 @@
                 <div class="cta-section mt-4">
                   <!-- Sandbox CTA: visible in the result card, upgraded when sandbox finishes -->
                   <div class="primary-cta-wrapper mb-3" {% if not name %}style="display:none" {% endif %}>
-                    {% if name and details and details.layers.get('sandbox') and details.layers.sandbox.success %}
+                    {% if name and details and 'sandbox' in details.layers and details.layers.sandbox.success %}
                     <a href="{{ url_for('sandbox_results', scan_id=details.layers.sandbox.scan_id) }}"
                       class="btn-sandbox-primary">
                       <span>View Sandbox Analysis</span>

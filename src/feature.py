@@ -12,8 +12,7 @@ import time
 from dateutil.parser import parse as date_parse
 from urllib.parse import urlparse, ParseResult
 from typing import Optional, Any
-
-from urllib3.util import url
+from googlesearch import search
 
 
 def sanitize_url(input_url):
@@ -686,7 +685,7 @@ class FeatureExtraction:
             )
 
             global_rank = int(
-                re.findall(r"Global Rank: ([0-9]+)", rank_checker_response.text)[0]
+                re.findall(r"Global Rank: ([0-9]+)", prank_checker_response.text)[0]
             )
             if global_rank > 0 and global_rank < 100000:
                 return 1
@@ -708,6 +707,8 @@ class FeatureExtraction:
     # 29. LinksPointingToPage
     def LinksPointingToPage(self):
         try:
+            if not self.response:
+                return -1
             number_of_links = len(re.findall(r"<a href=", self.response.text))
             if number_of_links == 0:
                 return 1
@@ -723,7 +724,7 @@ class FeatureExtraction:
         try:
             url_match = re.search(
                 r"at\.ua|usa\.cc|baltazarpresentes\.com\.br|pe\.hu|esy\.es|hol\.es|sweddy\.com|myjino\.ru|96\.lt|ow\.ly",
-                url,
+                self.url,
             )
             ip_address = socket.gethostbyname(self.domain)
             ip_match = re.search(
