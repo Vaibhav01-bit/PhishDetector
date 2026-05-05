@@ -34,7 +34,7 @@ if %errorlevel% neq 0 (
 
 echo.
 echo [3/5] Enabling required APIs...
-gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
+gcloud services enable run.googleapis.com cloudbuild.googleapis.com containerregistry.googleapis.com
 echo APIs enabled.
 
 echo.
@@ -43,13 +43,24 @@ for /f "delims=" %%i in ('python -c "import secrets; print(secrets.token_hex(24)
 echo Secret key generated.
 
 echo.
-echo [5/5] Deploying to Cloud Run...
+echo [5/5] Building and deploying to Cloud Run...
 echo This will take 5-10 minutes for the first build (Playwright + Chromium)...
 echo.
-gcloud run deploy phish-detector ^
-  --source . ^
+
+echo --- Building Docker image via Cloud Build ---
+gcloud builds submit --tag gcr.io/%PROJECT_ID%/phishdetector --region asia-south1
+if %errorlevel% neq 0 (
+    echo ERROR: Cloud Build failed.
+    pause
+    exit /b 1
+)
+
+echo.
+echo --- Deploying image to Cloud Run ---
+gcloud run deploy phishdetector ^
+  --image gcr.io/%PROJECT_ID%/phishdetector ^
+  --region asia-south1 ^
   --platform managed ^
-  --region us-central1 ^
   --allow-unauthenticated ^
   --memory 2Gi ^
   --timeout 300 ^
@@ -62,10 +73,11 @@ if %errorlevel% equ 0 (
     echo ============================================
     echo.
     echo To get your URL, run:
-    echo   gcloud run services describe phish-detector --region us-central1 --format="value(status.url)"
+    echo   gcloud run services describe phishdetector --region asia-south1 --format="value(status.url)"
     echo.
     echo To update after code changes:
-    echo   gcloud run deploy phish-detector --source . --platform managed --region us-central1 --memory 2Gi --timeout 300
+    echo   gcloud builds submit --tag gcr.io/%%PROJECT_ID%%/phishdetector --region asia-south1
+    echo   gcloud run deploy phishdetector --image gcr.io/%%PROJECT_ID%%/phishdetector --region asia-south1 --memory 2Gi --timeout 300
     echo.
 ) else (
     echo.
