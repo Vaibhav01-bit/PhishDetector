@@ -62,13 +62,16 @@ class PhishingDetectionPipeline:
 
         self._fast_results = InMemoryStatusStore()
         self._sandbox_status = InMemoryStatusStore()
-        self._sandbox_executor = ThreadPoolExecutor(
-            max_workers=max(2, min(4, os.cpu_count() or 2)),
-            thread_name_prefix="sandbox-worker",
-        )
-        atexit.register(self._shutdown_sandbox_resources)
-        if self.sandbox:
+
+        if enable_sandbox:
+            self._sandbox_executor = ThreadPoolExecutor(
+                max_workers=max(2, min(4, os.cpu_count() or 2)),
+                thread_name_prefix="sandbox-worker",
+            )
+            atexit.register(self._shutdown_sandbox_resources)
             self._prewarm_sandbox_workers()
+        else:
+            self._sandbox_executor = None
 
     def analyze_fast(self, url):
         """
@@ -165,6 +168,9 @@ class PhishingDetectionPipeline:
         ALL work happens off the request thread — never blocks the HTTP response.
         NO DATA IS STORED - all data is in-memory only.
         """
+        if not self.sandbox or not self._sandbox_executor:
+            return  # Silently skip in serverless environments
+
         fast_data = self._fast_results.get(scan_id)
         if fast_data:
             layers_snapshot = fast_data.get("layers", {})
@@ -356,10 +362,11 @@ class PhishingDetectionPipeline:
 
     def _shutdown_sandbox_resources(self):
         """Allow the process to exit cleanly while reusing browser workers during runtime."""
-        try:
-            self._sandbox_executor.shutdown(wait=False, cancel_futures=True)
-        except Exception:
-            pass
+        if self._sandbox_executor:
+            try:
+                self._sandbox_executor.shutdown(wait=False, cancel_futures=True)
+            except Exception:
+                pass
         if self.sandbox:
             try:
                 self.sandbox.close()
@@ -368,6 +375,8 @@ class PhishingDetectionPipeline:
 
     def _prewarm_sandbox_workers(self):
         """Warm Playwright runtimes in the background so the first scan returns sooner."""
+        if not self._sandbox_executor:
+            return
         for _ in range(getattr(self._sandbox_executor, "_max_workers", 0)):
             future = self._sandbox_executor.submit(self._warm_single_sandbox_worker)
             future.add_done_callback(self._consume_background_exception)

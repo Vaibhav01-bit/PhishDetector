@@ -20,7 +20,9 @@ warnings.filterwarnings("ignore")
 from src.pipeline.manager import PhishingDetectionPipeline, SAFE, WARNING, PHISHING
 
 # Initialize the pipeline
-pipeline = PhishingDetectionPipeline()
+# Disable sandbox in serverless environments (Vercel, AWS Lambda, etc.)
+enable_sandbox = os.getenv("VERCEL_DEPLOYMENT") != "true"
+pipeline = PhishingDetectionPipeline(enable_sandbox=enable_sandbox)
 
 app = Flask(__name__)
 
@@ -28,7 +30,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Configuration from environment variables
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", os.urandom(24))
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY") or os.getenv("FLASK_SECRET_KEY", "change-me-in-production")
 app.config["TELEGRAM_BOT_TOKEN"] = os.getenv("TELEGRAM_BOT_TOKEN")
 app.config["TELEGRAM_CHAT_ID"] = os.getenv("TELEGRAM_CHAT_ID")
 
@@ -527,4 +529,5 @@ def api_scan_qr():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    debug_mode = os.getenv("FLASK_ENV") == "development"
+    app.run(debug=debug_mode)

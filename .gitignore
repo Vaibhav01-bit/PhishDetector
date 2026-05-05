@@ -58,3 +58,8 @@ credentials.json
 nul
 venv_backup/
 Logs/
+
+# Vercel
+.vercel/
+.vercel_build_output/
+api/__pycache__/
