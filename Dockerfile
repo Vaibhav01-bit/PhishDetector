@@ -18,6 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libatspi2.0-0 libcups2 libcurl4 \
     # pyzbar dependencies
     libzbar0 \
+    # Fonts for Playwright/Chromium
+    fonts-unifont fonts-ubuntu \
     # whois dependencies
     whois \
     # Build tools
@@ -31,7 +33,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Install Playwright and download Chromium browser
-RUN playwright install --with-deps chromium
+RUN playwright install chromium
 
 # Copy application code
 COPY . /app/
