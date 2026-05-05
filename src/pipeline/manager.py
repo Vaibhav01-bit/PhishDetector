@@ -11,7 +11,10 @@ from .layers import (
     PHISHING,
     INVALID,
 )
-from .sandbox import SandboxAnalyzer
+try:
+    from .sandbox import SandboxAnalyzer
+except ImportError:
+    SandboxAnalyzer = None  # type: ignore
 from .forensics import ForensicAnalyzer
 from .sandbox_utils import generate_scan_id
 import os
@@ -48,7 +51,7 @@ class InMemoryStatusStore:
 
 
 class PhishingDetectionPipeline:
-    sandbox: Optional[SandboxAnalyzer]
+    sandbox: Optional["SandboxAnalyzer"]  # type: ignore
 
     def __init__(self, enable_sandbox=True):
         self.forensics = ForensicAnalyzer()
@@ -58,7 +61,9 @@ class PhishingDetectionPipeline:
         self.l3 = Layer3_SSL()
         self.l4 = Layer4_ML_Model()
         self.l5 = Layer5_Behavioral()
-        self.sandbox = SandboxAnalyzer() if enable_sandbox else None
+        self.sandbox = None
+        if enable_sandbox and SandboxAnalyzer is not None:
+            self.sandbox = SandboxAnalyzer()
 
         self._fast_results = InMemoryStatusStore()
         self._sandbox_status = InMemoryStatusStore()

@@ -13,7 +13,14 @@ from io import BytesIO
 from urllib.parse import urlparse
 
 from PIL import Image as PILImage
-from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+
+try:
+    from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+    PLAYWRIGHT_AVAILABLE = True
+except ImportError:
+    PLAYWRIGHT_AVAILABLE = False
+    sync_playwright = None  # type: ignore
+    PlaywrightTimeout = TimeoutError  # type: ignore
 from .sandbox_utils import (
     is_private_ip,
     normalize_url,
