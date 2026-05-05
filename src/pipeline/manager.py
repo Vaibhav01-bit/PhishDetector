@@ -382,9 +382,16 @@ class PhishingDetectionPipeline:
         """Warm Playwright runtimes in the background so the first scan returns sooner."""
         if not self._sandbox_executor:
             return
-        for _ in range(getattr(self._sandbox_executor, "_max_workers", 0)):
-            future = self._sandbox_executor.submit(self._warm_single_sandbox_worker)
-            future.add_done_callback(self._consume_background_exception)
+        # Run prewarm in a fire-and-forget thread so it doesn't block Flask startup
+        def _prewarm():
+            import time
+            time.sleep(2)  # Let Flask start first
+            for _ in range(getattr(self._sandbox_executor, "_max_workers", 0)):
+                try:
+                    self._warm_single_sandbox_worker()
+                except Exception:
+                    pass
+        threading.Thread(target=_prewarm, daemon=True).start()
 
     def _warm_single_sandbox_worker(self):
         if not self.sandbox:

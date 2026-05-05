@@ -41,4 +41,4 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Run with gunicorn for production
-CMD gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 120 --access-logfile - --error-logfile - app:app
+CMD gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 300 --access-logfile - --error-logfile - app:app
