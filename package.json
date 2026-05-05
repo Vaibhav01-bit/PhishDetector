@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "node scripts/build-static.mjs"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^3.1.10",
+    "netlify": "^26.0.1"
+  }
+}

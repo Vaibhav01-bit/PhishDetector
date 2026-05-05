@@ -20,8 +20,8 @@ warnings.filterwarnings("ignore")
 from src.pipeline.manager import PhishingDetectionPipeline, SAFE, WARNING, PHISHING
 
 # Initialize the pipeline
-# Disable sandbox in serverless environments (Vercel, AWS Lambda, etc.)
-enable_sandbox = os.getenv("VERCEL_DEPLOYMENT") != "true"
+# Sandbox works on Cloud Run; disable only when explicitly set
+enable_sandbox = os.getenv("DISABLE_SANDBOX") != "true"
 pipeline = PhishingDetectionPipeline(enable_sandbox=enable_sandbox)
 
 app = Flask(__name__)
@@ -529,5 +529,6 @@ def api_scan_qr():
 
 
 if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8080))
     debug_mode = os.getenv("FLASK_ENV") == "development"
-    app.run(debug=debug_mode)
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)

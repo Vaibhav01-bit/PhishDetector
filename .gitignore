@@ -63,3 +63,7 @@ Logs/
 .vercel/
 .vercel_build_output/
 api/__pycache__/
+
+# Netlify / Node
+.netlify/
+node_modules/
